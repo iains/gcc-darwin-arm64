@@ -23799,6 +23799,8 @@ _ACEOF
 
 
 # Check if we have .[us]leb128, and support symbol arithmetic with it.
+# Older versions of cctools assembler have a bug on values with the MSB
+# set.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking assembler for .sleb128 and .uleb128" >&5
 $as_echo_n "checking assembler for .sleb128 and .uleb128... " >&6; }
 if ${gcc_cv_as_leb128+:} false; then :
@@ -23816,6 +23818,7 @@ fi
 L1:
 	.uleb128 1280
 	.sleb128 -1010
+	.uleb128 0xffffffffffffffff
 L2:' > conftest.s
     if { ac_try='$gcc_cv_as $gcc_cv_as_flags  -o conftest.o conftest.s >&5'
   { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
@@ -23839,6 +23842,12 @@ L2:' > conftest.s
     then :
     else gcc_cv_as_leb128=yes
     fi
+  elif echo "$as_ver" | grep LLVM > /dev/null; then
+    # Some versions of Darwin's assembler report 'LLVM', these support leb128.
+    gcc_cv_as_leb128=yes
+  elif echo "$as_ver" | grep clang > /dev/null; then
+    # Likewise those that report 'clang'.
+    gcc_cv_as_leb128=yes
   fi
     else
       echo "configure: failed program was" >&5

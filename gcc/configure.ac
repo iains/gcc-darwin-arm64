@@ -3002,6 +3002,8 @@ AC_MSG_RESULT($gcc_cv_ld_ro_rw_mix)
 gcc_AC_INITFINI_ARRAY
 
 # Check if we have .[us]leb128, and support symbol arithmetic with it.
+# Older versions of cctools assembler have a bug on values with the MSB
+# set.
 gcc_GAS_CHECK_FEATURE([.sleb128 and .uleb128], gcc_cv_as_leb128,
   [elf,2,11,0],,
 [	.data
@@ -3009,6 +3011,7 @@ gcc_GAS_CHECK_FEATURE([.sleb128 and .uleb128], gcc_cv_as_leb128,
 L1:
 	.uleb128 1280
 	.sleb128 -1010
+	.uleb128 0xffffffffffffffff
 L2:],
 [[# GAS versions before 2.11 do not support uleb128,
   # despite appearing to.
@@ -3025,6 +3028,12 @@ L2:],
     then :
     else gcc_cv_as_leb128=yes
     fi
+  elif echo "$as_ver" | grep LLVM > /dev/null; then
+    # Some versions of Darwin's assembler report 'LLVM', these support leb128.
+    gcc_cv_as_leb128=yes
+  elif echo "$as_ver" | grep clang > /dev/null; then
+    # Likewise those that report 'clang'.
+    gcc_cv_as_leb128=yes
   fi]],
   [AC_DEFINE(HAVE_AS_LEB128, 1,
     [Define if your assembler supports .sleb128 and .uleb128.])],
