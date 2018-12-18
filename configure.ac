@@ -1770,6 +1770,11 @@ AC_ARG_WITH(boot-ldflags,
  if test "$poststage1_libs" = ""; then
    poststage1_ldflags="-static-libstdc++ -static-libgcc"
  fi])
+if test "x$enable_darwin_at_rpath" = "xyes"; then
+  if test "x$host_shared" != "xyes"; then 
+    poststage1_ldflags="$poststage1_ldflags -nodefaultrpath"
+  fi
+fi 
 AC_SUBST(poststage1_ldflags)
 
 # GCC GRAPHITE dependency isl.
