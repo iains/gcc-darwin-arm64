@@ -237,9 +237,9 @@ nodefaultexport
 Driver RejectNegative
 Do not add a default symbol exports to modules or dynamic libraries.
 
-nodefaultrpath
+nodefaultrpaths
 Driver RejectNegative
-Do not add a default rpath to executables, modules or dynamic libraries.
+Do not add default run paths (for the compiler library directories) to executables, modules or dynamic libraries.
 
 nofixprebinding
 Driver RejectNegative

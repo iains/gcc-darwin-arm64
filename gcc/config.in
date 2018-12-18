@@ -2208,6 +2208,12 @@
 #endif
 
 
+/* Define which stat syscall is able to handle 64bit indodes. */
+#ifndef USED_FOR_TARGET
+#undef HOST_STAT_FOR_64BIT_INODES
+#endif
+
+
 /* Define as const if the declaration of iconv() needs const. */
 #ifndef USED_FOR_TARGET
 #undef ICONV_CONST

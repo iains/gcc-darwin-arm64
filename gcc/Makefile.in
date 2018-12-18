@@ -1942,9 +1942,12 @@ cs-tconfig.h: Makefile
 	$(SHELL) $(srcdir)/mkconfig.sh tconfig.h
 
 cs-tm.h: Makefile
-	TARGET_CPU_DEFAULT="$(target_cpu_default)" \
-	HEADERS="$(tm_include_list)" DEFINES="$(tm_defines)" \
-	$(SHELL) $(srcdir)/mkconfig.sh tm.h
+@ENABLE_DARWIN_AT_RPATH_FALSE@	TARGET_CPU_DEFAULT="$(target_cpu_default)" \
+@ENABLE_DARWIN_AT_RPATH_FALSE@	HEADERS="$(tm_include_list)" DEFINES="$(tm_defines)" \
+@ENABLE_DARWIN_AT_RPATH_FALSE@	$(SHELL) $(srcdir)/mkconfig.sh tm.h
+@ENABLE_DARWIN_AT_RPATH_TRUE@	TARGET_CPU_DEFAULT="$(target_cpu_default)" \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	HEADERS="$(tm_include_list)" DEFINES="$(tm_defines) DARWIN_AT_RPATH=1" \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	$(SHELL) $(srcdir)/mkconfig.sh tm.h
 
 cs-tm_p.h: Makefile
 	TARGET_CPU_DEFAULT="" \
