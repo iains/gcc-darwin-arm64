@@ -190,6 +190,8 @@ dnl AM_DISABLE_SHARED
 dnl When we start using libtool:
 dnl AM_PROG_LIBTOOL
 
+AM_CONDITIONAL([ENABLE_DARWIN_AT_RPATH], [test x$enable_darwin_at_rpath = xyes])
+
 dnl When we start using automake:
 dnl AM_CONFIG_HEADER(config.h:config.in)
 AC_CONFIG_HEADER(config.h:config.in)
