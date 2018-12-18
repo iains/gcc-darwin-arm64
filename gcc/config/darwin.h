@@ -196,6 +196,14 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_NOCOMPACT_UNWIND \
 " %:version-compare(>= 10.6 mmacosx-version-min= -no_compact_unwind) "
 
+/* If we enabled default embedded rpaths, then add them.  */
+#ifdef USE_DEFAULT_RPATH
+#define DARWIN_DEFAULT_RPATH \
+"%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpath:%(darwin_rpaths)}}}} "
+#else
+#define DARWIN_DEFAULT_RPATH "%<nodefaultrpath "
+#endif
+
 /* In Darwin linker specs we can put -lcrt0.o and ld will search the library
    path for crt0.o or -lcrtx.a and it will search for for libcrtx.a.  As for
    other ports, we can also put xxx.{o,a}%s and get the appropriate complete
@@ -239,7 +247,7 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
-    "%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpath:%(darwin_rpaths)}}}} " \
+    DARWIN_DEFAULT_RPATH \
     "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
 
 /* Spec that controls whether the debug linker is run automatically for
@@ -462,12 +470,15 @@ extern GTY(()) int darwin_ms_struct;
 "%{!static:%:version-compare(< 10.6 mmacosx-version-min= -lbundle1.o)	\
 	   %{fgnu-tm: -lcrttms.o}}"
 
-/* FIXME: it would be great to have a version-compare that accepts multiple
-   arguments.  */
+#ifdef USE_DEFAULT_RPATH
+/* Find dylibs in the same dir as the exe and in the compiler's lib dirs.  */
 #define DARWIN_RPATH_SPEC \
   "%:version-compare(>= 10.5 mmacosx-version-min= -rpath) \
    %:version-compare(>= 10.5 mmacosx-version-min= @loader_path) \
    %P "
+#else
+#define DARWIN_RPATH_SPEC ""
+#endif
 
 #ifdef HAVE_AS_MMACOSX_VERSION_MIN_OPTION
 /* Emit macosx version (but only major).  */
