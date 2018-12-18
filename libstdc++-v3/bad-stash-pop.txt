@@ -1,0 +1,802 @@
+diff --git a/gcc/cp/g++spec.c b/gcc/cp/g++spec.c
+index 0ab63bcd211..b80d41c30b1 100644
+--- a/gcc/cp/g++spec.c
++++ b/gcc/cp/g++spec.c
+@@ -348,6 +348,10 @@ lang_specific_driver (struct cl_decoded_option **in_decoded_options,
+ 		       CL_DRIVER, &new_decoded_options[j]);
+       added_libraries++;
+       j++;
++      generate_option (OPT_l, "c++abi", 1,
++		       CL_DRIVER, &new_decoded_options[j]);
++      added_libraries++;
++      j++;
+       /* Add target-dependent static library, if necessary.  */
+       if ((static_link || library > 1) && LIBSTDCXX_STATIC != NULL)
+ 	{
+diff --git a/libstdc++-v3/Makefile.am b/libstdc++-v3/Makefile.am
+index da021ec7074..f35734aa146 100644
+--- a/libstdc++-v3/Makefile.am
++++ b/libstdc++-v3/Makefile.am
+@@ -28,7 +28,8 @@ if GLIBCXX_HOSTED
+ endif
+ 
+ ## Keep this list sync'd with acinclude.m4:GLIBCXX_CONFIGURE.
+-SUBDIRS = include libsupc++ $(hosted_source)
++#SUBDIRS = include libsupc++ $(hosted_source)
++SUBDIRS = include $(hosted_source)
+ 
+ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
+ 
+diff --git a/libstdc++-v3/Makefile.in b/libstdc++-v3/Makefile.in
+index 8f11aaf2810..29bca4ea8aa 100644
+--- a/libstdc++-v3/Makefile.in
++++ b/libstdc++-v3/Makefile.in
+@@ -180,7 +180,7 @@ am__define_uniq_tagged_files = \
+ ETAGS = etags
+ CTAGS = ctags
+ CSCOPE = cscope
+-DIST_SUBDIRS = include libsupc++ src doc po testsuite python
++DIST_SUBDIRS = include src doc po testsuite python
+ ABI_TWEAKS_SRCDIR = @ABI_TWEAKS_SRCDIR@
+ ACLOCAL = @ACLOCAL@
+ ALLOCATOR_H = @ALLOCATOR_H@
+@@ -408,7 +408,9 @@ WARN_CXXFLAGS = \
+ # -I/-D flags to pass when compiling.
+ AM_CPPFLAGS = $(GLIBCXX_INCLUDES) $(CPPFLAGS)
+ @GLIBCXX_HOSTED_TRUE@hosted_source = src doc po testsuite python
+-SUBDIRS = include libsupc++ $(hosted_source)
++
++#SUBDIRS = include libsupc++ $(hosted_source)
++SUBDIRS = include $(hosted_source)
+ ACLOCAL_AMFLAGS = -I . -I .. -I ../config
+ @BUILD_XML_FALSE@STAMP_XML = 
+ 
+diff --git a/libstdc++-v3/acinclude.m4 b/libstdc++-v3/acinclude.m4
+index ee5e0336f2c..1edd1ddeffc 100644
+--- a/libstdc++-v3/acinclude.m4
++++ b/libstdc++-v3/acinclude.m4
+@@ -49,7 +49,8 @@ AC_DEFUN([GLIBCXX_CONFIGURE], [
+   # Keep these sync'd with the list in Makefile.am.  The first provides an
+   # expandable list at autoconf time; the second provides an expandable list
+   # (i.e., shell variable) at configure time.
+-  m4_define([glibcxx_SUBDIRS],[include libsupc++ src src/c++98 src/c++11 src/c++17 src/filesystem doc po testsuite python])
++  #m4_define([glibcxx_SUBDIRS],[include libsupc++ src src/c++98 src/c++11 src/c++17 src/filesystem doc po testsuite python])
++  m4_define([glibcxx_SUBDIRS],[include src src/c++98 src/c++11 src/c++17 src/filesystem doc po testsuite python])
+   SUBDIRS='glibcxx_SUBDIRS'
+ 
+   # These need to be absolute paths, yet at the same time need to
+@@ -704,7 +705,9 @@ AC_DEFUN([GLIBCXX_EXPORT_INCLUDES], [
+   GLIBCXX_INCLUDES="\
+ -I$glibcxx_builddir/include/$host_alias \
+ -I$glibcxx_builddir/include \
+--I$glibcxx_srcdir/libsupc++"
++-I$glibcxx_srcdir/include/foreign-abi
++# \
++#-I$glibcxx_srcdir/libsupc++"
+ 
+   # For Canadian crosses, pick this up too.
+   if test $CANADIAN = yes; then
+diff --git a/libstdc++-v3/config/locale/generic/time_members.h b/libstdc++-v3/config/locale/generic/time_members.h
+index 8b2d7e9252f..600b2e4c23a 100644
+--- a/libstdc++-v3/config/locale/generic/time_members.h
++++ b/libstdc++-v3/config/locale/generic/time_members.h
+@@ -34,6 +34,8 @@
+ 
+ // Written by Benjamin Kosnik <bkoz@redhat.com>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/configure b/libstdc++-v3/configure
+index 9f9c5a2419a..a6f822eaf14 100755
+--- a/libstdc++-v3/configure
++++ b/libstdc++-v3/configure
+@@ -5412,8 +5412,9 @@ $as_echo "$ac_cv_path_EGREP" >&6; }
+   # Keep these sync'd with the list in Makefile.am.  The first provides an
+   # expandable list at autoconf time; the second provides an expandable list
+   # (i.e., shell variable) at configure time.
++  #m4_define([glibcxx_SUBDIRS],[include libsupc++ src src/c++98 src/c++11 src/c++17 src/filesystem doc po testsuite python])
+ 
+-  SUBDIRS='include libsupc++ src src/c++98 src/c++11 src/c++17 src/filesystem doc po testsuite python'
++  SUBDIRS='include src src/c++98 src/c++11 src/c++17 src/filesystem doc po testsuite python'
+ 
+   # These need to be absolute paths, yet at the same time need to
+   # canonicalize only relative paths, because then amd will not unmount
+@@ -12059,7 +12060,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 12062 "configure"
++#line 12063 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -12165,7 +12166,7 @@ else
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 12168 "configure"
++#line 12169 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -15857,7 +15858,7 @@ $as_echo "$glibcxx_cv_atomic_long_long" >&6; }
+   # Fake what AC_TRY_COMPILE does.
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 15860 "configure"
++#line 15861 "configure"
+ int main()
+ {
+   typedef bool atomic_type;
+@@ -15892,7 +15893,7 @@ $as_echo "$glibcxx_cv_atomic_bool" >&6; }
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 15895 "configure"
++#line 15896 "configure"
+ int main()
+ {
+   typedef short atomic_type;
+@@ -15927,7 +15928,7 @@ $as_echo "$glibcxx_cv_atomic_short" >&6; }
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 15930 "configure"
++#line 15931 "configure"
+ int main()
+ {
+   // NB: _Atomic_word not necessarily int.
+@@ -15963,7 +15964,7 @@ $as_echo "$glibcxx_cv_atomic_int" >&6; }
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 15966 "configure"
++#line 15967 "configure"
+ int main()
+ {
+   typedef long long atomic_type;
+@@ -16116,7 +16117,7 @@ $as_echo "mutex" >&6; }
+   # unnecessary for this test.
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16119 "configure"
++#line 16120 "configure"
+ int main()
+ {
+   _Decimal32 d1;
+@@ -16158,7 +16159,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+   # unnecessary for this test.
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16161 "configure"
++#line 16162 "configure"
+ template<typename T1, typename T2>
+   struct same
+   { typedef T2 type; };
+@@ -16192,7 +16193,7 @@ $as_echo "$enable_int128" >&6; }
+     rm -f conftest*
+ 
+     cat > conftest.$ac_ext << EOF
+-#line 16195 "configure"
++#line 16196 "configure"
+ template<typename T1, typename T2>
+   struct same
+   { typedef T2 type; };
+@@ -77977,7 +77978,9 @@ $as_echo "$gxx_include_dir" >&6; }
+   GLIBCXX_INCLUDES="\
+ -I$glibcxx_builddir/include/$host_alias \
+ -I$glibcxx_builddir/include \
+--I$glibcxx_srcdir/libsupc++"
++-I$glibcxx_srcdir/include/foreign-abi
++# \
++#-I$glibcxx_srcdir/libsupc++"
+ 
+   # For Canadian crosses, pick this up too.
+   if test $CANADIAN = yes; then
+@@ -78036,7 +78039,7 @@ ac_config_files="$ac_config_files doc/xsl/customization.xsl"
+ # append it here.  Only modify Makefiles that have just been created.
+ #
+ # Also, get rid of this simulated-VPATH thing that automake does.
+-ac_config_files="$ac_config_files include/Makefile libsupc++/Makefile src/Makefile src/c++98/Makefile src/c++11/Makefile src/c++17/Makefile src/filesystem/Makefile doc/Makefile po/Makefile testsuite/Makefile python/Makefile"
++ac_config_files="$ac_config_files include/Makefile src/Makefile src/c++98/Makefile src/c++11/Makefile src/c++17/Makefile src/filesystem/Makefile doc/Makefile po/Makefile testsuite/Makefile python/Makefile"
+ 
+ 
+ ac_config_commands="$ac_config_commands generate-headers"
+@@ -79287,7 +79290,6 @@ do
+     "scripts/extract_symvers") CONFIG_FILES="$CONFIG_FILES scripts/extract_symvers" ;;
+     "doc/xsl/customization.xsl") CONFIG_FILES="$CONFIG_FILES doc/xsl/customization.xsl" ;;
+     "include/Makefile") CONFIG_FILES="$CONFIG_FILES include/Makefile" ;;
+-    "libsupc++/Makefile") CONFIG_FILES="$CONFIG_FILES libsupc++/Makefile" ;;
+     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
+     "src/c++98/Makefile") CONFIG_FILES="$CONFIG_FILES src/c++98/Makefile" ;;
+     "src/c++11/Makefile") CONFIG_FILES="$CONFIG_FILES src/c++11/Makefile" ;;
+@@ -81087,17 +81089,6 @@ fi
+     "scripts/extract_symvers":F) chmod +x scripts/extract_symvers ;;
+     "include/Makefile":F) cat > vpsed$$ << \_EOF
+ s!`test -f '$<' || echo '$(srcdir)/'`!!
+-_EOF
+-   sed -f vpsed$$ $ac_file > tmp$$
+-   mv tmp$$ $ac_file
+-   rm vpsed$$
+-   echo 'MULTISUBDIR =' >> $ac_file
+-   ml_norecursion=yes
+-   . ${multi_basedir}/config-ml.in
+-   { ml_norecursion=; unset ml_norecursion;}
+- ;;
+-    "libsupc++/Makefile":F) cat > vpsed$$ << \_EOF
+-s!`test -f '$<' || echo '$(srcdir)/'`!!
+ _EOF
+    sed -f vpsed$$ $ac_file > tmp$$
+    mv tmp$$ $ac_file
+diff --git a/libstdc++-v3/include/Makefile.am b/libstdc++-v3/include/Makefile.am
+index 80aeb3f8959..cf7479fcf34 100644
+--- a/libstdc++-v3/include/Makefile.am
++++ b/libstdc++-v3/include/Makefile.am
+@@ -1015,11 +1015,13 @@ endif
+ # List of all timestamp files.  By keeping only one copy of this list, both
+ # CLEANFILES and all-local are kept up-to-date.
+ allstamped = \
+-	stamp-std stamp-bits stamp-bits-sup stamp-pstl stamp-c_base stamp-c_compatibility \
++	stamp-std stamp-bits stamp-pstl stamp-c_base stamp-c_compatibility \
+ 	stamp-backward stamp-ext stamp-pb stamp-tr1 stamp-tr2 stamp-decimal \
+ 	stamp-experimental stamp-experimental-bits stamp-debug stamp-parallel \
+ 	stamp-host
+ 
++#stamp-bits-sup
++
+ # List of all files that are created by explicit building, editing, or
+ # catenation.
+ allcreated = \
+diff --git a/libstdc++-v3/include/Makefile.in b/libstdc++-v3/include/Makefile.in
+index eb437ad8d8d..ac80010226f 100644
+--- a/libstdc++-v3/include/Makefile.in
++++ b/libstdc++-v3/include/Makefile.in
+@@ -1347,12 +1347,14 @@ PCHFLAGS = -x c++-header -nostdinc++ $(CXXFLAGS) $(VTV_PCH_CXXFLAGS)
+ # List of all timestamp files.  By keeping only one copy of this list, both
+ # CLEANFILES and all-local are kept up-to-date.
+ allstamped = \
+-	stamp-std stamp-bits stamp-bits-sup stamp-pstl stamp-c_base stamp-c_compatibility \
++	stamp-std stamp-bits stamp-pstl stamp-c_base stamp-c_compatibility \
+ 	stamp-backward stamp-ext stamp-pb stamp-tr1 stamp-tr2 stamp-decimal \
+ 	stamp-experimental stamp-experimental-bits stamp-debug stamp-parallel \
+ 	stamp-host
+ 
+ 
++#stamp-bits-sup
++
+ # List of all files that are created by explicit building, editing, or
+ # catenation.
+ allcreated = \
+diff --git a/libstdc++-v3/include/bits/atomic_base.h b/libstdc++-v3/include/bits/atomic_base.h
+index 87fe0bd6000..15735eece2e 100644
+--- a/libstdc++-v3/include/bits/atomic_base.h
++++ b/libstdc++-v3/include/bits/atomic_base.h
+@@ -34,7 +34,7 @@
+ 
+ #include <bits/c++config.h>
+ #include <stdint.h>
+-#include <bits/atomic_lockfree_defines.h>
++//#include <bits/atomic_lockfree_defines.h>
+ #include <bits/move.h>
+ 
+ #ifndef _GLIBCXX_ALWAYS_INLINE
+diff --git a/libstdc++-v3/include/bits/basic_ios.h b/libstdc++-v3/include/bits/basic_ios.h
+index 2771756bbc9..65a8b7e3656 100644
+--- a/libstdc++-v3/include/bits/basic_ios.h
++++ b/libstdc++-v3/include/bits/basic_ios.h
+@@ -38,6 +38,8 @@
+ #include <bits/streambuf_iterator.h>
+ #include <bits/move.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/basic_string.tcc b/libstdc++-v3/include/bits/basic_string.tcc
+index e78bb2c14b3..6d0c89f8f7d 100644
+--- a/libstdc++-v3/include/bits/basic_string.tcc
++++ b/libstdc++-v3/include/bits/basic_string.tcc
+@@ -41,7 +41,10 @@
+ 
+ #pragma GCC system_header
+ 
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
++
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/bits/deque.tcc b/libstdc++-v3/include/bits/deque.tcc
+index b4943e8ea77..6c7c2e61702 100644
+--- a/libstdc++-v3/include/bits/deque.tcc
++++ b/libstdc++-v3/include/bits/deque.tcc
+@@ -58,6 +58,8 @@
+ 
+ #include <bits/stl_algobase.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/forward_list.h b/libstdc++-v3/include/bits/forward_list.h
+index b926d45f205..58564ae6f42 100644
+--- a/libstdc++-v3/include/bits/forward_list.h
++++ b/libstdc++-v3/include/bits/forward_list.h
+@@ -41,6 +41,8 @@
+ #include <ext/alloc_traits.h>
+ #include <ext/aligned_buffer.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/fstream.tcc b/libstdc++-v3/include/bits/fstream.tcc
+index 81d00c4d318..f84bdbdb02c 100644
+--- a/libstdc++-v3/include/bits/fstream.tcc
++++ b/libstdc++-v3/include/bits/fstream.tcc
+@@ -36,7 +36,10 @@
+ 
+ #pragma GCC system_header
+ 
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
++
+ #include <bits/move.h>   // for swap
+ #include <cerrno>
+ 
+diff --git a/libstdc++-v3/include/bits/functexcept.h b/libstdc++-v3/include/bits/functexcept.h
+index 52eef2bb2c6..0b395cec379 100644
+--- a/libstdc++-v3/include/bits/functexcept.h
++++ b/libstdc++-v3/include/bits/functexcept.h
+@@ -37,7 +37,9 @@
+ #define _FUNCTEXCEPT_H 1
+ 
+ #include <bits/c++config.h>
+-#include <bits/exception_defines.h>
++//#include <bits/exception_defines.h>
++
++#include <exception_defines.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/bits/functional_hash.h b/libstdc++-v3/include/bits/functional_hash.h
+index 6ca79154fe0..4f16ea4131f 100644
+--- a/libstdc++-v3/include/bits/functional_hash.h
++++ b/libstdc++-v3/include/bits/functional_hash.h
+@@ -32,7 +32,8 @@
+ 
+ #pragma GCC system_header
+ 
+-#include <bits/hash_bytes.h>
++//#include <bits/hash_bytes.h>
++#include <hash_bytes.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/bits/hashtable.h b/libstdc++-v3/include/bits/hashtable.h
+index b00319a668b..c60ee74c0c9 100644
+--- a/libstdc++-v3/include/bits/hashtable.h
++++ b/libstdc++-v3/include/bits/hashtable.h
+@@ -32,6 +32,7 @@
+ 
+ #pragma GCC system_header
+ 
++#include <exception_defines.h>
+ #include <bits/hashtable_policy.h>
+ #if __cplusplus > 201402L
+ # include <bits/node_handle.h>
+diff --git a/libstdc++-v3/include/bits/istream.tcc b/libstdc++-v3/include/bits/istream.tcc
+index c82da56b9f9..19e35cca6ee 100644
+--- a/libstdc++-v3/include/bits/istream.tcc
++++ b/libstdc++-v3/include/bits/istream.tcc
+@@ -36,7 +36,10 @@
+ 
+ #pragma GCC system_header
+ 
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
++
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/bits/list.tcc b/libstdc++-v3/include/bits/list.tcc
+index ce9e983c539..07c43ddff99 100644
+--- a/libstdc++-v3/include/bits/list.tcc
++++ b/libstdc++-v3/include/bits/list.tcc
+@@ -56,6 +56,8 @@
+ #ifndef _LIST_TCC
+ #define _LIST_TCC 1
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/locale_classes.h b/libstdc++-v3/include/bits/locale_classes.h
+index 11bdddd3dcd..97f4f5961a3 100644
+--- a/libstdc++-v3/include/bits/locale_classes.h
++++ b/libstdc++-v3/include/bits/locale_classes.h
+@@ -40,6 +40,8 @@
+ #include <string>
+ #include <ext/atomicity.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/locale_classes.tcc b/libstdc++-v3/include/bits/locale_classes.tcc
+index 49df726efd3..7217a45b78d 100644
+--- a/libstdc++-v3/include/bits/locale_classes.tcc
++++ b/libstdc++-v3/include/bits/locale_classes.tcc
+@@ -36,6 +36,8 @@
+ 
+ #pragma GCC system_header
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/locale_facets.h b/libstdc++-v3/include/bits/locale_facets.h
+index 3e0ae8776c9..17cdc390c88 100644
+--- a/libstdc++-v3/include/bits/locale_facets.h
++++ b/libstdc++-v3/include/bits/locale_facets.h
+@@ -47,6 +47,8 @@
+ #include <ext/numeric_traits.h>
+ #include <bits/streambuf_iterator.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/locale_facets_nonio.tcc b/libstdc++-v3/include/bits/locale_facets_nonio.tcc
+index 17b12c92f6c..b8b1b4f26eb 100644
+--- a/libstdc++-v3/include/bits/locale_facets_nonio.tcc
++++ b/libstdc++-v3/include/bits/locale_facets_nonio.tcc
+@@ -32,6 +32,8 @@
+ 
+ #pragma GCC system_header
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/ostream.tcc b/libstdc++-v3/include/bits/ostream.tcc
+index 67348c474ca..3b5091b1089 100644
+--- a/libstdc++-v3/include/bits/ostream.tcc
++++ b/libstdc++-v3/include/bits/ostream.tcc
+@@ -36,7 +36,9 @@
+ 
+ #pragma GCC system_header
+ 
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/bits/ostream_insert.h b/libstdc++-v3/include/bits/ostream_insert.h
+index 89011eaf5a1..63ea43ba01a 100644
+--- a/libstdc++-v3/include/bits/ostream_insert.h
++++ b/libstdc++-v3/include/bits/ostream_insert.h
+@@ -33,7 +33,10 @@
+ #pragma GCC system_header
+ 
+ #include <iosfwd>
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
++
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/bits/shared_ptr_base.h b/libstdc++-v3/include/bits/shared_ptr_base.h
+index c9017ede4cb..3d53c9ad724 100644
+--- a/libstdc++-v3/include/bits/shared_ptr_base.h
++++ b/libstdc++-v3/include/bits/shared_ptr_base.h
+@@ -55,6 +55,8 @@
+ #include <bits/stl_function.h>
+ #include <ext/aligned_buffer.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/stl_deque.h b/libstdc++-v3/include/bits/stl_deque.h
+index c1af637f67b..85159d1f0a8 100644
+--- a/libstdc++-v3/include/bits/stl_deque.h
++++ b/libstdc++-v3/include/bits/stl_deque.h
+@@ -66,6 +66,8 @@
+ 
+ #include <debug/assertions.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/stl_tempbuf.h b/libstdc++-v3/include/bits/stl_tempbuf.h
+index f6f17960472..aac11e45f2f 100644
+--- a/libstdc++-v3/include/bits/stl_tempbuf.h
++++ b/libstdc++-v3/include/bits/stl_tempbuf.h
+@@ -59,6 +59,8 @@
+ #include <bits/stl_algobase.h>
+ #include <bits/stl_construct.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/stl_tree.h b/libstdc++-v3/include/bits/stl_tree.h
+index 9339011e872..4449041cc11 100644
+--- a/libstdc++-v3/include/bits/stl_tree.h
++++ b/libstdc++-v3/include/bits/stl_tree.h
+@@ -72,6 +72,8 @@
+ # include <bits/node_handle.h>
+ #endif
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/stl_uninitialized.h b/libstdc++-v3/include/bits/stl_uninitialized.h
+index 3109a89462d..86074c4804f 100644
+--- a/libstdc++-v3/include/bits/stl_uninitialized.h
++++ b/libstdc++-v3/include/bits/stl_uninitialized.h
+@@ -66,6 +66,8 @@
+ 
+ #include <ext/alloc_traits.h>
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/bits/stl_vector.h b/libstdc++-v3/include/bits/stl_vector.h
+index 14308a37770..455aae9bf10 100644
+--- a/libstdc++-v3/include/bits/stl_vector.h
++++ b/libstdc++-v3/include/bits/stl_vector.h
+@@ -63,6 +63,8 @@
+ #include <initializer_list>
+ #endif
+ 
++#include <exception_defines.h>
++
+ #include <debug/assertions.h>
+ 
+ #if _GLIBCXX_SANITIZE_STD_ALLOCATOR && _GLIBCXX_SANITIZE_VECTOR
+diff --git a/libstdc++-v3/include/bits/streambuf_iterator.h b/libstdc++-v3/include/bits/streambuf_iterator.h
+index d3f1610fc8d..049e9bd059b 100644
+--- a/libstdc++-v3/include/bits/streambuf_iterator.h
++++ b/libstdc++-v3/include/bits/streambuf_iterator.h
+@@ -33,6 +33,7 @@
+ #pragma GCC system_header
+ 
+ #include <streambuf>
++
+ #include <debug/debug.h>
+ 
+ namespace std _GLIBCXX_VISIBILITY(default)
+diff --git a/libstdc++-v3/include/bits/vector.tcc b/libstdc++-v3/include/bits/vector.tcc
+index 27e63388feb..e7f9a3a29a2 100644
+--- a/libstdc++-v3/include/bits/vector.tcc
++++ b/libstdc++-v3/include/bits/vector.tcc
+@@ -56,6 +56,8 @@
+ #ifndef _VECTOR_TCC
+ #define _VECTOR_TCC 1
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/ext/bitmap_allocator.h b/libstdc++-v3/include/ext/bitmap_allocator.h
+index 97b89e14c8c..e5d7767dba1 100644
+--- a/libstdc++-v3/include/ext/bitmap_allocator.h
++++ b/libstdc++-v3/include/ext/bitmap_allocator.h
+@@ -37,6 +37,8 @@
+ #include <ext/concurrence.h>
+ #include <bits/move.h>
+ 
++#include <exception_defines.h>
++
+ /** @brief The constant in the expression below is the alignment
+  * required in bytes.
+  */
+diff --git a/libstdc++-v3/include/ext/pool_allocator.h b/libstdc++-v3/include/ext/pool_allocator.h
+index cb5bbc2cbb1..1a5524b04c5 100644
+--- a/libstdc++-v3/include/ext/pool_allocator.h
++++ b/libstdc++-v3/include/ext/pool_allocator.h
+@@ -53,6 +53,8 @@
+ #include <type_traits>
+ #endif
+ 
++#include <exception_defines.h>
++
+ namespace __gnu_cxx _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/ext/vstring.tcc b/libstdc++-v3/include/ext/vstring.tcc
+index 1233480a05a..fb295a9ef0f 100644
+--- a/libstdc++-v3/include/ext/vstring.tcc
++++ b/libstdc++-v3/include/ext/vstring.tcc
+@@ -32,7 +32,7 @@
+ 
+ #pragma GCC system_header
+ 
+-#include <bits/cxxabi_forced.h>
++#include <cxxabi_forced.h>
+ 
+ namespace __gnu_cxx _GLIBCXX_VISIBILITY(default)
+ {
+diff --git a/libstdc++-v3/include/std/bitset b/libstdc++-v3/include/std/bitset
+index 93296b9e623..0719fe6c9e9 100644
+--- a/libstdc++-v3/include/std/bitset
++++ b/libstdc++-v3/include/std/bitset
+@@ -48,12 +48,15 @@
+ #include <bits/functexcept.h>   // For invalid_argument, out_of_range,
+                                 // overflow_error
+ #include <iosfwd>
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
+ 
+ #if __cplusplus >= 201103L
+ # include <bits/functional_hash.h>
+ #endif
+ 
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
++
+ #define _GLIBCXX_BITSET_BITS_PER_WORD  (__CHAR_BIT__ * __SIZEOF_LONG__)
+ #define _GLIBCXX_BITSET_WORDS(__n) \
+   ((__n) / _GLIBCXX_BITSET_BITS_PER_WORD + \
+diff --git a/libstdc++-v3/include/std/condition_variable b/libstdc++-v3/include/std/condition_variable
+index cc7f99f6921..5ff9d3aad74 100644
+--- a/libstdc++-v3/include/std/condition_variable
++++ b/libstdc++-v3/include/std/condition_variable
+@@ -44,7 +44,10 @@
+ #include <bits/allocator.h>
+ #include <bits/unique_ptr.h>
+ #include <bits/shared_ptr.h>
+-#include <bits/cxxabi_forced.h>
++//#include <bits/cxxabi_forced.h>
++
++#include <exception_defines.h>
++#include <cxxabi_forced.h>
+ 
+ #if __cplusplus > 201703L
+ #define __cpp_lib_jthread 201907L
+diff --git a/libstdc++-v3/include/std/fstream b/libstdc++-v3/include/std/fstream
+index efc99d1e5a5..54d0c26ac18 100644
+--- a/libstdc++-v3/include/std/fstream
++++ b/libstdc++-v3/include/std/fstream
+@@ -44,6 +44,8 @@
+ #include <string>             // For std::string overloads.
+ #endif
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/std/future b/libstdc++-v3/include/std/future
+index 97506a27e37..39e49fcb729 100644
+--- a/libstdc++-v3/include/std/future
++++ b/libstdc++-v3/include/std/future
+@@ -40,6 +40,7 @@
+ #include <condition_variable>
+ #include <system_error>
+ #include <atomic>
++
+ #include <bits/atomic_futex.h>
+ #include <bits/functexcept.h>
+ #include <bits/invoke.h>
+@@ -50,6 +51,9 @@
+ #include <bits/allocated_ptr.h>
+ #include <ext/aligned_buffer.h>
+ 
++#include <cxxabi_forced.h>
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/include/std/iomanip b/libstdc++-v3/include/std/iomanip
+index a2049723f55..e744f62971a 100644
+--- a/libstdc++-v3/include/std/iomanip
++++ b/libstdc++-v3/include/std/iomanip
+@@ -46,6 +46,8 @@
+ #endif
+ #endif
+ 
++#include <exception_defines.h>
++
+ namespace std _GLIBCXX_VISIBILITY(default)
+ {
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+diff --git a/libstdc++-v3/src/Makefile.am b/libstdc++-v3/src/Makefile.am
+index a139adc81b3..e78a9408da0 100644
+--- a/libstdc++-v3/src/Makefile.am
++++ b/libstdc++-v3/src/Makefile.am
+@@ -92,14 +92,12 @@ libstdc___la_SOURCES = $(cxx98_sources) $(cxx11_sources)
+ 
+ libstdc___la_LIBADD = \
+ 	$(GLIBCXX_LIBS) \
+-	$(top_builddir)/libsupc++/libsupc++convenience.la \
+ 	$(top_builddir)/src/c++98/libc++98convenience.la \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la \
+ 	$(top_builddir)/src/c++17/libc++17convenience.la
+ 
+ libstdc___la_DEPENDENCIES = \
+ 	${version_dep} \
+-	$(top_builddir)/libsupc++/libsupc++convenience.la \
+ 	$(top_builddir)/src/c++98/libc++98convenience.la \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la \
+ 	$(top_builddir)/src/c++17/libc++17convenience.la
+@@ -107,6 +105,10 @@ libstdc___la_DEPENDENCIES = \
+ libstdc___la_LDFLAGS = \
+ 	-version-info $(libtool_VERSION) ${version_arg} -lm
+ 
++if ENABLE_SYMVERS_DARWIN
++libstdc___la_LDFLAGS += -Wl,-rpath,@loader_path,-lc++abi
++endif
++
+ libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
+ 
+ # Use special rules for compatibility-ldbl.cc compilation, as we need to
+diff --git a/libstdc++-v3/src/Makefile.in b/libstdc++-v3/src/Makefile.in
+index ea37a962a9a..33ccaa90582 100644
+--- a/libstdc++-v3/src/Makefile.in
++++ b/libstdc++-v3/src/Makefile.in
+@@ -89,6 +89,7 @@ POST_UNINSTALL = :
+ build_triplet = @build@
+ host_triplet = @host@
+ target_triplet = @target@
++@ENABLE_SYMVERS_DARWIN_TRUE@am__append_1 = -Wl,-rpath,@loader_path,-lc++abi
+ subdir = src
+ ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+ am__aclocal_m4_deps = $(top_srcdir)/../config/acx.m4 \
+@@ -501,21 +502,18 @@ cxx11_sources = \
+ libstdc___la_SOURCES = $(cxx98_sources) $(cxx11_sources)
+ libstdc___la_LIBADD = \
+ 	$(GLIBCXX_LIBS) \
+-	$(top_builddir)/libsupc++/libsupc++convenience.la \
+ 	$(top_builddir)/src/c++98/libc++98convenience.la \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la \
+ 	$(top_builddir)/src/c++17/libc++17convenience.la
+ 
+ libstdc___la_DEPENDENCIES = \
+ 	${version_dep} \
+-	$(top_builddir)/libsupc++/libsupc++convenience.la \
+ 	$(top_builddir)/src/c++98/libc++98convenience.la \
+ 	$(top_builddir)/src/c++11/libc++11convenience.la \
+ 	$(top_builddir)/src/c++17/libc++17convenience.la
+ 
+-libstdc___la_LDFLAGS = \
+-	-version-info $(libtool_VERSION) ${version_arg} -lm
+-
++libstdc___la_LDFLAGS = -version-info $(libtool_VERSION) ${version_arg} \
++	-lm $(am__append_1)
+ libstdc___la_LINK = $(CXXLINK) $(libstdc___la_LDFLAGS)
+ 
+ # A note on compatibility and static libraries.
