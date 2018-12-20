@@ -572,6 +572,7 @@ or with constant text in a single argument.
  %l     process LINK_SPEC as a spec.
  %L     process LIB_SPEC as a spec.
  %M     Output multilib_os_dir.
+ %P	Output a RUNPATH_OPTION for each directory in startfile_prefixes.
  %G     process LIBGCC_SPEC as a spec.
  %R     Output the concatenation of target_system_root and
         target_sysroot_suffix.
@@ -1189,6 +1190,10 @@ proper position among the other output files.  */
 
 #ifndef SYSROOT_HEADERS_SUFFIX_SPEC
 # define SYSROOT_HEADERS_SUFFIX_SPEC ""
+#endif
+
+#ifndef RUNPATH_OPTION
+# define RUNPATH_OPTION "-rpath"
 #endif
 
 static const char *asm_debug = ASM_DEBUG_SPEC;
@@ -6125,6 +6130,19 @@ do_spec_1 (const char *spec, int inswitch, const char *soft_matched_part)
 	      info.omit_relative = false;
 #endif
 	      info.separate_options = false;
+
+	      for_each_path (&startfile_prefixes, true, 0, spec_path, &info);
+	    }
+	    break;
+
+	  case 'P':
+	    {
+	      struct spec_path_info info;
+
+	      info.option = RUNPATH_OPTION;
+	      info.append_len = 0;
+	      info.omit_relative = false;
+	      info.separate_options = true;
 
 	      for_each_path (&startfile_prefixes, true, 0, spec_path, &info);
 	    }
