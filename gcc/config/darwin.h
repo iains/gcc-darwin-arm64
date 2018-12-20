@@ -379,6 +379,7 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
+    "%{!r:%{!nostdlib:%{!rpath:%(darwin_rpaths)}}}" \
     "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
 
 /* Spec that controls whether the debug linker is run automatically for
@@ -494,7 +495,7 @@ extern GTY(()) int darwin_ms_struct;
                                %{!object:%{preload:-lgcrt0.o}		    \
                                  %{!preload:-lgcrt1.o                       \
                                  %:version-compare(>= 10.8 mmacosx-version-min= -no_new_main) \
-                                 %(darwin_crt2)}}}}    \
+                                 %(darwin_crt2)}}}}                         \
                 %{!pg:%{static:-lcrt0.o}				    \
                       %{!static:%{object:-lcrt0.o}			    \
                                 %{!object:%{preload:-lcrt0.o}		    \
@@ -504,6 +505,7 @@ extern GTY(()) int darwin_ms_struct;
 
 /* We want a destructor last in the list.  */
 #define TM_DESTRUCTOR "%{fgnu-tm: -lcrttme.o}"
+
 #define ENDFILE_SPEC TM_DESTRUCTOR
 
 #define DARWIN_EXTRA_SPECS						\
@@ -511,7 +513,8 @@ extern GTY(()) int darwin_ms_struct;
   { "darwin_crt2", DARWIN_CRT2_SPEC },					\
   { "darwin_crt3", DARWIN_CRT3_SPEC },					\
   { "darwin_dylib1", DARWIN_DYLIB1_SPEC },				\
-  { "darwin_bundle1", DARWIN_BUNDLE1_SPEC },
+  { "darwin_bundle1", DARWIN_BUNDLE1_SPEC },				\
+  { "darwin_rpaths", DARWIN_RPATH_SPEC },
 
 #define DARWIN_CRT1_SPEC						\
   "%:version-compare(!> 10.5 mmacosx-version-min= -lcrt1.o)		\
@@ -536,6 +539,15 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_BUNDLE1_SPEC \
 "%{!static:%:version-compare(< 10.6 mmacosx-version-min= -lbundle1.o)	\
 	   %{fgnu-tm: -lcrttms.o}}"
+
+/* FIXME: it would be great to have a version-compare that accepts multiple
+   arguments.  */
+#define DARWIN_RPATH_SPEC \
+  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath)		\
+   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path/.)	\
+   %:version-compare(>= 10.5 mmacosx-version-min= -rpath)		\
+   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path/../lib)	\
+   %P "
 
 #ifdef HAVE_AS_MMACOSX_VERSION_MIN_OPTION
 /* Emit macosx version (but only major).  */
