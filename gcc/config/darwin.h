@@ -230,6 +230,7 @@ extern GTY(()) int darwin_ms_struct;
       %{%:sanitize(address): -lasan } \
       %{%:sanitize(undefined): -lubsan } \
       %(link_ssp) \
+      %:version-compare(>< 10.6 10.7 mmacosx-version-min= -ld10-uwfef.o) \
       %(link_gcc_c_sequence) \
     }}}\
     %{!nostdlib:%{!r:%{!nostartfiles:%E}}} %{T*} %{F*} "\
@@ -364,37 +365,42 @@ extern GTY(()) int darwin_ms_struct;
 
 #define LIB_SPEC "%{!static:-lSystem}"
 
-/* Support -mmacosx-version-min by supplying different (stub) libgcc_s.dylib
-   libraries to link against, and by not linking against libgcc_s on
-   earlier-than-10.3.9.  If we need exceptions, prior to 10.3.9, then we have
-   to link the static eh lib, since there's no shared version on the system.
-
-   Note that by default, except as above, -lgcc_eh is not linked against.
+/*
+   Note that by default, -lgcc_eh is not linked against.
    This is because,in general, we need to unwind through system libraries that
    are linked with the shared unwinder in libunwind (or libgcc_s for 10.4/5).
 
-   The static version of the current libgcc unwinder (which differs from the
-   implementation in libunwind.dylib on systems Darwin10 [10.6]+) can be used
-   by specifying -static-libgcc.
+   For -static-libgcc: < 10.6, use the unwinder in libgcc_eh (and find
+   the emultls impl. there too).
 
-   If libgcc_eh is linked against, it has to be before -lgcc, because it might
-   need symbols from -lgcc.  */
+   For -static-libgcc: >= 10.6, the unwinder *still* comes from libSystem and
+   we find the emutls impl from lemutls_w. In either case, the builtins etc.
+   are linked from -lgcc.
 
+   When we have specified shared-libgcc or any case that might require
+   exceptions, we pull the libgcc content (including emulated tls) from
+   -lgcc_s.2 and the unwinder from libgcc_s.1 or libSystem, for < 10.6
+   and >= 10.6 respectively.
+   Otherwise, we just link the emutls/builtins from convenience libs.
+
+   If we need exceptions, prior to 10.3.9, then we have to link the static
+   eh lib, since there's no shared version on the system.
+
+   In all cases, libgcc_s.2 will be installed with the compiler, or any app
+   built using it, so we can link the builtins and emutls shared on all.
+*/
 #undef REAL_LIBGCC_SPEC
-#define REAL_LIBGCC_SPEC						   \
-   "%{static-libgcc|static: -lgcc_eh -lgcc;				   \
-      shared-libgcc|fexceptions|fobjc-exceptions|fgnu-runtime:		   \
-       %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)	   \
-       %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4) \
-       %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5)   \
-       %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_ext.10.4) \
-       %:version-compare(>= 10.5 mmacosx-version-min= -lgcc_ext.10.5)	   \
-       -lgcc ;								   \
-      :%:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4) \
-       %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5)   \
-       %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_ext.10.4) \
-       %:version-compare(>= 10.5 mmacosx-version-min= -lgcc_ext.10.5)	   \
-       -lgcc }"
+#define REAL_LIBGCC_SPEC						\
+"%{static-libgcc|static:						\
+    %:version-compare(!> 10.6 mmacosx-version-min= -lgcc_eh)		\
+    %:version-compare(>= 10.6 mmacosx-version-min= -lemutls_w) -lgcc;	\
+   shared-libgcc|static-libstdc++|fexceptions|fobjc-exceptions|fgnu-runtime:\
+    -lgcc_s.2	\
+    %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)	   \
+    %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4) \
+    %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5);	\
+   : -lemutls_w	 -lgcc							\
+  }"
 
 /* We specify crt0.o as -lcrt0.o so that ld will search the library path.  */
 
