@@ -214,8 +214,10 @@ esac
 case ${host} in
 *-*-darwin*)
   asm_hidden_op=.private_extern
-  tmake_file="$tmake_file t-darwin ${cpu_type}/t-darwin "
-  tmake_file="$tmake_file t-libgcc-pic t-slibgcc-darwin "
+  tmake_file="$tmake_file t-darwin ${cpu_type}/t-darwin t-libgcc-pic"
+  # The unwinder is provided by the system shared libraries, do not add one
+  # to the shared libgcc.
+  tmake_file="$tmake_file t-darwin-noeh t-slibgcc-darwin"
   # We are not using libtool to build the libs here, so we need to replicate
   # a little of the logic around setting Darwin rpaths.  Setting an explicit
   # yes or no is honoured, otherwise we choose a suitable default.
@@ -235,7 +237,7 @@ case ${host} in
   else
     echo "enable_darwin_at_rpath is '$enable_darwin_at_rpath'" 1>&2
   fi
-  extra_parts="crt3.o d10-uwfef.o crttms.o crttme.o"
+  extra_parts="crt3.o d10-uwfef.o crttms.o crttme.o libemutls_w.a"
   ;;
 *-*-dragonfly*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip"
@@ -697,12 +699,12 @@ hppa*-*-netbsd*)
 	;;
 i[34567]86-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
-	tm_file="$tm_file i386/darwin-lib.h"
+	tm_file="$tm_file "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 x86_64-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
-	tm_file="$tm_file i386/darwin-lib.h"
+	tm_file="$tm_file "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 i[34567]86-*-elfiamcu)
