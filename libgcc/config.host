@@ -214,8 +214,16 @@ esac
 case ${host} in
 *-*-darwin*)
   asm_hidden_op=.private_extern
-  tmake_file="$tmake_file t-darwin ${cpu_type}/t-darwin t-libgcc-pic t-slibgcc-darwin"
-  extra_parts="crt3.o d10-uwfef.o crttms.o crttme.o"
+  tmake_file="$tmake_file t-darwin ${cpu_type}/t-darwin t-libgcc-pic"
+  extra_parts="crt3.o d10-uwfef.o crttms.o crttme.o libemutls_w.a"
+  if test "${slibdir}" = "/usr/lib"; then
+    # If we're building to install libgcc_s into the system, then proceed to
+    # make a libgcc_s.1 and the 10.5/10.5 stubs.
+    tmake_file="$tmake_file t-slibgcc-darwin"
+  else
+    # Otherwise, we are going to build libgcc_s.2.
+    tmake_file="$tmake_file t-darwin-noeh t-slibgcc-darwin"
+  fi
   ;;
 *-*-dragonfly*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip"
@@ -678,12 +686,12 @@ hppa*-*-netbsd*)
 	;;
 i[34567]86-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
-	tm_file="$tm_file i386/darwin-lib.h"
+	tm_file="$tm_file "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 x86_64-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
-	tm_file="$tm_file i386/darwin-lib.h"
+	tm_file="$tm_file "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 i[34567]86-*-elfiamcu)
