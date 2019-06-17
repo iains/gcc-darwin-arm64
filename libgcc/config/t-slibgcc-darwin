@@ -1,4 +1,4 @@
-# Build a shared libgcc library with the darwin linker.
+# Build a shared libgcc library able to use embedded runpaths.
 
 SHLIB_SOVERSION = 1.1
 SHLIB_SO_MINVERSION = 1
