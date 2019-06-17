@@ -1,5 +1,4 @@
 # Build a shared libgcc library with the darwin linker.
-SHLIB_SOVERSION = 1
 SHLIB_VERSTRING = -compatibility_version $(SHLIB_SOVERSION) -current_version $(SHLIB_SOVERSION).0
 SHLIB_EXT = .dylib
 SHLIB_INSTALL_NAME = @shlib_base_name@.$(SHLIB_SOVERSION)$(SHLIB_EXT)
@@ -24,21 +23,22 @@ SHLIB_LINK = $(CC) $(LIBGCC2_CFLAGS) -dynamiclib -nodefaultlibs \
 
 SHLIB_MKMAP = $(srcdir)/mkmap-flat.awk
 SHLIB_MKMAP_OPTS = -v leading_underscore=1
-SHLIB_MAPFILES = libgcc-std.ver $(srcdir)/config/libgcc-libsystem.ver
-SHLIB_VERPFX = $(srcdir)/config/$(cpu_type)/libgcc-darwin
+SHLIB_MAPFILES += libgcc-std.ver
 
 # we're only going to build the stubs if the target slib is /usr/lib
 # there is no other case in which they're useful in a live system.
 ifeq (/usr/lib,$(shlib_slibdir))
-LGCC_STUBS = libgcc_s.10.4.dylib libgcc_s.10.5.dylib
+LGCC_STUBS = libgcc_s.10.4.dylib libgcc_s.10.5.dylib libgcc_s.2.dylib
+SHLIB_VERPFX = $(srcdir)/config/$(cpu_type)/libgcc-darwin
+SHLIB_SOVERSION = 1
 else
 LGCC_STUBS =
+SHLIB_VERPFX =
+SHLIB_SOVERSION = 2
 endif
 
 LGCC_FILES = libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)
 LGCC_FILES += $(LGCC_STUBS)
-LEXT_STUBS = libgcc_ext.10.4$(SHLIB_EXT) libgcc_ext.10.5$(SHLIB_EXT)
-LGCC_FILES += $(LEXT_STUBS)
 INSTALL_FILES=$(LGCC_FILES)
 
 # we do our own thing
@@ -51,6 +51,22 @@ ifeq ($(enable_shared),yes)
 all: $(INSTALL_FILES)
 install-leaf: install-darwin-libgcc-stubs
 endif
+
+ifeq (/usr/lib,$(shlib_slibdir))
+
+# To support the case that one is building to install into /lib/usr, we
+# need to build a dummy libgcc_s.2, which just redirects to the newly-
+# built libgcc_s.1.  This is a stub library that exports the symbols less
+# those that might be provided via the system-specific stub.
+libgcc_s.2.dylib : all-multi $(SHLIB_VERPFX).10.5.ver libgcc_s$(SHLIB_EXT) 
+	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
+	for mlib in $$MLIBS ; do \
+	  $(STRIP) -o $(@)_T$${mlib} \
+	    -R $(SHLIB_VERPFX).10.5.ver -c -urx \
+	    ../$${mlib}/libgcc/$${mlib}/libgcc_s$(SHLIB_EXT) || exit 1 ; \
+	done
+	$(LIPO) -output $@ -create $(@)_T*
+	rm $(@)_T*
 
 # In order to support -mmacosx-version-min, you need to have multiple
 # different libgcc_s libraries that actually get linked against, one for
@@ -68,16 +84,7 @@ libgcc_s.%.dylib : all-multi $(SHLIB_VERPFX).%.ver libgcc_s$(SHLIB_EXT)
 	done
 	$(LIPO) -output $@ -create $(@)_T*
 	rm $(@)_T*
-
-libgcc_ext.%.dylib : all-multi $(SHLIB_VERPFX).%.ver libgcc_s$(SHLIB_EXT) 
-	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
-	for mlib in $$MLIBS ; do \
-	  $(STRIP) -o $(@)_T$${mlib} \
-	    -R $(SHLIB_VERPFX).$(*).ver -c -urx \
-	    ../$${mlib}/libgcc/$${mlib}/libgcc_s$(SHLIB_EXT) || exit 1 ; \
-	done
-	$(LIPO) -output $@ -create $(@)_T*
-	rm $(@)_T*
+endif
 
 libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT): all-multi libgcc_s$(SHLIB_EXT)
 	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
@@ -94,16 +101,6 @@ install-darwin-libgcc-stubs :
 	for d in $(INSTALL_FILES) ; do \
 	  $(INSTALL_DATA) $$d $(DESTDIR)$(slibdir)/$$d || exit 1 ; \
 	done
-	if [ -f $(DESTDIR)$(slibdir)/libgcc_s_ppc64.1.dylib ]; then \
-	  rm -f $(DESTDIR)$(slibdir)/libgcc_s_ppc64.1.dylib; \
-	else true; fi
-	$(LN_S) libgcc_s.1.dylib \
-		$(DESTDIR)$(slibdir)/libgcc_s_ppc64.1.dylib
-	if [ -f $(DESTDIR)$(slibdir)/libgcc_s_x86_64.1.dylib ]; then \
-	  rm -f $(DESTDIR)$(slibdir)/libgcc_s_x86_64.1.dylib; \
-	else true; fi
-	$(LN_S) libgcc_s.1.dylib \
-		$(DESTDIR)$(slibdir)/libgcc_s_x86_64.1.dylib
 
 else
 
@@ -122,13 +119,5 @@ install-darwin-libgcc-links:
 	  rm -f $(gcc_objdir)$(MULTISUBDIR)/$$file;		\
 	  $(LN_S) ../$$file $(gcc_objdir)$(MULTISUBDIR)/;	\
 	done
-
-	rm -f $(gcc_objdir)$(MULTISUBDIR)/libgcc_s_x86_64.1.dylib
-	$(LN_S) libgcc_s.1.dylib \
-		$(gcc_objdir)$(MULTISUBDIR)/libgcc_s_x86_64.1.dylib
-
-	rm -f $(gcc_objdir)$(MULTISUBDIR)/libgcc_s_ppc64.1.dylib
-	$(LN_S) libgcc_s.1.dylib \
-		$(gcc_objdir)$(MULTISUBDIR)/libgcc_s_ppc64.1.dylib
 
 endif
