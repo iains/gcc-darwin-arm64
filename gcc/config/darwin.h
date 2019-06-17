@@ -514,8 +514,7 @@ extern GTY(()) int darwin_ms_struct;
     %:version-compare(!> 10.6 mmacosx-version-min= -lgcc_eh)		  \
     %:version-compare(>= 10.6 mmacosx-version-min= -lemutls_w);		  \
    shared-libgcc|fexceptions|fobjc-exceptions|fgnu-runtime:		  \
-    %:version-compare(!> 10.11 mmacosx-version-min= -lgcc_s.1.1)	  \
-    %:version-compare(>= 10.11 mmacosx-version-min= -lemutls_w)		  \
+   -lgcc_s.1.1								  \
     %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)		  \
     %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4)   \
     %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5);	  \
