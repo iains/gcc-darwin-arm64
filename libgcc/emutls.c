@@ -50,8 +50,16 @@ struct __emutls_array
   void **data[];
 };
 
-void *__emutls_get_address (struct __emutls_object *);
-void __emutls_register_common (struct __emutls_object *, word, word, void *);
+/* EMUTLS_ATTR is provided to allow targets to build the emulated tls
+   routines as weak functions for inclusion in convenience libraries.
+   If there is no definition, fall back to the default.  */
+#ifndef EMUTLS_ATTR
+#  define EMUTLS_ATTR
+#endif
+
+void *__emutls_get_address (struct __emutls_object *) EMUTLS_ATTR;
+void __emutls_register_common (struct __emutls_object *,
+			       word, word, void *) EMUTLS_ATTR;
 
 #ifdef __GTHREADS
 #ifdef __GTHREAD_MUTEX_INIT
