@@ -2,6 +2,8 @@
 #include "tsystem.h"
 #include "unwind-dw2-fde.h"
 
+extern void *_darwin10_Unwind_FindEnclosingFunction (void *);
+
 void *
 _darwin10_Unwind_FindEnclosingFunction (void *pc)
 {
