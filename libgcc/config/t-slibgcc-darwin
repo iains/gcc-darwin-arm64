@@ -28,7 +28,7 @@ SHLIB_MAPFILES += libgcc-std.ver
 # we're only going to build the stubs if the target slib is /usr/lib
 # there is no other case in which they're useful in a live system.
 ifeq (/usr/lib,$(shlib_slibdir))
-LGCC_STUBS = libgcc_s.10.4.dylib libgcc_s.10.5.dylib
+LGCC_STUBS = libgcc_s.10.4.dylib libgcc_s.10.5.dylib libgcc_s.2.dylib
 SHLIB_VERPFX = $(srcdir)/config/$(cpu_type)/libgcc-darwin
 SHLIB_SOVERSION = 1
 else
@@ -52,6 +52,22 @@ all: $(INSTALL_FILES)
 install-leaf: install-darwin-libgcc-stubs
 endif
 
+ifeq (/usr/lib,$(shlib_slibdir))
+
+# To support the case that one is building to install into /lib/usr, we
+# need to build a dummy libgcc_s.2, which just redirects to the newly-
+# built libgcc_s.1.  This is a stub library that exports the symbols less
+# those that might be provided via the system-specific stub.
+libgcc_s.2.dylib : all-multi $(SHLIB_VERPFX).10.5.ver libgcc_s$(SHLIB_EXT) 
+	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
+	for mlib in $$MLIBS ; do \
+	  $(STRIP) -o $(@)_T$${mlib} \
+	    -R $(SHLIB_VERPFX).10.5.ver -c -urx \
+	    ../$${mlib}/libgcc/$${mlib}/libgcc_s$(SHLIB_EXT) || exit 1 ; \
+	done
+	$(LIPO) -output $@ -create $(@)_T*
+	rm $(@)_T*
+
 # In order to support -mmacosx-version-min, you need to have multiple
 # different libgcc_s libraries that actually get linked against, one for
 # each system version supported.  They are 'stub' libraries that
@@ -68,6 +84,7 @@ libgcc_s.%.dylib : all-multi $(SHLIB_VERPFX).%.ver libgcc_s$(SHLIB_EXT)
 	done
 	$(LIPO) -output $@ -create $(@)_T*
 	rm $(@)_T*
+endif
 
 libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT): all-multi libgcc_s$(SHLIB_EXT)
 	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
