@@ -979,7 +979,12 @@ extern GTY(()) section * darwin_sections[NUM_DARWIN_SECTIONS];
   { "apple_kext_compatibility", 0, 0, false, true, false, false,	     \
     darwin_handle_kext_attribute, NULL },				     \
   { "weak_import", 0, 0, true, false, false, false,			     \
-    darwin_handle_weak_import_attribute, NULL }
+    darwin_handle_weak_import_attribute, NULL },			     \
+  { "availability", 0, -1, true, false, false, false,			     \
+    darwin_handle_availability_attribute, NULL }
+
+#undef TARGET_ATTRIBUTE_TAKES_IDENTIFIER_P
+#define TARGET_ATTRIBUTE_TAKES_IDENTIFIER_P darwin_attribute_takes_identifier_p
 
 /* Make local constant labels linker-visible, so that if one follows a
    weak_global constant, ld64 will be able to separate the atoms.  */
