@@ -1856,6 +1856,10 @@ static-libmpxwrappers
 Driver WarnRemoved
 Removed in GCC 9.  This switch has no effect.
 
+fallow-const-var-array-size
+C ObjC C++ ObjC++ LTO Var(flag_allow_const_var_array_size) Init(0)
+Allow arrays sizes to be const-qualified vars in C and Objective-C.
+
 fallow-extended-attribute-placement
 C ObjC C++ ObjC++ LTO Var(flag_allow_ext_attr_placement) Init(0)
 Allow placement of attributes on function definitions.
