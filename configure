@@ -3731,7 +3731,7 @@ esac
 case "${target}" in
   *-*-chorusos)
     ;;
-  aarch64-*-darwin*)
+  aarch64-*-darwin* | arm64*-*-darwin*)
     noconfigdirs="$noconfigdirs ld gas gdb gprof"
     noconfigdirs="$noconfigdirs sim target-rda"
     ;;
