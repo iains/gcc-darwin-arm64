@@ -1005,7 +1005,7 @@ esac
 case "${target}" in
   *-*-chorusos)
     ;;
-  aarch64-*-darwin*)
+  aarch64-*-darwin* | arm64*-*-darwin*)
     noconfigdirs="$noconfigdirs ld gas gdb gprof"
     noconfigdirs="$noconfigdirs sim target-rda"
     ;;
@@ -1330,6 +1330,8 @@ case "${host}" in
     ;;
   hppa*-*)	
     host_makefile_frag="config/mh-pa"
+    ;;
+  aarch64-*-darwin* | arm64*-*-darwin*)
     ;;
   *-*-darwin*)
     host_makefile_frag="config/mh-darwin"
