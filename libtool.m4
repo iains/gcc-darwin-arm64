@@ -994,12 +994,18 @@ _LT_EOF
         rm -f conftest.err libconftest.a conftest conftest.c
         rm -rf conftest.dSYM
     ])
-    case $host_os in
-    rhapsody* | darwin1.[[012]])
+    case $host_cpu-$host_os in
+    aarch64-darwin* | arm64*-darwin* )
+      # For the present, we'll default this which means that all symbols need to
+      # be resolved.  If there are specific libraries or cases that should have
+      # undefined = dynamic_lookup, those should be adjusted specially rather than
+      # having this as a blanket setting.
+      ;;
+    *-rhapsody* | *-darwin1.[[012]])
       _lt_dar_allow_undefined='${wl}-undefined ${wl}suppress' ;;
-    darwin1.*)
+    *-darwin1.*)
       _lt_dar_allow_undefined='${wl}-flat_namespace ${wl}-undefined ${wl}suppress' ;;
-    darwin*) # darwin 5.x on
+    *-darwin*) # darwin 5.x on
       # if running on 10.5 or later, the deployment target defaults
       # to the OS version, if on x86, and 10.4, the deployment
       # target defaults to 10.4. Don't you love it?
@@ -1033,7 +1039,7 @@ _LT_EOF
 
 # _LT_DARWIN_LINKER_FEATURES
 # --------------------------
-# Checks for linker and compiler features on darwin
+# Checks for linker and compiler features on darwin / macos / ios
 m4_defun([_LT_DARWIN_LINKER_FEATURES],
 [
   m4_require([_LT_REQUIRED_DARWIN_CHECKS])
