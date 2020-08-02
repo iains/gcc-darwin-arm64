@@ -15483,12 +15483,18 @@ _LT_EOF
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_ld_force_load" >&5
 $as_echo "$lt_cv_ld_force_load" >&6; }
-    case $host_os in
-    rhapsody* | darwin1.[012])
+    case $host_cpu-$host_os in
+    aarch64-darwin* | arm64*-darwin* )
+      # For the present, we'll default this which means that all symbols need to
+      # be resolved.  If there are specific libraries or cases that should have
+      # undefined = dynamic_lookup, those should be adjusted specially rather than
+      # having this as a blanket setting.
+      ;;
+    *-rhapsody* | *-darwin1.[012])
       _lt_dar_allow_undefined='${wl}-undefined ${wl}suppress' ;;
-    darwin1.*)
+    *-darwin1.*)
       _lt_dar_allow_undefined='${wl}-flat_namespace ${wl}-undefined ${wl}suppress' ;;
-    darwin*) # darwin 5.x on
+    *-darwin*) # darwin 5.x on
       # if running on 10.5 or later, the deployment target defaults
       # to the OS version, if on x86, and 10.4, the deployment
       # target defaults to 10.4. Don't you love it?
@@ -19013,7 +19019,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 19016 "configure"
+#line 19022 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19119,7 +19125,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 19122 "configure"
+#line 19128 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -23926,6 +23932,9 @@ else
 if $gcc_cv_objdump -Wf conftest.o 2>/dev/null \
     | grep 'DW_CFA_advance_loc[24]:[ 	][ 	]*75040[ 	]' >/dev/null; then
    gcc_cv_as_cfi_advance_working=yes
+elif $gcc_cv_objdump -dwarf=frames conftest.o 2>/dev/null \
+    | grep 'DW_CFA_advance_loc[24]:[ 	][ 	]*75040[ 	]*$' >/dev/null; then
+   gcc_cv_as_cfi_advance_working=yes
 fi
 
     else
@@ -24123,8 +24132,19 @@ EOF
   test $ac_status = 0; }; }; then
     gcc_cv_as_eh_frame=buggy
   else
-    # Uh oh, what do we do now?
-    gcc_cv_as_eh_frame=no
+    # Darwin/macOS/iOS as has support on systems using LLVM as the assembler.
+    case "${target}" in
+      arm64-*-darwin* | aarch64-*-darwin*)
+      gcc_cv_as_eh_frame=yes
+      ;;
+      *-*-darwin1456789* | *-*-darwin20*)
+      gcc_cv_as_eh_frame=yes
+      ;;
+    *)
+      # Uh oh, what do we do now?
+      gcc_cv_as_eh_frame=no
+      ;;
+    esac
   fi
     else
       echo "configure: failed program was" >&5
