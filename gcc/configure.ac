@@ -3081,6 +3081,9 @@ gcc_GAS_CHECK_FEATURE([working cfi advance], gcc_cv_as_cfi_advance_working,
 if $gcc_cv_objdump -Wf conftest.o 2>/dev/null \
     | grep 'DW_CFA_advance_loc[24]:[ 	][ 	]*75040[ 	]' >/dev/null; then
    gcc_cv_as_cfi_advance_working=yes
+elif $gcc_cv_objdump -dwarf=frames conftest.o 2>/dev/null \
+    | grep 'DW_CFA_advance_loc[24]:[ 	][ 	]*75040[ 	]*$' >/dev/null; then
+   gcc_cv_as_cfi_advance_working=yes
 fi
 ]])
 else
@@ -3193,8 +3196,19 @@ EOF
   elif AC_TRY_COMMAND($gcc_cv_as -o conftest.o --traditional-format /dev/null); then
     gcc_cv_as_eh_frame=buggy
   else
-    # Uh oh, what do we do now?
-    gcc_cv_as_eh_frame=no
+    # Darwin/macOS/iOS as has support on systems using LLVM as the assembler.
+    case "${target}" in
+      arm64-*-darwin* | aarch64-*-darwin*)
+      gcc_cv_as_eh_frame=yes
+      ;;
+      *-*-darwin1[456789]* | *-*-darwin20*)
+      gcc_cv_as_eh_frame=yes
+      ;;
+    *)
+      # Uh oh, what do we do now?
+      gcc_cv_as_eh_frame=no
+      ;;
+    esac
   fi])
 
 if test $gcc_cv_as_eh_frame = buggy; then
