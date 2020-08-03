@@ -42,6 +42,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 
 #define DARWIN_X86 0
 #define DARWIN_PPC 0
+#define DARWIN_ARM64 0
 
 /* Suppress g++ attempt to link in the math library automatically. */
 #define MATH_LIBRARY ""
