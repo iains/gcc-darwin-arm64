@@ -58,6 +58,10 @@
 #define TARGET_SIMD (!TARGET_GENERAL_REGS_ONLY && AARCH64_ISA_SIMD)
 #define TARGET_FLOAT (!TARGET_GENERAL_REGS_ONLY && AARCH64_ISA_FP)
 
+/* If this is non-zero then generated code of the object format, ABI and
+   assembler syntax used by Darwin (Mach-O) platforms.  */
+#define TARGET_MACHO		0
+
 #define UNITS_PER_WORD		8
 
 #define UNITS_PER_VREG		16
@@ -1015,6 +1019,12 @@ typedef struct
 				   aapcs_reg == NULL_RTX.  */
   int aapcs_stack_size;		/* The total size (in words, per 8 byte) of the
 				   stack arg area so far.  */
+  int darwinpcs_stack_bytes;	/* If the argument is passed on the stack, this
+				   the byte-size.  */
+  int darwinpcs_sub_word_offset;/* This is the offset of this arg within a word
+				   when placing smaller items for darwinpcs.  */
+  int darwinpcs_sub_word_pos;	/* The next byte available within the word for
+				   darwinpcs.  */
   bool silent_p;		/* True if we should act silently, rather than
 				   raise an error for invalid calls.  */
 } CUMULATIVE_ARGS;
@@ -1299,8 +1309,13 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
 #define ASM_CPU_SPEC \
    MCPU_TO_MARCH_SPEC
 
+#ifndef SUBTARGET_EXTRA_SPECS
+#define SUBTARGET_EXTRA_SPECS
+#endif
+
 #define EXTRA_SPECS						\
-  { "asm_cpu_spec",		ASM_CPU_SPEC }
+  { "asm_cpu_spec",		ASM_CPU_SPEC },			\
+  SUBTARGET_EXTRA_SPECS
 
 #define ASM_OUTPUT_POOL_EPILOGUE  aarch64_asm_output_pool_epilogue
 

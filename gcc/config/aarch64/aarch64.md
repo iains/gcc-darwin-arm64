@@ -303,6 +303,7 @@
     UNSPEC_TAG_SPACE		; Translate address to MTE tag address space.
     UNSPEC_LD1RO
     UNSPEC_SALT_ADDR
+    UNSPEC_MACHOPIC_OFFSET
 ])
 
 (define_c_enum "unspecv" [
@@ -846,6 +847,37 @@
   [(set_attr "type" "load_4")]
 )
 
+(define_insn "prefetch_unscaled"
+  [(prefetch (match_operand:DI 0 "aarch64_unscaled_prefetch_operand" "Du")
+            (match_operand:QI 1 "const_int_operand" "")
+            (match_operand:QI 2 "const_int_operand" ""))]
+  ""
+  {
+    const char * pftype[2][4] =
+    {
+      {"prfum\\tPLDL1STRM, %0",
+       "prfum\\tPLDL3KEEP, %0",
+       "prfum\\tPLDL2KEEP, %0",
+       "prfum\\tPLDL1KEEP, %0"},
+      {"prfum\\tPSTL1STRM, %0",
+       "prfum\\tPSTL3KEEP, %0",
+       "prfum\\tPSTL2KEEP, %0",
+       "prfum\\tPSTL1KEEP, %0"},
+    };
+
+    int locality = INTVAL (operands[2]);
+
+    gcc_assert (IN_RANGE (locality, 0, 3));
+
+    /* PRFUM accepts the same addresses as a 64-bit LDR so wrap
+       the address into a DImode MEM so that aarch64_print_operand knows
+       how to print it.  */
+    operands[0] = gen_rtx_MEM (DImode, operands[0]);
+    return pftype[INTVAL(operands[1])][locality];
+  }
+  [(set_attr "type" "load_4")]
+)
+
 (define_insn "trap"
   [(trap_if (const_int 1) (const_int 8))]
   ""
@@ -1283,7 +1315,7 @@
    ldr\\t%s0, %1
    str\\t%w1, %0
    str\\t%s1, %0
-   adrp\\t%x0, %A1\;ldr\\t%w0, [%x0, %L1]
+   * return TARGET_MACHO ? \"adrp\\t%x0, %A1\;ldr\\t%w0, [%x0, %O1]\" : \"adrp\\t%x0, %A1\;ldr\\t%w0, [%x0, %L1]\";
    adr\\t%x0, %c1
    adrp\\t%x0, %A1
    fmov\\t%s0, %w1
@@ -1322,7 +1354,7 @@
    ldr\\t%d0, %1
    str\\t%x1, %0
    str\\t%d1, %0
-   * return TARGET_ILP32 ? \"adrp\\t%0, %A1\;ldr\\t%w0, [%0, %L1]\" : \"adrp\\t%0, %A1\;ldr\\t%0, [%0, %L1]\";
+   * return TARGET_ILP32 ? (TARGET_MACHO ? \"adrp\\t%0, %A1\;ldr\\t%w0, [%0, %O1]\" : \"adrp\\t%0, %A1\;ldr\\t%w0, [%0, %L1]\") : (TARGET_MACHO ? \"adrp\\t%0, %A1\;ldr\\t%0, [%0, %O1]\" : \"adrp\\t%0, %A1\;ldr\\t%0, [%0, %L1]\");
    adr\\t%x0, %c1
    adrp\\t%x0, %A1
    fmov\\t%d0, %x1
@@ -6907,7 +6939,10 @@
 	(lo_sum:P (match_operand:P 1 "register_operand" "r")
 		  (match_operand 2 "aarch64_valid_symref" "S")))]
   ""
-  "add\\t%<w>0, %<w>1, :lo12:%c2"
+  { return TARGET_MACHO
+    ? "add\\t%<w>0, %<w>1, %K2;momd"
+    : "add\\t%<w>0, %<w>1, :lo12:%c2";
+  }
   [(set_attr "type" "alu_imm")]
 )
 
