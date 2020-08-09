@@ -303,6 +303,7 @@
     UNSPEC_TAG_SPACE		; Translate address to MTE tag address space.
     UNSPEC_LD1RO
     UNSPEC_SALT_ADDR
+    UNSPEC_MACHOPIC_OFFSET
 ])
 
 (define_c_enum "unspecv" [
@@ -6785,7 +6786,10 @@
 	(lo_sum:P (match_operand:P 1 "register_operand" "r")
 		  (match_operand 2 "aarch64_valid_symref" "S")))]
   ""
-  "add\\t%<w>0, %<w>1, :lo12:%c2"
+  { return TARGET_MACHO
+    ? "add\\t%<w>0, %<w>1, %c2@PAGEOFF;momd"
+    : "add\\t%<w>0, %<w>1, :lo12:%c2";
+  }
   [(set_attr "type" "alu_imm")]
 )
 
@@ -6796,7 +6800,10 @@
 			      (match_operand:PTR 2 "aarch64_valid_symref" "S")))]
 		    UNSPEC_GOTSMALLPIC28K))]
   ""
-  "ldr\\t%<w>0, [%1, #:<got_modifier>:%c2]"
+  { return TARGET_MACHO
+    ? "ldr\\t%<w>0, [%1, %c2@GOTPAGEOFF];momd"
+    : "ldr\\t%<w>0, [%1, #:<got_modifier>:%c2]"
+  }
   [(set_attr "type" "load_<ldst_sz>")]
 )
 
