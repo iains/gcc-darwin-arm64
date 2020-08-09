@@ -58,6 +58,9 @@
 #define TARGET_SIMD (!TARGET_GENERAL_REGS_ONLY && AARCH64_ISA_SIMD)
 #define TARGET_FLOAT (!TARGET_GENERAL_REGS_ONLY && AARCH64_ISA_FP)
 
+/* Object format, ABI and syntax for Darwin platforms.  */
+#define TARGET_MACHO		0
+
 #define UNITS_PER_WORD		8
 
 #define UNITS_PER_VREG		16
@@ -934,6 +937,7 @@ enum arm_pcs
   ARM_PCS_SVE,			/* For functions that pass or return
 				   values in SVE registers.  */
   ARM_PCS_TLSDESC,		/* For targets of tlsdesc calls.  */
+  ARM_PCS_DARWINPCS,		/* Darwin's amended AAPCS for 64 bit.  */
   ARM_PCS_UNKNOWN
 };
 
@@ -1255,8 +1259,13 @@ extern const char *host_detect_local_cpu (int argc, const char **argv);
 #define ASM_CPU_SPEC \
    MCPU_TO_MARCH_SPEC
 
+#ifndef SUBTARGET_EXTRA_SPECS
+#define SUBTARGET_EXTRA_SPECS
+#endif
+
 #define EXTRA_SPECS						\
-  { "asm_cpu_spec",		ASM_CPU_SPEC }
+  { "asm_cpu_spec",		ASM_CPU_SPEC },			\
+  SUBTARGET_EXTRA_SPECS
 
 #define ASM_OUTPUT_POOL_EPILOGUE  aarch64_asm_output_pool_epilogue
 
