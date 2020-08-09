@@ -527,6 +527,8 @@ enum aarch64_builtins
   AARCH64_MEMTAG_BUILTIN_SET_TAG,
   AARCH64_MEMTAG_BUILTIN_GET_TAG,
   AARCH64_MEMTAG_BUILTIN_END,
+  /* OS-specific */
+  AARCH64_BUILTIN_CFSTRING,
   AARCH64_BUILTIN_MAX
 };
 
@@ -1469,6 +1471,14 @@ aarch64_general_init_builtins (void)
 
   if (TARGET_MEMTAG)
     aarch64_init_memtag_builtins ();
+}
+
+void
+aarch64_init_subtarget_builtins (void)
+{
+#ifdef SUBTARGET_INIT_BUILTINS
+  SUBTARGET_INIT_BUILTINS;
+#endif
 }
 
 /* Implement TARGET_BUILTIN_DECL for the AARCH64_BUILTIN_GENERAL group.  */
