@@ -287,8 +287,10 @@ static bool aarch64_vfp_is_call_or_return_candidate (machine_mode,
 						     const_tree,
 						     machine_mode *, int *,
 						     bool *, bool);
+#if !TARGET_MACHO
 static void aarch64_elf_asm_constructor (rtx, int) ATTRIBUTE_UNUSED;
 static void aarch64_elf_asm_destructor (rtx, int) ATTRIBUTE_UNUSED;
+#endif
 static void aarch64_override_options_after_change (void);
 static bool aarch64_vector_mode_supported_p (machine_mode);
 static int aarch64_address_cost (rtx, machine_mode, addr_space_t, bool);
@@ -1565,6 +1567,7 @@ handle_aarch64_vector_pcs_attribute (tree *node, tree name, tree,
     case ARM_PCS_SIMD:
       return NULL_TREE;
 
+    case ARM_PCS_DARWINPCS: /* FIXME: check if this is correct.  */
     case ARM_PCS_SVE:
       error ("the %qE attribute cannot be applied to an SVE function type",
 	     name);
@@ -1591,6 +1594,9 @@ static const struct attribute_spec aarch64_attribute_table[] =
   { "Advanced SIMD type", 1, 1, false, true,  false, true,  NULL, NULL },
   { "SVE type",		  3, 3, false, true,  false, true,  NULL, NULL },
   { "SVE sizeless type",  0, 0, false, true,  false, true,  NULL, NULL },
+#ifdef SUBTARGET_ATTRIBUTE_TABLE
+  SUBTARGET_ATTRIBUTE_TABLE,
+#endif
   { NULL,                 0, 0, false, false, false, false, NULL, NULL }
 };
 
@@ -2801,6 +2807,7 @@ aarch64_reg_save_mode (unsigned int regno)
     switch (crtl->abi->id ())
       {
       case ARM_PCS_AAPCS64:
+      case ARM_PCS_DARWINPCS:
 	/* Only the low 64 bits are saved by the base PCS.  */
 	return DFmode;
 
@@ -3110,6 +3117,7 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
   switch (type)
     {
     case SYMBOL_SMALL_ABSOLUTE:
+    case SYMBOL_MO_SMALL_PCR:
       {
 	/* In ILP32, the mode of dest can be either SImode or DImode.  */
 	rtx tmp_reg = dest;
@@ -3203,6 +3211,7 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 	return;
       }
 
+    case SYMBOL_MO_SMALL_GOT:
     case SYMBOL_SMALL_GOT_4G:
       {
 	/* In ILP32, the mode of dest can be either SImode or DImode,
@@ -5266,6 +5275,7 @@ aarch64_expand_mov_immediate (rtx dest, rtx imm)
 	case SYMBOL_SMALL_TLSIE:
 	case SYMBOL_SMALL_GOT_28K:
 	case SYMBOL_SMALL_GOT_4G:
+	case SYMBOL_MO_SMALL_GOT:
 	case SYMBOL_TINY_GOT:
 	case SYMBOL_TINY_TLSIE:
 	  if (const_offset != 0)
@@ -5279,6 +5289,7 @@ aarch64_expand_mov_immediate (rtx dest, rtx imm)
 	  /* FALLTHRU */
 
 	case SYMBOL_SMALL_ABSOLUTE:
+	case SYMBOL_MO_SMALL_PCR:
 	case SYMBOL_TINY_ABSOLUTE:
 	case SYMBOL_TLSLE12:
 	case SYMBOL_TLSLE24:
@@ -6021,7 +6032,13 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
       if (!pcum->silent_p && !TARGET_FLOAT)
 	aarch64_err_no_fpadvsimd (mode);
 
-      if (nvrn + nregs <= NUM_FP_ARG_REGS)
+      if (pcum->pcs_variant == ARM_PCS_DARWINPCS
+	  && !arg.named)
+	{
+	  pcum->aapcs_nextnvrn = NUM_FP_ARG_REGS;
+	  goto on_stack;
+	}
+      else if (nvrn + nregs <= NUM_FP_ARG_REGS)
 	{
 	  pcum->aapcs_nextnvrn = nvrn + nregs;
 	  if (!aarch64_composite_type_p (type, mode))
@@ -6061,9 +6078,17 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
   /* C6 - C9.  though the sign and zero extension semantics are
      handled elsewhere.  This is the case where the argument fits
      entirely general registers.  */
+
   if (allocate_ncrn && (ncrn + nregs <= NUM_ARG_REGS))
     {
       gcc_assert (nregs == 0 || nregs == 1 || nregs == 2);
+
+      if (pcum->pcs_variant == ARM_PCS_DARWINPCS
+	  && !arg.named)
+	{
+	  pcum->aapcs_nextncrn = NUM_ARG_REGS;
+	  goto on_stack;
+	}
 
       /* C.8 if the argument has an alignment of 16 then the NGRN is
 	 rounded up to the next even number.  */
@@ -6074,7 +6099,9 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 	     alignment nregs should be > 2 and therefore it should be
 	     passed by reference rather than value.  */
 	  && (aarch64_function_arg_alignment (mode, type, &abi_break)
-	      == 16 * BITS_PER_UNIT))
+	      == 16 * BITS_PER_UNIT)
+	  /* Darwin PCS deletes rule C.8.  */
+	  && pcum->pcs_variant != ARM_PCS_DARWINPCS)
 	{
 	  if (abi_break && warn_psabi && currently_expanding_gimple_stmt)
 	    inform (input_location, "parameter passing for argument of type "
@@ -6156,7 +6183,8 @@ aarch64_function_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
   CUMULATIVE_ARGS *pcum = get_cumulative_args (pcum_v);
   gcc_assert (pcum->pcs_variant == ARM_PCS_AAPCS64
 	      || pcum->pcs_variant == ARM_PCS_SIMD
-	      || pcum->pcs_variant == ARM_PCS_SVE);
+	      || pcum->pcs_variant == ARM_PCS_SVE
+	      || pcum->pcs_variant == ARM_PCS_DARWINPCS);
 
   if (arg.end_marker_p ())
     return gen_int_mode (pcum->pcs_variant, DImode);
@@ -6183,6 +6211,9 @@ aarch64_init_cumulative_args (CUMULATIVE_ARGS *pcum,
     pcum->pcs_variant = (arm_pcs) fntype_abi (fntype).id ();
   else
     pcum->pcs_variant = ARM_PCS_AAPCS64;
+  /* FIXME: Is there ever a case on Darwin where non-darwinpcs is valid?  */
+  if (TARGET_MACHO && pcum->pcs_variant == ARM_PCS_AAPCS64)
+    pcum->pcs_variant = ARM_PCS_DARWINPCS;
   pcum->aapcs_reg = NULL_RTX;
   pcum->aapcs_arg_processed = false;
   pcum->aapcs_stack_words = 0;
@@ -6223,7 +6254,8 @@ aarch64_function_arg_advance (cumulative_args_t pcum_v,
   CUMULATIVE_ARGS *pcum = get_cumulative_args (pcum_v);
   if (pcum->pcs_variant == ARM_PCS_AAPCS64
       || pcum->pcs_variant == ARM_PCS_SIMD
-      || pcum->pcs_variant == ARM_PCS_SVE)
+      || pcum->pcs_variant == ARM_PCS_SVE
+      || pcum->pcs_variant == ARM_PCS_DARWINPCS)
     {
       aarch64_layout_arg (pcum_v, arg);
       gcc_assert ((pcum->aapcs_reg != NULL_RTX)
@@ -10513,7 +10545,7 @@ aarch64_print_operand (FILE *f, rtx x, int code)
     case 'A':
       if (GET_CODE (x) == HIGH)
 	x = XEXP (x, 0);
-
+#if !TARGET_MACHO
       switch (aarch64_classify_symbolic_expression (x))
 	{
 	case SYMBOL_SMALL_GOT_4G:
@@ -10543,10 +10575,27 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	default:
 	  break;
 	}
+#endif
       output_addr_const (asm_out_file, x);
+#if TARGET_MACHO
+  // FIXME update classify symbolic expression to handle macho.
+      switch (aarch64_classify_symbolic_expression (x))
+	{
+	case SYMBOL_MO_SMALL_PCR:
+	  asm_fprintf (asm_out_file, "@PAGE;mopcr");
+	  break;
+	case SYMBOL_MO_SMALL_GOT:
+	  asm_fprintf (asm_out_file, "@GOTPAGE;mosg");
+	  break;
+	default:
+	  asm_fprintf (asm_out_file, "@BLEAH");
+	  break;
+	}
+#endif
       break;
 
     case 'L':
+#if !TARGET_MACHO
       switch (aarch64_classify_symbolic_expression (x))
 	{
 	case SYMBOL_SMALL_GOT_4G:
@@ -10584,10 +10633,12 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	default:
 	  break;
 	}
+#endif
       output_addr_const (asm_out_file, x);
       break;
 
     case 'G':
+#if !TARGET_MACHO
       switch (aarch64_classify_symbolic_expression (x))
 	{
 	case SYMBOL_TLSLE24:
@@ -10596,6 +10647,7 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	default:
 	  break;
 	}
+#endif
       output_addr_const (asm_out_file, x);
       break;
 
@@ -10743,9 +10795,15 @@ aarch64_print_address_internal (FILE *f, machine_mode mode, rtx x,
 	break;
 
       case ADDRESS_LO_SUM:
+#if TARGET_MACHO
+	asm_fprintf (f, "[%s, #", reg_names [REGNO (addr.base)]);
+	output_addr_const (f, addr.offset);
+	asm_fprintf (f, "@PAGEOFF]");
+#else
 	asm_fprintf (f, "[%s, #:lo12:", reg_names [REGNO (addr.base)]);
 	output_addr_const (f, addr.offset);
 	asm_fprintf (f, "]");
+#endif
 	return true;
 
       case ADDRESS_SYMBOLIC:
@@ -11214,6 +11272,8 @@ aarch64_asm_output_labelref (FILE* f, const char *name)
   asm_fprintf (f, "%U%s", name);
 }
 
+#if !TARGET_MACHO
+
 static void
 aarch64_elf_asm_constructor (rtx symbol, int priority)
 {
@@ -11253,6 +11313,7 @@ aarch64_elf_asm_destructor (rtx symbol, int priority)
       assemble_aligned_integer (POINTER_BYTES, symbol);
     }
 }
+#endif
 
 const char*
 aarch64_output_casesi (rtx *operands)
@@ -13417,12 +13478,17 @@ aarch64_init_builtins ()
 {
   aarch64_general_init_builtins ();
   aarch64_sve::init_builtins ();
+  aarch64_init_subtarget_builtins ();
 }
 
 /* Implement TARGET_FOLD_BUILTIN.  */
 static tree
 aarch64_fold_builtin (tree fndecl, int nargs, tree *args, bool)
 {
+#ifdef SUBTARGET_FOLD_BUILTIN
+  if (tree res = SUBTARGET_FOLD_BUILTIN (fndecl, nargs, args, false))
+    return res;
+#endif
   unsigned int code = DECL_MD_FUNCTION_CODE (fndecl);
   unsigned int subcode = code >> AARCH64_BUILTIN_SHIFT;
   tree type = TREE_TYPE (TREE_TYPE (fndecl));
@@ -15232,10 +15298,14 @@ initialize_aarch64_code_model (struct gcc_options *opts)
 	}
       break;
     case AARCH64_CMODEL_LARGE:
-      if (opts->x_flag_pic)
+      if (TARGET_MACHO)
+	/* We need to implement fPIC here (arm64_32 also accepts the large
+	   model).  */
+	;
+      else if (opts->x_flag_pic)
 	sorry ("code model %qs with %<-f%s%>", "large",
 	       opts->x_flag_pic > 1 ? "PIC" : "pic");
-      if (opts->x_aarch64_abi == AARCH64_ABI_ILP32)
+      else if (opts->x_aarch64_abi == AARCH64_ABI_ILP32)
 	sorry ("code model %qs not supported in ilp32 mode", "large");
       break;
     case AARCH64_CMODEL_TINY_PIC:
@@ -16196,6 +16266,13 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 
 	case AARCH64_CMODEL_SMALL_SPIC:
 	case AARCH64_CMODEL_SMALL_PIC:
+#if TARGET_MACHO
+	  if (TARGET_MACHO)
+	    return (MACHO_SYMBOL_INDIRECTION_P (x) ||
+		   ! MACHO_SYMBOL_DEFINED_P (x))
+		   ? SYMBOL_MO_SMALL_GOT
+		   : SYMBOL_MO_SMALL_PCR;
+#endif
 	  if (!aarch64_symbol_binds_local_p (x))
 	    return (aarch64_cmodel == AARCH64_CMODEL_SMALL_SPIC
 		    ?  SYMBOL_SMALL_GOT_28K : SYMBOL_SMALL_GOT_4G);
@@ -19406,7 +19483,9 @@ aarch64_declare_function_name (FILE *stream, const char* name,
   aarch64_asm_output_variant_pcs (stream, fndecl, name);
 
   /* Don't forget the type directive for ELF.  */
+#ifdef ASM_OUTPUT_TYPE_DIRECTIVE
   ASM_OUTPUT_TYPE_DIRECTIVE (stream, name, "function");
+#endif
   ASM_OUTPUT_LABEL (stream, name);
 
   cfun->machine->label_is_assembled = true;
@@ -19441,12 +19520,17 @@ aarch64_print_patchable_function_entry (FILE *file,
 /* Implement ASM_OUTPUT_DEF_FROM_DECLS.  Output .variant_pcs for aliases.  */
 
 void
-aarch64_asm_output_alias (FILE *stream, const tree decl, const tree target)
+aarch64_asm_output_alias (FILE *stream, const tree decl,
+			  const tree target ATTRIBUTE_UNUSED)
 {
   const char *name = XSTR (XEXP (DECL_RTL (decl), 0), 0);
+#ifdef ASM_OUTPUT_DEF
   const char *value = IDENTIFIER_POINTER (target);
+#endif
   aarch64_asm_output_variant_pcs (stream, decl, name);
+#ifdef ASM_OUTPUT_DEF
   ASM_OUTPUT_DEF (stream, name, value);
+#endif
 }
 
 /* Implement ASM_OUTPUT_EXTERNAL.  Output .variant_pcs for undefined
@@ -19913,7 +19997,7 @@ aarch64_init_libfuncs (void)
 static machine_mode
 aarch64_c_mode_for_suffix (char suffix)
 {
-  if (suffix == 'q')
+  if (suffix == 'q' && !TARGET_MACHO)
     return TFmode;
 
   return VOIDmode;
@@ -23746,13 +23830,17 @@ aarch64_sls_emit_shared_blr_thunks (FILE *out_file)
       /* Only emits if the compiler is configured for an assembler that can
 	 handle visibility directives.  */
       targetm.asm_out.assemble_visibility (decl, VISIBILITY_HIDDEN);
+#ifdef ASM_OUTPUT_TYPE_DIRECTIVE
       ASM_OUTPUT_TYPE_DIRECTIVE (out_file, name, "function");
+#endif
       ASM_OUTPUT_LABEL (out_file, name);
       aarch64_sls_emit_function_stub (out_file, regnum);
       /* Use the most conservative target to ensure it can always be used by any
 	 function in the translation unit.  */
       asm_fprintf (out_file, "\tdsb\tsy\n\tisb\n");
+#ifdef ASM_DECLARE_FUNCTION_SIZE
       ASM_DECLARE_FUNCTION_SIZE (out_file, name, decl);
+#endif
     }
 }
 
@@ -23850,6 +23938,15 @@ aarch64_run_selftests (void)
 
 #undef TARGET_ASM_ALIGNED_SI_OP
 #define TARGET_ASM_ALIGNED_SI_OP "\t.word\t"
+
+#if TARGET_MACHO
+#undef TARGET_ASM_UNALIGNED_HI_OP
+#define TARGET_ASM_UNALIGNED_HI_OP "\t.short\t"
+#undef TARGET_ASM_UNALIGNED_SI_OP
+#define TARGET_ASM_UNALIGNED_SI_OP "\t.long\t"
+#undef TARGET_ASM_UNALIGNED_DI_OP
+#define TARGET_ASM_UNALIGNED_DI_OP "\t.quad\t"
+#endif
 
 #undef TARGET_ASM_CAN_OUTPUT_MI_THUNK
 #define TARGET_ASM_CAN_OUTPUT_MI_THUNK \
