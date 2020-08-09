@@ -613,6 +613,8 @@ enum aarch64_builtins
   AARCH64_LS64_BUILTIN_ST64B,
   AARCH64_LS64_BUILTIN_ST64BV,
   AARCH64_LS64_BUILTIN_ST64BV0,
+  /* OS-specific */
+  AARCH64_BUILTIN_CFSTRING,
   AARCH64_BUILTIN_MAX
 };
 
@@ -1733,6 +1735,14 @@ aarch64_general_init_builtins (void)
 
   if (TARGET_LS64)
     aarch64_init_ls64_builtins ();
+}
+
+void
+aarch64_init_subtarget_builtins (void)
+{
+#ifdef SUBTARGET_INIT_BUILTINS
+  SUBTARGET_INIT_BUILTINS;
+#endif
 }
 
 /* Implement TARGET_BUILTIN_DECL for the AARCH64_BUILTIN_GENERAL group.  */
