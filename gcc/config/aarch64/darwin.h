@@ -54,6 +54,10 @@ along with GCC; see the file COPYING3.  If not see
 #undef LONG_DOUBLE_TYPE_SIZE
 #define LONG_DOUBLE_TYPE_SIZE	64
 
+/* Disable custom function descriptors on Darwin, it breaks ABI.  */
+#undef AARCH64_CUSTOM_FUNCTION_TEST
+#define AARCH64_CUSTOM_FUNCTION_TEST 0
+
 /* Non-PIE executables are forbidden by the aarch64-darwin security model;
    remove the option from link-lines since they just produce a warning from
    ld64 and are then ignored anyway.  */
@@ -268,3 +272,8 @@ along with GCC; see the file COPYING3.  If not see
 #define SYMBOL_FLAG_SUBT_DEP (SYMBOL_FLAG_MACH_DEP)
 
 #undef ASM_OUTPUT_DEF_FROM_DECLS
+
+#undef CLEAR_INSN_CACHE
+#define CLEAR_INSN_CACHE(beg, end)				\
+  extern void sys_icache_invalidate(void *start, size_t len);	\
+  sys_icache_invalidate ((beg), (size_t)((end)-(beg)))
