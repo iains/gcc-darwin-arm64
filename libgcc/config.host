@@ -82,7 +82,7 @@ m32c*-*-*)
         cpu_type=m32c
 	tmake_file=t-fdpbit
         ;;
-aarch64*-*-*)
+aarch64*-*-* | arm64*-*-*)
 	cpu_type=aarch64
 	;;
 alpha*-*-*)
@@ -405,6 +405,14 @@ aarch64*-*-elf | aarch64*-*-rtems*)
 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
 	tmake_file="${tmake_file} ${cpu_type}/t-lse t-slibgcc-libgcc"
 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp t-crtfm"
+	md_unwind_header=aarch64/aarch64-unwind.h
+	;;
+aarch64*-*darwin* | arm64*-*darwin* )
+	extra_parts="$extra_parts crtfastmath.o"
+	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
+	tmake_file="${tmake_file} ${cpu_type}/t-lse "
+	tmake_file="${tmake_file} t-crtfm"
+	# No soft float for now because our long double is DF not TF.
 	md_unwind_header=aarch64/aarch64-unwind.h
 	;;
 aarch64*-*-freebsd*)
