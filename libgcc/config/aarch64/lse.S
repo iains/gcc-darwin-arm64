@@ -58,7 +58,11 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #endif
 
 /* Declare the symbol gating the LSE implementations.  */
+#if __ELF__
 	.hidden	__aarch64_have_lse_atomics
+#else
+	.private_extern	__aarch64_have_lse_atomics
+#endif
 
 /* Turn size and memory model defines into mnemonic fragments.  */
 #if SIZE == 1
@@ -164,6 +168,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define BTI_C	hint	34
 
 /* Start and end a function.  */
+#if __ELF__
 .macro	STARTFN name
 	.text
 	.balign	16
@@ -186,6 +191,29 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 	ldrb	w(tmp0), [x(tmp0), :lo12:__aarch64_have_lse_atomics]
 	cbz	w(tmp0), \label
 .endm
+
+#else
+.macro	STARTFN name
+	.text
+	.balign	16
+	.private_extern	_\name
+	.cfi_startproc
+_\name:
+	BTI_C
+.endm
+
+.macro	ENDFN name
+	.cfi_endproc
+.endm
+
+/* Branch to LABEL if LSE is disabled.  */
+.macro	JUMP_IF_NOT_LSE label
+	adrp	x(tmp0), ___aarch64_have_lse_atomics@PAGE
+	ldrb	w(tmp0), [x(tmp0), ___aarch64_have_lse_atomics@PAGEOFF]
+	cbz	w(tmp0), \label
+.endm
+
+#endif
 
 #ifdef L_cas
 
