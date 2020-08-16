@@ -82,7 +82,7 @@ m32c*-*-*)
         cpu_type=m32c
 	tmake_file=t-fdpbit
         ;;
-aarch64*-*-*)
+aarch64*-*-* | arm64*-*-*)
 	cpu_type=aarch64
 	;;
 alpha*-*-*)
@@ -272,7 +272,7 @@ case ${host} in
       echo "Warning: libgcc configured to support macOS 10.5" 1>&2
       ;;
   esac
-  extra_parts="crt3.o libd10-uwfef.a crttms.o crttme.o libemutls_w.a"
+  extra_parts="crt3.o crttms.o crttme.o libemutls_w.a"
   ;;
 *-*-dragonfly*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip"
@@ -415,6 +415,16 @@ aarch64*-*-elf | aarch64*-*-rtems*)
 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp t-crtfm"
 	tmake_file="${tmake_file} t-dfprules"
 	md_unwind_header=aarch64/aarch64-unwind.h
+	;;
+aarch64*-*-darwin*)
+	extra_parts="$extra_parts crtfastmath.o"
+	tmake_file="${tmake_file} ${cpu_type}/t-lse "
+	tmake_file="${tmake_file} t-crtfm"
+	# No soft float for now because our long double is DF not TF.
+	md_unwind_header=aarch64/aarch64-unwind.h
+	if test x$off_stack_trampolines = xyes; then
+	    tmake_file="${tmake_file} ${cpu_type}/t-heap-trampoline"
+	fi
 	;;
 aarch64*-*-freebsd*)
 	extra_parts="$extra_parts crtfastmath.o"
@@ -734,11 +744,13 @@ hppa*-*-netbsd*)
 i[34567]86-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
 	tm_file="$tm_file i386/darwin-lib.h"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 x86_64-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
 	tm_file="$tm_file i386/darwin-lib.h"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 i[34567]86-*-elfiamcu)
@@ -1202,12 +1214,14 @@ powerpc-*-darwin*)
 	# We build the darwin10 EH shim for Rosetta (running on x86 machines).
 	tm_file="$tm_file i386/darwin-lib.h"
 	tmake_file="$tmake_file rs6000/t-ppc64-fp rs6000/t-ibm-ldouble"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crt2.o crt3_2.o libef_ppc.a dw_ppc.o"
 	;;
 powerpc64-*-darwin*)
 	# We build the darwin10 EH shim for Rosetta (running on x86 machines).
 	tm_file="$tm_file i386/darwin-lib.h"
 	tmake_file="$tmake_file rs6000/t-darwin64 rs6000/t-ibm-ldouble"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crt2.o crt3_2.o libef_ppc.a dw_ppc.o"
 	;;
 powerpc*-*-freebsd*)
