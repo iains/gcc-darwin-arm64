@@ -47,6 +47,10 @@ along with GCC; see the file COPYING3.  If not see
 #undef DEFAULT_SIGNED_CHAR
 #define DEFAULT_SIGNED_CHAR 1
 
+/* Hack alert - we want the exported cas etc.  */
+#undef LIB_SPEC
+#define LIB_SPEC "%{!static:-lSystem} -lgcc"
+
 /* We want -fPIC by default, unless we're using -static to compile for
    the kernel or some such.  */
 
