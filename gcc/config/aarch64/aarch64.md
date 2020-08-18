@@ -2621,7 +2621,7 @@
 		   (const_int 0))
 		  (match_operand:GPI 4 "register_operand" "r")))]
   "aarch64_is_extend_from_extract (<MODE>mode, operands[2], operands[3])"
-  "add\\t%<w>0, %<w>4, %<w>1, <su>xt%e3 %p2"
+  "add\\t%<w>0, %<w>4, %w1, <su>xt%e3 %p2"
   [(set_attr "type" "alu_ext")]
 )
 
@@ -2852,7 +2852,7 @@
   "*
   operands[3] = GEN_INT (aarch64_uxt_size (exact_log2 (INTVAL (operands[2])),
 					   INTVAL (operands[3])));
-  return \"add\t%<w>0, %<w>4, %<w>1, uxt%e3 %p2\";"
+  return \"add\t%<w>0, %<w>4, %w1, uxt%e3 %p2\";"
   [(set_attr "type" "alu_ext")]
 )
 
