@@ -7590,12 +7590,18 @@ _LT_EOF
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $lt_cv_ld_force_load" >&5
 $as_echo "$lt_cv_ld_force_load" >&6; }
-    case $host_os in
-    rhapsody* | darwin1.[012])
+    case $host_cpu-$host_os in
+    aarch64-darwin* | arm64*-darwin* )
+      # For the present, we'll default this which means that all symbols need to
+      # be resolved.  If there are specific libraries or cases that should have
+      # undefined = dynamic_lookup, those should be adjusted specially rather than
+      # having this as a blanket setting.
+      ;;
+    *-rhapsody* | *-darwin1.[012])
       _lt_dar_allow_undefined='${wl}-undefined ${wl}suppress' ;;
-    darwin1.*)
+    *-darwin1.*)
       _lt_dar_allow_undefined='${wl}-flat_namespace ${wl}-undefined ${wl}suppress' ;;
-    darwin*) # darwin 5.x on
+    *-darwin*) # darwin 5.x on
       # if running on 10.5 or later, the deployment target defaults
       # to the OS version, if on x86, and 10.4, the deployment
       # target defaults to 10.4. Don't you love it?
@@ -11388,7 +11394,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11391 "configure"
+#line 11397 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11494,7 +11500,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11497 "configure"
+#line 11503 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15596,7 +15602,7 @@ case "$host" in
     case "$enable_cet" in
       auto)
 	# Check if target supports multi-byte NOPs
-	# and if assembler supports CET insn.
+	# and if compiler and assembler support CET insn.
 	cet_save_CFLAGS="$CFLAGS"
 	CFLAGS="$CFLAGS -fcf-protection"
 	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
