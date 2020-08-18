@@ -106,6 +106,9 @@ case "${host_cpu}" in
   alpha*)
     try_cpu=alpha
     ;;
+  arm64)
+    try_cpu=aarch64
+    ;;
   arm*)
     try_cpu=arm
     ;;
@@ -234,11 +237,6 @@ case "${host_os}" in
   darwin8 | darwin8.* )
     # For 8+ compatibility is better if not -flat_namespace.
     OPT_LDFLAGS="${OPT_LDFLAGS} -Wl,-single_module"
-    case "${host_cpu}" in
-      i[34567]86 | x86_64)
-        OPTIMIZE_CXXFLAGS="${OPTIMIZE_CXXFLAGS} -fvisibility-inlines-hidden"
-        ;;
-    esac
     os_include_dir="os/bsd/darwin"
     ;;
   darwin*)
@@ -354,6 +352,9 @@ case "${host}" in
 	;;
     esac
     ;;
+  arm64*-*-darwin* | aarch64-*-darwin*)
+     # Nothing special so far.
+     ;;
   arm*-*-freebsd*)
      port_specific_symbol_files="\$(srcdir)/../config/os/gnu-linux/arm-eabi-extra.ver"
      ;;
