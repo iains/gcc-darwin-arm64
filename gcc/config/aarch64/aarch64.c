@@ -3429,7 +3429,7 @@ aarch64_hard_regno_mode_ok (unsigned regno, machine_mode mode)
       if (known_le (GET_MODE_SIZE (mode), 8))
 	return true;
       if (known_le (GET_MODE_SIZE (mode), 16))
-	return (regno & 1) == 0;
+	return (regno & 1) == 0 || TARGET_MACHO; /* darwinpcs D.4 */
     }
   else if (FP_REGNUM_P (regno))
     {
