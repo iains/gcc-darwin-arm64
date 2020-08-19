@@ -2165,6 +2165,8 @@ darwin_emit_except_table_label (FILE *file)
 rtx
 darwin_make_eh_symbol_indirect (rtx orig, bool ARG_UNUSED (pubvis))
 {
+  if (DARWIN_ARM64)
+    return orig;
   if (DARWIN_PPC == 0 && TARGET_64BIT)
     return orig;
 
