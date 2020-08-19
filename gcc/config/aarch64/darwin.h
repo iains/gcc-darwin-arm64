@@ -47,6 +47,9 @@ along with GCC; see the file COPYING3.  If not see
 #undef DEFAULT_SIGNED_CHAR
 #define DEFAULT_SIGNED_CHAR 1
 
+#undef LONG_DOUBLE_TYPE_SIZE
+#define LONG_DOUBLE_TYPE_SIZE	64
+
 /* Hack alert - we want the exported cas etc.  */
 #undef LIB_SPEC
 #define LIB_SPEC "%{!static:-lSystem} -lgcc"
