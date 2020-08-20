@@ -6958,7 +6958,20 @@ on_stack:
 	 size is rounded up to 8 bytes, so will account for enough slots to
 	 accommodate the entire argument - potentially, with some padding
 	 at the end.  When the current position is 0 - any allocation needs
-	 a stack slot.  CHECKME: do we need to align 16byte entities?  */
+	 a stack slot.  CHECKME: do we need to align 16byte entities?
+
+	 but we don't do this for unnamed parms in variadic functions, they
+	 each get their own slot.  */
+      if (!arg.named)
+	{
+	  pcum->aapcs_stack_words = size / UNITS_PER_WORD;
+	  pcum->darwinpcs_sub_word_offset = 0;
+	  pcum->darwinpcs_sub_word_pos = 0;
+	  /* We skip the re-alignment for 16byte things, since we currently
+	     assume that the darwinpcs doesn't force such alignment.  */
+	  return;
+	}
+
       if (pcum->darwinpcs_sub_word_pos == 0)
 	pcum->aapcs_stack_words = size / UNITS_PER_WORD;
 
@@ -18783,13 +18796,23 @@ static GTY(()) tree va_list_type;
      void *__vr_top;
      int   __gr_offs;
      int   __vr_offs;
-   };  */
+   };
+
+  darwinpcs uses 'char *' for the va_list (in common with other platform
+  ports).  */
 
 static tree
 aarch64_build_builtin_va_list (void)
 {
   tree va_list_name;
   tree f_stack, f_grtop, f_vrtop, f_groff, f_vroff;
+
+  /* darwinpcs uses a simple char * for this.  */
+  if (TARGET_MACHO)
+    {
+      va_list_type = build_pointer_type (char_type_node);
+      return va_list_type;
+    }
 
   /* Create the type.  */
   va_list_type = lang_hooks.types.make_type (RECORD_TYPE);
@@ -18861,6 +18884,13 @@ aarch64_expand_builtin_va_start (tree valist, rtx nextarg ATTRIBUTE_UNUSED)
   int gr_save_area_size = cfun->va_list_gpr_size;
   int vr_save_area_size = cfun->va_list_fpr_size;
   int vr_offset;
+
+  /* darwinpcs uses the default, char * va_list impl.  */
+  if (TARGET_MACHO)
+    {
+      std_expand_builtin_va_start (valist, nextarg);
+      return;
+    }
 
   cum = &crtl->args.info;
   if (cfun->va_list_gpr_size)
@@ -18951,6 +18981,9 @@ aarch64_gimplify_va_arg_expr (tree valist, tree type, gimple_seq *pre_p,
   tree stack, f_top, f_off, off, arg, roundup, on_stack;
   HOST_WIDE_INT size, rsize, adjust, align;
   tree t, u, cond1, cond2;
+
+  if (TARGET_MACHO)
+    return std_gimplify_va_arg_expr (valist, type, pre_p, post_p);
 
   indirect_p = pass_va_arg_by_reference (type);
   if (indirect_p)
@@ -19207,6 +19240,9 @@ aarch64_setup_incoming_varargs (cumulative_args_t cum_v,
   CUMULATIVE_ARGS local_cum;
   int gr_saved = cfun->va_list_gpr_size;
   int vr_saved = cfun->va_list_fpr_size;
+
+  if (TARGET_MACHO)
+    return;
 
   /* The caller has advanced CUM up to, but not beyond, the last named
      argument.  Advance a local copy of CUM past the last "real" named
