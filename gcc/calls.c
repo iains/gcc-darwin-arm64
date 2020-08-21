@@ -2551,7 +2551,8 @@ initialize_argument_information (int num_actuals ATTRIBUTE_UNUSED,
 #endif
 			     reg_parm_stack_space,
 			     args[i].pass_on_stack ? 0 : args[i].partial,
-			     fndecl, args_size, &args[i].locate);
+			     fndecl, args_size, &args[i].locate,
+			     argpos < n_named_args);
 #ifdef BLOCK_REG_PADDING
       else
 	/* The argument is passed entirely in registers.  See at which
@@ -5281,7 +5282,8 @@ emit_library_call_value_1 (int retval, rtx orgfun, rtx value,
 			   argvec[count].reg != 0,
 #endif
 			   reg_parm_stack_space, 0,
-			   NULL_TREE, &args_size, &argvec[count].locate);
+			   NULL_TREE, &args_size, &argvec[count].locate,
+			   /*named_p=*/ true);
 
       if (argvec[count].reg == 0 || argvec[count].partial != 0
 	  || reg_parm_stack_space > 0)
@@ -5372,7 +5374,8 @@ emit_library_call_value_1 (int retval, rtx orgfun, rtx value,
 			       argvec[count].reg != 0,
 #endif
 			       reg_parm_stack_space, argvec[count].partial,
-			       NULL_TREE, &args_size, &argvec[count].locate);
+			       NULL_TREE, &args_size, &argvec[count].locate,
+			       /*named_p=*/true);
 	  args_size.constant += argvec[count].locate.size.constant;
 	  gcc_assert (!argvec[count].locate.size.var);
 	}
