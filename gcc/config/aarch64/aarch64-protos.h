@@ -915,6 +915,7 @@ void aarch64_expand_vector_init (rtx, rtx);
 void aarch64_sve_expand_vector_init (rtx, rtx);
 void aarch64_init_cumulative_args (CUMULATIVE_ARGS *, const_tree, rtx,
 				   const_tree, unsigned, bool = false);
+void aarch64_init_cumulative_incoming_args (CUMULATIVE_ARGS *, const_tree, rtx);
 void aarch64_init_expanders (void);
 void aarch64_init_simd_builtins (void);
 void aarch64_emit_call_insn (rtx);
