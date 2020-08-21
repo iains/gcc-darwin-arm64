@@ -6778,13 +6778,15 @@ on_stack:
 	 at the end.  When the current position is 0 - any allocation needs
 	 a stack slot.  CHECKME: do we need to align 16byte entities?
 
-	 but we don't do this for unnamed parms in variadic functinos, they
+	 but we don't do this for unnamed parms in variadic functions, they
 	 each get their own slot.  */
       if (!arg.named)
 	{
 	  pcum->aapcs_stack_words = size / UNITS_PER_WORD;
+	  pcum->darwinpcs_sub_word_offset = 0;
+	  pcum->darwinpcs_sub_word_pos = 0;
 	  /* We skip the re-alignment for 16byte things, since we currently
-	     assume that the don't force such alignment.  */
+	     assume that the darwinpcs doesn't force such alignment.  */
 	  return;
 	}
 
