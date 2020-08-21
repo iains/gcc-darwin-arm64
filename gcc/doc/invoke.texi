@@ -706,6 +706,7 @@ Objective-C and Objective-C++ Dialects}.
 -fverbose-asm  -fpack-struct[=@var{n}]  @gol
 -fleading-underscore  -ftls-model=@var{model} @gol
 -fstack-reuse=@var{reuse_level} @gol
+-fstack-use-cumulative-args @gol
 -ftrampolines  -ftrapv  -fwrapv @gol
 -fvisibility=@r{[}default@r{|}internal@r{|}hidden@r{|}protected@r{]} @gol
 -fstrict-volatile-bitfields  -fsync-libcalls}
@@ -17970,6 +17971,17 @@ does not overlap with it. However some of the legacy code relies on
 the behavior of older compilers in which temporaries' stack space is
 not reused, the aggressive stack reuse can lead to runtime errors. This
 option is used to control the temporary stack reuse optimization.
+
+@item -fstack-use-cumulative-args
+@opindex fstack_use_cumulative_args
+This option instructs the compiler to use the
+@code{cumulative_args_t}-based stack layout target hooks,
+@code{TARGET_FUNCTION_ARG_BOUNDARY_CA} and
+@code{TARGET_FUNCTION_ARG_ROUND_BOUNDARY_CA}. If a given target does
+not define these hooks, the default behaviour is to fallback to using
+the standard non-@code{_CA} variants instead. Certain targets (such as
+AArch64 Darwin) require using the more advanced @code{_CA}-based
+hooks: For these targets this option should be enabled by default.
 
 @item -ftrapv
 @opindex ftrapv
