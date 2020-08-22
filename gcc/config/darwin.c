@@ -2434,8 +2434,12 @@ darwin_emit_local_bss (FILE *fp, tree decl, const char *name,
 	 and the section alignment will take care of the rest.  */
       char secnam[64];
       unsigned int flags ;
+#if DARWIN_ARM64
+      snprintf (secnam, 64, "__DATA,__common");
+#else
       snprintf (secnam, 64, "__DATA,__%sbss%u", ((size)?"":"zo_"),
 						(unsigned) l2align);
+#endif
       /* We can't anchor (yet, if ever) in zerofill sections, because we can't
 	 switch to them and emit a label.  */
       flags = SECTION_BSS|SECTION_WRITE|SECTION_NO_ANCHOR;
@@ -2606,7 +2610,11 @@ fprintf (fp, "# albss: %s (%lld,%d) ro %d cst %d stat %d com %d"
       /* When we are on a non-section anchor target, we can get zero-sized
 	 items here.  However, all we need to do is to bump them to one byte
 	 and the section alignment will take care of the rest.  */
+#if DARWIN_ARM64
+      snprintf (secnam, 64, "__DATA,__common");
+#else
       snprintf (secnam, 64, "__DATA,__%spu_bss%u", ((size)?"":"zo_"), l2align);
+#endif
 
       /* We can't anchor in zerofill sections, because we can't switch
 	 to them and emit a label.  */
