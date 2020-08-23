@@ -54,6 +54,17 @@ along with GCC; see the file COPYING3.  If not see
 #undef LIB_SPEC
 #define LIB_SPEC "%{!static:-lSystem} -lgcc"
 
+/* Force the default endianness and ABI flags onto the command line
+   in order to make the other specs easier to write.  */
+#undef DRIVER_SELF_SPECS
+#define DRIVER_SELF_SPECS \
+"%{mbig-endian:%eDarwin platforms do not support big-endian arm64}" \
+"%{!mlittle-endian:-mlittle-endian} " \
+"%{mabi=ilp32:%eSorry, support for Darwin ilp32 arm64 is not implemented} " \
+"%{!mabi=*:-mabi=lp64} " \
+  MCPU_MTUNE_NATIVE_SPECS \
+  SUBTARGET_DRIVER_SELF_SPECS
+
 /* We want -fPIC by default, unless we're using -static to compile for
    the kernel or some such.  */
 
