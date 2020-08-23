@@ -6102,7 +6102,9 @@ on_stack:
 	  * unnamed parms in variadic functions
 	  * complex types smaller than 4 bytes
 	 each get their own slot.  */
-      if (!arg.named || (TREE_CODE (type) == COMPLEX_TYPE))
+      if (!arg.named
+	  || TREE_CODE (type) == COMPLEX_TYPE
+	  || TREE_CODE (type) == RECORD_TYPE)
 	{
 	  pcum->aapcs_stack_words = size / UNITS_PER_WORD;
 	  pcum->darwinpcs_sub_word_offset = 0;
@@ -6271,8 +6273,9 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
   unsigned int alignment = aarch64_function_arg_alignment (mode, type,
 							   &abi_break);
 #if TARGET_MACHO
-  /* Temporary fudge to put complex values into distinct stack slots.  */
-  if (TREE_CODE (type) == COMPLEX_TYPE)
+  /* Temporary fudge to put some non-scalar types in distinct stack slots.  */
+  if (TREE_CODE (type) == COMPLEX_TYPE
+      || TREE_CODE (type) == RECORD_TYPE)
     return MIN (MAX (alignment, PARM_BOUNDARY), STACK_BOUNDARY);
   return MIN (alignment, STACK_BOUNDARY);
 #else
