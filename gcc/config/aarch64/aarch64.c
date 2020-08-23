@@ -6643,6 +6643,7 @@ aarch64_return_in_memory (const_tree type, const_tree fndecl ATTRIBUTE_UNUSED)
   gcc_unreachable ();
 }
 
+#if !TARGET_MACHO
 static bool
 aarch64_vfp_is_call_candidate (cumulative_args_t pcum_v, machine_mode mode,
 			       const_tree type, int *nregs)
@@ -6652,6 +6653,7 @@ aarch64_vfp_is_call_candidate (cumulative_args_t pcum_v, machine_mode mode,
 						  &pcum->aapcs_vfp_rmode,
 						  nregs, NULL, pcum->silent_p);
 }
+#endif
 
 /* Given MODE and TYPE of a function argument, return the alignment in
    bits.  The idea is to suppress any stronger alignment requested by
@@ -6795,10 +6797,18 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
   size = ROUND_UP (size, UNITS_PER_WORD);
 
   allocate_ncrn = (type) ? !(FLOAT_TYPE_P (type)) : !FLOAT_MODE_P (mode);
+  bool is_ha = false;
+#if !TARGET_MACHO
   allocate_nvrn = aarch64_vfp_is_call_candidate (pcum_v,
 						 mode,
 						 type,
 						 &nregs);
+#else
+  allocate_nvrn = aarch64_vfp_is_call_or_return_candidate (mode, type,
+						  &pcum->aapcs_vfp_rmode,
+						  &nregs, &is_ha,
+						  pcum->silent_p);
+#endif
   gcc_assert (!sve_p || !allocate_nvrn);
 
   /* allocate_ncrn may be false-positive, but allocate_nvrn is quite reliable.
@@ -6960,9 +6970,15 @@ on_stack:
 	 at the end.  When the current position is 0 - any allocation needs
 	 a stack slot.  CHECKME: do we need to align 16byte entities?
 
-	 but we don't do this for unnamed parms in variadic functions, they
+	 but we don't do this for:
+	  * unnamed parms in variadic functions
+	  * complex types smaller than 4 bytes
 	 each get their own slot.  */
-      if (!arg.named)
+      if (!arg.named
+	  || TREE_CODE (type) == COMPLEX_TYPE
+	  || (TREE_CODE (type) == RECORD_TYPE
+	      && !is_ha && !SCALAR_FLOAT_MODE_P (pcum->aapcs_vfp_rmode))
+	  || TREE_CODE (type) == UNION_TYPE)
 	{
 	  pcum->aapcs_stack_words = size / UNITS_PER_WORD;
 	  pcum->darwinpcs_sub_word_offset = 0;
@@ -7049,6 +7065,7 @@ aarch64_init_cumulative_args (CUMULATIVE_ARGS *pcum,
   pcum->darwinpcs_sub_word_offset = 0;
   pcum->darwinpcs_sub_word_pos = 0;
   pcum->silent_p = silent_p;
+  pcum->aapcs_vfp_rmode = VOIDmode;
 
   if (!silent_p
       && !TARGET_FLOAT
@@ -7122,12 +7139,23 @@ aarch64_function_arg_regno_p (unsigned regno)
 static unsigned int
 aarch64_function_arg_boundary (machine_mode mode, const_tree type)
 {
-#if TARGET_MACHO
-  return MIN (alignment, STACK_BOUNDARY);
-#else
   unsigned int abi_break;
   unsigned int alignment = aarch64_function_arg_alignment (mode, type,
 							   &abi_break);
+#if TARGET_MACHO
+  /* Temporary fudge to put some non-scalar types in distinct stack slots.  */
+  machine_mode comp_mode = VOIDmode;
+  int nregs;
+  bool is_ha;
+  aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
+					   &is_ha, /*silent*/true);
+  if (TREE_CODE (type) == COMPLEX_TYPE
+      || (TREE_CODE (type) == RECORD_TYPE
+	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode))
+      || TREE_CODE (type) == UNION_TYPE)
+    return MIN (MAX (alignment, PARM_BOUNDARY), STACK_BOUNDARY);
+  return MIN (alignment, STACK_BOUNDARY);
+#else
   alignment = MIN (MAX (alignment, PARM_BOUNDARY), STACK_BOUNDARY);
   if (abi_break & warn_psabi)
     {
