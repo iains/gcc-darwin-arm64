@@ -6113,7 +6113,8 @@ on_stack:
       if (!arg.named
 	  || TREE_CODE (type) == COMPLEX_TYPE
 	  || (TREE_CODE (type) == RECORD_TYPE
-	      && !is_ha && !SCALAR_FLOAT_MODE_P (pcum->aapcs_vfp_rmode)))
+	      && !is_ha && !SCALAR_FLOAT_MODE_P (pcum->aapcs_vfp_rmode))
+	  || TREE_CODE (type) == UNION_TYPE)
 	{
 	  pcum->aapcs_stack_words = size / UNITS_PER_WORD;
 	  pcum->darwinpcs_sub_word_offset = 0;
@@ -6293,7 +6294,8 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
 						  /*silent*/true);
   if (TREE_CODE (type) == COMPLEX_TYPE
       || (TREE_CODE (type) == RECORD_TYPE
-	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode)))
+	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode))
+      || TREE_CODE (type) == UNION_TYPE)
     return MIN (MAX (alignment, PARM_BOUNDARY), STACK_BOUNDARY);
   return MIN (alignment, STACK_BOUNDARY);
 #else
