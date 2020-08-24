@@ -2188,7 +2188,6 @@ handle_aarch64_vector_pcs_attribute (tree *node, tree name, tree,
     case ARM_PCS_SIMD:
       return NULL_TREE;
 
-    case ARM_PCS_DARWINPCS: /* FIXME: check if this is correct.  */
     case ARM_PCS_SVE:
       error ("the %qE attribute cannot be applied to an SVE function type",
 	     name);
@@ -3549,7 +3548,6 @@ aarch64_reg_save_mode (unsigned int regno)
     switch (crtl->abi->id ())
       {
       case ARM_PCS_AAPCS64:
-      case ARM_PCS_DARWINPCS:
 	/* Only the low 64 bits are saved by the base PCS.  */
 	return DFmode;
 
@@ -6796,7 +6794,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
       if (!pcum->silent_p && !TARGET_FLOAT)
 	aarch64_err_no_fpadvsimd (mode);
 
-      if (pcum->pcs_variant == ARM_PCS_DARWINPCS
+      if (TARGET_MACHO
 	  && !arg.named)
 	{
 	  pcum->aapcs_nextnvrn = NUM_FP_ARG_REGS;
@@ -6853,7 +6851,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
     {
       gcc_assert (nregs == 0 || nregs == 1 || nregs == 2);
 
-      if (pcum->pcs_variant == ARM_PCS_DARWINPCS
+      if (TARGET_MACHO
 	  && !arg.named)
 	{
 	  pcum->aapcs_nextncrn = NUM_ARG_REGS;
@@ -6871,7 +6869,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 	  && (aarch64_function_arg_alignment (mode, type, &abi_break)
 	      == 16 * BITS_PER_UNIT)
 	  /* Darwin PCS deletes rule C.8.  */
-	  && pcum->pcs_variant != ARM_PCS_DARWINPCS)
+	  && !TARGET_MACHO)
 	{
 	  if (abi_break && warn_psabi && currently_expanding_gimple_stmt)
 	    inform (input_location, "parameter passing for argument of type "
@@ -6931,7 +6929,7 @@ on_stack:
 
   unsigned int align = aarch64_function_arg_alignment (mode, type, &abi_break);
 
-  if (pcum->pcs_variant == ARM_PCS_DARWINPCS)
+  if (TARGET_MACHO)
     {
       /* Darwin does not round up the allocation for smaller entities to 8
 	 bytes.  It only requires the natural alignment for these.  There
@@ -6984,8 +6982,7 @@ aarch64_function_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
   CUMULATIVE_ARGS *pcum = get_cumulative_args (pcum_v);
   gcc_assert (pcum->pcs_variant == ARM_PCS_AAPCS64
 	      || pcum->pcs_variant == ARM_PCS_SIMD
-	      || pcum->pcs_variant == ARM_PCS_SVE
-	      || pcum->pcs_variant == ARM_PCS_DARWINPCS);
+	      || pcum->pcs_variant == ARM_PCS_SVE);
 
   if (arg.end_marker_p ())
     return gen_int_mode (pcum->pcs_variant, DImode);
@@ -7012,9 +7009,6 @@ aarch64_init_cumulative_args (CUMULATIVE_ARGS *pcum,
     pcum->pcs_variant = (arm_pcs) fntype_abi (fntype).id ();
   else
     pcum->pcs_variant = ARM_PCS_AAPCS64;
-  /* FIXME: Is there ever a case on Darwin where non-darwinpcs is valid?  */
-  if (TARGET_MACHO && pcum->pcs_variant == ARM_PCS_AAPCS64)
-    pcum->pcs_variant = ARM_PCS_DARWINPCS;
   pcum->aapcs_reg = NULL_RTX;
   pcum->aapcs_arg_processed = false;
   pcum->aapcs_stack_words = 0;
@@ -7058,13 +7052,12 @@ aarch64_function_arg_advance (cumulative_args_t pcum_v,
   CUMULATIVE_ARGS *pcum = get_cumulative_args (pcum_v);
   if (pcum->pcs_variant == ARM_PCS_AAPCS64
       || pcum->pcs_variant == ARM_PCS_SIMD
-      || pcum->pcs_variant == ARM_PCS_SVE
-      || pcum->pcs_variant == ARM_PCS_DARWINPCS)
+      || pcum->pcs_variant == ARM_PCS_SVE)
     {
       aarch64_layout_arg (pcum_v, arg);
-      if (pcum->pcs_variant != ARM_PCS_DARWINPCS)
-	gcc_assert ((pcum->aapcs_reg != NULL_RTX)
-		    != (pcum->aapcs_stack_words != 0));
+      gcc_assert (TARGET_MACHO
+		  || (pcum->aapcs_reg != NULL_RTX)
+		      != (pcum->aapcs_stack_words != 0));
       pcum->aapcs_arg_processed = false;
       pcum->aapcs_ncrn = pcum->aapcs_nextncrn;
       pcum->aapcs_nvrn = pcum->aapcs_nextnvrn;

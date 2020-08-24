@@ -953,7 +953,6 @@ enum arm_pcs
   ARM_PCS_SVE,			/* For functions that pass or return
 				   values in SVE registers.  */
   ARM_PCS_TLSDESC,		/* For targets of tlsdesc calls.  */
-  ARM_PCS_DARWINPCS,		/* Darwin's amended AAPCS for 64 bit.  */
   ARM_PCS_UNKNOWN
 };
 
