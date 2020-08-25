@@ -31,6 +31,9 @@ along with GCC; see the file COPYING3.  If not see
 #undef TARGET_64BIT
 #define TARGET_64BIT 1
 
+#undef  PTRDIFF_TYPE
+#define PTRDIFF_TYPE "long int"
+
 /* NOTE that arm64_32 is a valid thing and corresponds to darwinpcs
    and TARGET_ILP32, but we are not implementing that for now.  */
 #define TARGET_OS_CPP_BUILTINS()		\
