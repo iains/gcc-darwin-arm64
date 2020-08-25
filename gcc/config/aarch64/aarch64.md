@@ -6705,7 +6705,7 @@
 		  (match_operand 2 "aarch64_valid_symref" "S")))]
   ""
   { return TARGET_MACHO
-    ? "add\\t%<w>0, %<w>1, %c2@PAGEOFF;momd"
+    ? "add\\t%<w>0, %<w>1, %K2;momd"
     : "add\\t%<w>0, %<w>1, :lo12:%c2";
   }
   [(set_attr "type" "alu_imm")]
@@ -6719,7 +6719,7 @@
 		    UNSPEC_GOTSMALLPIC))]
   ""
   { return TARGET_MACHO
-    ? "ldr\\t%<w>0, [%1, %c2@GOTPAGEOFF];momd"
+    ? "ldr\\t%<w>0, [%1, %O2];momd"
     : "ldr\\t%<w>0, [%1, #:got_lo12:%c2]";
   }
   [(set_attr "type" "load_<ldst_sz>")]
