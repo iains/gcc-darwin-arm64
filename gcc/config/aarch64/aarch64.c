@@ -11000,6 +11000,136 @@ sizetochar (int size)
     }
 }
 
+static void
+output_macho_postfix_expr (FILE *file, rtx x, const char *postfix)
+{
+  char buf[256];
+
+ restart:
+  switch (GET_CODE (x))
+    {
+    case PC:
+      putc ('.', file);
+      break;
+
+    case SYMBOL_REF:
+      if (SYMBOL_REF_DECL (x))
+	assemble_external (SYMBOL_REF_DECL (x));
+      assemble_name (file, XSTR (x, 0));
+      fprintf (file, "@%s", postfix);
+      break;
+
+    case LABEL_REF:
+      x = label_ref_label (x);
+      /* Fall through.  */
+    case CODE_LABEL:
+      ASM_GENERATE_INTERNAL_LABEL (buf, "L", CODE_LABEL_NUMBER (x));
+      assemble_name (file, buf);
+      break;
+
+    case CONST_INT:
+      fprintf (file, HOST_WIDE_INT_PRINT_DEC, INTVAL (x));
+      break;
+
+    case CONST:
+      /* This used to output parentheses around the expression,
+	 but that does not work on the 386 (either ATT or BSD assembler).  */
+      output_macho_postfix_expr (file, XEXP (x, 0), postfix);
+      break;
+
+    case CONST_WIDE_INT:
+      /* We do not know the mode here so we have to use a round about
+	 way to build a wide-int to get it printed properly.  */
+      {
+	wide_int w = wide_int::from_array (&CONST_WIDE_INT_ELT (x, 0),
+					   CONST_WIDE_INT_NUNITS (x),
+					   CONST_WIDE_INT_NUNITS (x)
+					   * HOST_BITS_PER_WIDE_INT,
+					   false);
+	print_decs (w, file);
+      }
+      break;
+
+    case CONST_DOUBLE:
+      if (CONST_DOUBLE_AS_INT_P (x))
+	{
+	  /* We can use %d if the number is one word and positive.  */
+	  if (CONST_DOUBLE_HIGH (x))
+	    fprintf (file, HOST_WIDE_INT_PRINT_DOUBLE_HEX,
+		     (unsigned HOST_WIDE_INT) CONST_DOUBLE_HIGH (x),
+		     (unsigned HOST_WIDE_INT) CONST_DOUBLE_LOW (x));
+	  else if (CONST_DOUBLE_LOW (x) < 0)
+	    fprintf (file, HOST_WIDE_INT_PRINT_HEX,
+		     (unsigned HOST_WIDE_INT) CONST_DOUBLE_LOW (x));
+	  else
+	    fprintf (file, HOST_WIDE_INT_PRINT_DEC, CONST_DOUBLE_LOW (x));
+	}
+      else
+	/* We can't handle floating point constants;
+	   PRINT_OPERAND must handle them.  */
+	output_operand_lossage ("floating constant misused");
+      break;
+
+    case CONST_FIXED:
+      fprintf (file, HOST_WIDE_INT_PRINT_DEC, CONST_FIXED_VALUE_LOW (x));
+      break;
+
+    case PLUS:
+      /* Some assemblers need integer constants to appear last (eg masm).  */
+      if (CONST_INT_P (XEXP (x, 0)))
+	{
+	  output_macho_postfix_expr (file, XEXP (x, 1), postfix);
+	  if (INTVAL (XEXP (x, 0)) >= 0)
+	    fprintf (file, "+");
+	  output_addr_const (file, XEXP (x, 0));
+	}
+      else
+	{
+	  output_macho_postfix_expr (file, XEXP (x, 0), postfix);
+	  if (!CONST_INT_P (XEXP (x, 1))
+	      || INTVAL (XEXP (x, 1)) >= 0)
+	    fprintf (file, "+");
+	  output_addr_const (file, XEXP (x, 1));
+	}
+      break;
+
+    case MINUS:
+      /* Avoid outputting things like x-x or x+5-x,
+	 since some assemblers can't handle that.  */
+      x = simplify_subtraction (x);
+      if (GET_CODE (x) != MINUS)
+	goto restart;
+
+      output_macho_postfix_expr (file, XEXP (x, 0), postfix);
+      fprintf (file, "-");
+      if ((CONST_INT_P (XEXP (x, 1)) && INTVAL (XEXP (x, 1)) >= 0)
+	  || GET_CODE (XEXP (x, 1)) == PC
+	  || GET_CODE (XEXP (x, 1)) == SYMBOL_REF)
+	output_addr_const (file, XEXP (x, 1));
+      else
+	{
+	  fputs (targetm.asm_out.open_paren, file);
+	  output_addr_const (file, XEXP (x, 1));
+	  fputs (targetm.asm_out.close_paren, file);
+	}
+      break;
+
+    case ZERO_EXTEND:
+    case SIGN_EXTEND:
+    case SUBREG:
+    case TRUNCATE:
+      output_addr_const (file, XEXP (x, 0));
+      break;
+
+    default:
+      if (targetm.asm_out.output_addr_const_extra (file, x))
+	break;
+
+      output_operand_lossage ("invalid expression as operand");
+    }
+
+}
+
 /* Print operand X to file F in a target specific manner according to CODE.
    The acceptable formatting commands given by CODE are:
      'c':		An integer or symbol address without a preceding #
@@ -11068,6 +11198,12 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	}
       break;
 
+    case 'K':
+      output_macho_postfix_expr (f, x, "PAGEOFF");
+      break;
+    case 'O':
+      output_macho_postfix_expr (f, x, "GOTPAGEOFF");
+      break;
     case 'e':
       {
 	x = unwrap_const_vec_duplicate (x);
@@ -11421,20 +11557,23 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	default:
 	  break;
 	}
-#endif
       output_addr_const (asm_out_file, x);
+#endif
 #if TARGET_MACHO
   // FIXME update classify symbolic expression to handle macho.
       switch (aarch64_classify_symbolic_expression (x))
 	{
 	case SYMBOL_MO_SMALL_PCR:
-	  asm_fprintf (asm_out_file, "@PAGE;mopcr");
+	  output_macho_postfix_expr (asm_out_file, x, "PAGE");
+//	  asm_fprintf (asm_out_file, "@PAGE;mopcr");
 	  break;
 	case SYMBOL_MO_SMALL_GOT:
-	  asm_fprintf (asm_out_file, "@GOTPAGE;mosg");
+	  output_macho_postfix_expr (asm_out_file, x, "GOTPAGE");
+//	  asm_fprintf (asm_out_file, "@GOTPAGE;mosg");
 	  break;
 	default:
-	  asm_fprintf (asm_out_file, "@BLEAH");
+	  output_macho_postfix_expr (asm_out_file, x, "BLEAH");
+//	  asm_fprintf (asm_out_file, "@BLEAH");
 	  break;
 	}
 #endif
@@ -11643,13 +11782,13 @@ aarch64_print_address_internal (FILE *f, machine_mode mode, rtx x,
       case ADDRESS_LO_SUM:
 #if TARGET_MACHO
 	asm_fprintf (f, "[%s, #", reg_names [REGNO (addr.base)]);
-	output_addr_const (f, addr.offset);
-	asm_fprintf (f, "@PAGEOFF]");
+	output_macho_postfix_expr (f, addr.offset, "PAGEOFF");
+//	output_addr_const (f, addr.offset);
 #else
 	asm_fprintf (f, "[%s, #:lo12:", reg_names [REGNO (addr.base)]);
 	output_addr_const (f, addr.offset);
-	asm_fprintf (f, "]");
 #endif
+	asm_fprintf (f, "]");
 	return true;
 
       case ADDRESS_SYMBOLIC:
@@ -20524,7 +20663,8 @@ aarch64_mov_operand_p (rtx x, machine_mode mode)
 
   /* GOT accesses are valid moves.  */
   if (SYMBOL_REF_P (x)
-      && aarch64_classify_symbolic_expression (x) == SYMBOL_SMALL_GOT_4G)
+      && (aarch64_classify_symbolic_expression (x) == SYMBOL_SMALL_GOT_4G
+	  || aarch64_classify_symbolic_expression (x) == SYMBOL_MO_SMALL_GOT))
     return true;
 
   if (SYMBOL_REF_P (x) && mode == DImode && CONSTANT_ADDRESS_P (x))
