@@ -5759,6 +5759,7 @@ aarch64_return_in_memory (const_tree type, const_tree fndecl ATTRIBUTE_UNUSED)
   gcc_unreachable ();
 }
 
+#if !TARGET_MACHO
 static bool
 aarch64_vfp_is_call_candidate (cumulative_args_t pcum_v, machine_mode mode,
 			       const_tree type, int *nregs)
@@ -5768,6 +5769,7 @@ aarch64_vfp_is_call_candidate (cumulative_args_t pcum_v, machine_mode mode,
 						  &pcum->aapcs_vfp_rmode,
 						  nregs, NULL, pcum->silent_p);
 }
+#endif
 
 /* Given MODE and TYPE of a function argument, return the alignment in
    bits.  The idea is to suppress any stronger alignment requested by
