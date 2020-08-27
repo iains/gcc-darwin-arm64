@@ -3867,6 +3867,21 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 	if (can_create_pseudo_p ())
 	  tmp_reg = gen_reg_rtx (mode);
 
+	if (TARGET_MACHO)
+	  {
+	    rtx sym, off;
+	    split_const (imm, &sym, &off);
+	    /* Negative offsets don't work, whether by intention is TBD.  */
+	    if (INTVAL (off) < 0)
+	      {
+		emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, sym));
+		emit_insn (gen_add_losym (dest, tmp_reg, sym));
+		/* FIXME: add the SI option if/when we support ilp32.  */
+		emit_insn (gen_adddi3 (dest, dest, off));
+		return;
+	      }
+	   /* else positive offset is OK.  */
+	  }
 	emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, imm));
 	emit_insn (gen_add_losym (dest, tmp_reg, imm));
 	return;
@@ -10234,6 +10249,7 @@ aarch64_classify_address (struct aarch64_address_info *info,
       /* load literal: pc-relative constant pool entry.  Only supported
          for SI mode or larger.  */
       info->type = ADDRESS_SYMBOLIC;
+      info->offset = NULL_RTX;
 
       if (!load_store_pair_p
 	  && GET_MODE_SIZE (mode).is_constant (&const_size)
@@ -10241,6 +10257,7 @@ aarch64_classify_address (struct aarch64_address_info *info,
 	{
 	  poly_int64 offset;
 	  rtx sym = strip_offset_and_salt (x, &offset);
+
 	  return ((LABEL_REF_P (sym)
 		   || (SYMBOL_REF_P (sym)
 		       && CONSTANT_POOL_ADDRESS_P (sym)
@@ -10258,6 +10275,7 @@ aarch64_classify_address (struct aarch64_address_info *info,
 	  poly_int64 offset;
 	  HOST_WIDE_INT const_offset;
 	  rtx sym = strip_offset_and_salt (info->offset, &offset);
+
 	  if (SYMBOL_REF_P (sym)
 	      && offset.is_constant (&const_offset)
 	      && (aarch64_classify_symbol (sym, const_offset)
