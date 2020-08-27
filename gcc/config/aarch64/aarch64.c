@@ -6254,10 +6254,8 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
   machine_mode comp_mode = VOIDmode;
   int nregs;
   bool is_ha;
-  bool cand =  aarch64_vfp_is_call_or_return_candidate (mode, type,
-						  &comp_mode,
-						  &nregs, &is_ha,
-						  /*silent*/true);
+  aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
+					   &is_ha, /*silent*/true);
   if (TREE_CODE (type) == COMPLEX_TYPE
       || (TREE_CODE (type) == RECORD_TYPE
 	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode))
