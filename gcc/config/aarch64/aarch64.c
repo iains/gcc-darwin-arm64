@@ -19584,10 +19584,13 @@ aarch64_print_patchable_function_entry (FILE *file,
 /* Implement ASM_OUTPUT_DEF_FROM_DECLS.  Output .variant_pcs for aliases.  */
 
 void
-aarch64_asm_output_alias (FILE *stream, const tree decl, const tree target)
+aarch64_asm_output_alias (FILE *stream, const tree decl,
+			  const tree target ATTRIBUTE_UNUSED)
 {
   const char *name = XSTR (XEXP (DECL_RTL (decl), 0), 0);
+#ifdef ASM_OUTPUT_DEF
   const char *value = IDENTIFIER_POINTER (target);
+#endif
   aarch64_asm_output_variant_pcs (stream, decl, name);
 #ifdef ASM_OUTPUT_DEF
   ASM_OUTPUT_DEF (stream, name, value);
