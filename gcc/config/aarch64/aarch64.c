@@ -10885,6 +10885,7 @@ output_macho_postfix_expr (FILE *file, rtx x, const char *postfix)
     case CODE_LABEL:
       ASM_GENERATE_INTERNAL_LABEL (buf, "L", CODE_LABEL_NUMBER (x));
       assemble_name (file, buf);
+      fprintf (file, "@%s", postfix);
       break;
 
     case CONST_INT:
@@ -18441,7 +18442,9 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 	case AARCH64_CMODEL_SMALL_SPIC:
 	case AARCH64_CMODEL_SMALL_PIC:
 	case AARCH64_CMODEL_SMALL:
-	  return SYMBOL_SMALL_ABSOLUTE;
+	  return TARGET_MACHO
+		 ? SYMBOL_MO_SMALL_PCR
+		 : SYMBOL_SMALL_ABSOLUTE;
 
 	default:
 	  gcc_unreachable ();
