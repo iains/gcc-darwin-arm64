@@ -763,7 +763,7 @@ proc scan-lto-assembler { args } {
 # to function bodies in array RESULT.  FILENAME has already been uploaded
 # locally where necessary and is known to exist.
 
-proc parse_function_bodies { filename result } {
+proc parse_ELF_function_bodies { filename result } {
     upvar $result up_result
 
     # Regexp for the start of a function definition (name in \1).
@@ -786,6 +786,44 @@ proc parse_function_bodies { filename result } {
 		set up_result($function_name) $function_body
 		set in_function 0
 	    } elseif { ![regexp $fluff $line] } {
+		append function_body $line "\n"
+	    }
+	}
+    }
+    close $fd
+}
+
+proc parse_MACHO_function_bodies { filename result } {
+    upvar $result up_result
+
+    # Regexp for the start of a function definition (name in \1).
+    set label {^(_[a-zA-Z_]\S+):$}
+    set start {^LFB[0-9]+}
+
+    # Regexp for the end of a function definition.
+    set terminator {^LFE[0-9]+}
+
+    # Regexp for lines that aren't interesting.
+    set fluff {^\s*(?:\.|//|@)}
+    set fluff3 {^L[0-9ACESV]}
+
+    set fd [open $filename r]
+    set in_function 0
+    while { [gets $fd line] >= 0 } {
+	if { !$in_function && [regexp $label $line dummy function_name] } {
+	    set in_function 1
+	    set function_body ""
+	} elseif { $in_function == 1 } {
+	  if { [regexp $start $line] } {
+	    set in_function 2
+	  } else {
+	    set in_function 0
+	  }
+	} elseif { $in_function == 2 } {
+	    if { [regexp $terminator $line] } {
+		set up_result($function_name) $function_body
+		set in_function 0
+	    } elseif { ![regexp $fluff $line]  && ![regexp $fluff3 $line] } {
 		append function_body $line "\n"
 	    }
 	}
@@ -818,6 +856,14 @@ proc check-function-bodies { args } {
     }
     if { [llength $args] > 4 } {
 	error "too many arguments to check-function-bodies"
+    }
+
+    set isELF 1
+    # some targets have a __USER_LABEL_PREFIX__
+    set needsULP 0
+    if { [istarget *-*-darwin*] } {
+      set isELF 0
+      set needsULP 1
     }
 
     if { [llength $args] >= 3 } {
@@ -876,7 +922,11 @@ proc check-function-bodies { args } {
 	remote_upload host "$filename"
     }
     if { [file exists $output_filename] } {
-	parse_function_bodies $output_filename functions
+        if { $isELF } {
+	    parse_ELF_function_bodies $output_filename functions
+	} else {
+	    parse_MACHO_function_bodies $output_filename functions
+	}
 	set have_bodies 1
     } else {
 	verbose -log "$testcase: output file does not exist"
@@ -920,6 +970,9 @@ proc check-function-bodies { args } {
 	    if { ![string equal $selector "N"] } {
 		if { $xfail_all || [string equal $selector "F"] } {
 		    setup_xfail "*-*-*"
+		}
+		if { $needsULP } {
+		    set function_name "_$function_name"
 		}
 		set testname "$testcase check-function-bodies $function_name"
 		if { !$have_bodies } {

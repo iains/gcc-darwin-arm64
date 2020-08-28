@@ -8517,7 +8517,7 @@ proc check_effective_target_section_anchors { } {
     return [check_cached_effective_target section_anchors {
       expr { [istarget powerpc*-*-*]
 	     || [istarget arm*-*-*]
-	     || [istarget aarch64*-*-*] }}]
+	     || ([istarget aarch64*-*-*] && ![istarget aarch64*-*-darwin*]) }}]
 }
 
 # Return 1 if the target supports atomic operations on "int_128" values.
@@ -11564,6 +11564,15 @@ proc check_effective_target_arm_thumb2_ok_no_arm_v8_1_lob { } {
     }
     return 0
 }
+
+# Return 1 if this is an ARM target where -mabi=ilp32 can be used.
+
+proc check_effective_target_arm_mabi_ilp32 { } {
+  return [check_no_compiler_messages_nocache arm_mabi_ilp32 assembly {
+     int main() { return 0; }
+  } "-mabi=ilp32"]
+}
+
 
 # Returns 1 if the target is using glibc, 0 otherwise.
 
