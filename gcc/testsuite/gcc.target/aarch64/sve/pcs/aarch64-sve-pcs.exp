@@ -25,6 +25,10 @@ if {![istarget aarch64*-*-*] } then {
     return
 }
 
+if { [istarget *-*-darwin*] } then {
+    return
+}
+
 # Load support procs.
 load_lib gcc-dg.exp
 
