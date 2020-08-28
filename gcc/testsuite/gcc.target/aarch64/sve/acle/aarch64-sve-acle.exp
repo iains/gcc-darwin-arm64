@@ -25,6 +25,11 @@ if {![istarget aarch64*-*-*] } {
     return
 }
 
+# Darwin doesn't support sve
+if { [istarget *-*-darwin*] } then {
+  return
+}
+
 # Load support procs.
 load_lib gcc-dg.exp
 
