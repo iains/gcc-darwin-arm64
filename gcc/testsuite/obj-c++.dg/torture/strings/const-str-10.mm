@@ -33,4 +33,4 @@ const NSConstantString *appKey = @"MyApp";
 /* { dg-final { scan-assembler ".section __OBJC, __cstring_object" { target { *-*-darwin* && { ! lp64 } } } } } */
 /* { dg-final { scan-assembler ".section __DATA, __objc_stringobj" { target { *-*-darwin* && { lp64 } } } } } */
 /* { dg-final { scan-assembler ".long\t__NSConstantStringClassReference\n\t.long\t.*\n\t.long\t5\n\t.data" { target { *-*-darwin* && { ! lp64 } } } } } */
-/* { dg-final { scan-assembler ".quad\t_OBJC_CLASS_._NSConstantString\n\t.quad\t.*\n\t.long\t5\n\t.space" { target { *-*-darwin* && { lp64 } } } } } */
+/* { dg-final { scan-assembler {.(quad|xword)\t_OBJC_CLASS_._NSConstantString\n\t.(quad|xword)\t.*\n\t.(long|word)\t5\n\t.space} { target { *-*-darwin* && { lp64 } } } } } */
