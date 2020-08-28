@@ -18,4 +18,4 @@ void *foo (void)
 
 /* { dg-final { scan-assembler ".section __DATA, __cfstring" } } */
 /* { dg-final { scan-assembler ".long\t___CFConstantStringClassReference\n\t.long\t1992\n\t.long\t.*\n\t.long\t19\n" { target { *-*-darwin* && { ! lp64 } } } } } */
-/* { dg-final { scan-assembler ".quad\t___CFConstantStringClassReference\n\t.long\t1992\n\t.space 4\n\t.quad\t.*\n\t.quad\t19\n" { target { *-*-darwin* && {  lp64 } } } } } */
+/* { dg-final { scan-assembler {.(quad|xword)\t___CFConstantStringClassReference\n\t.(long|word)\t1992\n\t.space 4\n\t.(quad|xword)\t.*\n\t.(quad|xword)\t19\n} { target { *-*-darwin* && {  lp64 } } } } } */
