@@ -1829,6 +1829,9 @@ finalize_ctors ()
   else
     switch_to_section (darwin_sections[constructor_section]);
 
+  /* Provide a linker-visible section-start symbol so that we have stable
+     output from compact unwind.  */
+  fputs (MACHOPIC_INDIRECT ? "_Mod_init:\n" : "_CTOR_sect:\n", asm_out_file);
   if (vec_safe_length (ctors) > 1)
     ctors->qsort (sort_cdtor_records);
   FOR_EACH_VEC_SAFE_ELT (ctors, i, elt)
@@ -1849,6 +1852,7 @@ finalize_dtors ()
   else
     switch_to_section (darwin_sections[destructor_section]);
 
+  fputs (MACHOPIC_INDIRECT ? "_Mod_term:\n" : "_DTOR_sect:\n", asm_out_file);
   if (vec_safe_length (dtors) > 1)
     dtors->qsort (sort_cdtor_records);
   FOR_EACH_VEC_SAFE_ELT (dtors, i, elt)
