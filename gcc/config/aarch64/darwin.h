@@ -152,6 +152,28 @@ along with GCC; see the file COPYING3.  If not see
 
 #define SUBTARGET_ENCODE_SECTION_INFO  darwin_encode_section_info
 
+#undef ASM_MAYBE_OUTPUT_ENCODED_ADDR_RTX
+#define ASM_MAYBE_OUTPUT_ENCODED_ADDR_RTX(FILE, ENCODING, SIZE, ADDR, DONE) \
+  if (TARGET_64BIT)							\
+    {									\
+      if ((SIZE) == 4 && ((ENCODING) & 0x70) == DW_EH_PE_pcrel)		\
+	{								\
+	  fputs (ASM_LONG, FILE);					\
+	  assemble_name (FILE, XSTR (ADDR, 0));				\
+	  fputs ("@GOT-.", FILE);					\
+	  goto DONE;							\
+	}								\
+    }									\
+  else									\
+    {									\
+      if (ENCODING == ASM_PREFERRED_EH_DATA_FORMAT (2, 1))		\
+	{								\
+	  gcc_unreachable (); /* no 32b support yet.*/			\
+	  /*darwin_non_lazy_pcrel (FILE, ADDR);*/			\
+	  goto DONE;							\
+	}								\
+    }
+
 /* Darwin x86 assemblers support the .ident directive.  */
 
 #undef TARGET_ASM_OUTPUT_IDENT
