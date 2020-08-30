@@ -50,6 +50,8 @@ git commit messages can work for that too.
 
 2020-08-25 Added markdown and updated to be the branch README.
 
+2020-08-30 Enough of this is implemented to allow GCC to bootstrap, many test fails and issues to be resolved.
+
 ## Introduction.
 
 This is taken from:
@@ -463,6 +465,8 @@ Offset within page of TLVP slot, scaled by r_length [add imm, ld/st].
 
 Must be followed by `ARM64_RELOC_PAGE21` or `ARM64_RELOC_PAGEOFF12`.
 (no source representation)
+
+The addend is a signed 24bit quantity (+/- 8M range).
 
 `ARM64_RELOC_ADDEND = 10`
 
