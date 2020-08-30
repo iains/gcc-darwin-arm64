@@ -1,5 +1,6 @@
-#if DEBUG
+#if DBG
 #include <stdio.h>
+#undef DBG
 #define DBG(x) fputs (x, stdout); fflush (stdout);
 #else
 #define DBG(x)
