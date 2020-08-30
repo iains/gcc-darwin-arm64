@@ -50,6 +50,8 @@ git commit messages can work for that too.
 
 2020-08-25 Added markdown and updated to be the branch README.
 
+2020-08-30 Enough of this is implemented to allow GCC to bootstrap, many test fails and issues to be resolved.
+
 ## Introduction.
 
 This is taken from:
