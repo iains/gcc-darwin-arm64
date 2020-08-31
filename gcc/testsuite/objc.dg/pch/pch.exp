@@ -14,6 +14,11 @@
 # along with GCC; see the file COPYING3.  If not see
 # <http://www.gnu.org/licenses/>.
 
+# Arm64 Darwin doesn't support PCH
+if { [istarget aarch64-*-darwin*] } then {
+  return
+}
+
 # GCC testsuite for precompiled header interaction,
 # that uses the `dg.exp' driver.
 
