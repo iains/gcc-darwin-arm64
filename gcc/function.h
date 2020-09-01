@@ -663,7 +663,7 @@ extern gimple_seq gimplify_parameters (gimple_seq *);
 extern void locate_and_pad_parm (machine_mode, tree, int, int, int,
 				 tree, struct args_size *,
 				 struct locate_and_pad_arg_data *,
-				 bool named_p = true);
+				 bool named_p = true, bool last_named = false);
 extern void generate_setjmp_warnings (void);
 
 /* Identify BLOCKs referenced by more than one NOTE_INSN_BLOCK_{BEG,END},
