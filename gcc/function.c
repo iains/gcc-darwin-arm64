@@ -2445,7 +2445,10 @@ assign_parm_find_data_types (struct assign_parm_data_all *all, tree parm,
   else if (DECL_CHAIN (parm))
     data->arg.named = 1;  /* Not the last non-variadic parm. */
   else if (targetm.calls.strict_argument_naming (all->args_so_far))
-    data->arg.named = 1;  /* Only variadic ones are unnamed.  */
+    {
+      data->arg.named = 1;  /* Only variadic ones are unnamed.  */
+      data->arg.last_named = 1;
+    }
   else
     data->arg.named = 0;  /* Treat as variadic.  */
 
@@ -2502,6 +2505,7 @@ assign_parms_setup_varargs (struct assign_parm_data_all *all,
 
   function_arg_info last_named_arg = data->arg;
   last_named_arg.named = true;
+  last_named_arg.last_named = true;
   targetm.calls.setup_incoming_varargs (all->args_so_far, last_named_arg,
 					&varargs_pretend_bytes, no_rtl);
 
@@ -2612,7 +2616,7 @@ assign_parm_find_entry_rtl (struct assign_parm_data_all *all,
 		       all->reg_parm_stack_space,
 		       entry_parm ? data->partial : 0, current_function_decl,
 		       &all->stack_args_size, &data->locate,
-		       data->arg.named);
+		       data->arg.named, data->arg.last_named);
 
   /* Update parm_stack_boundary if this parameter is passed in the
      stack.  */
@@ -3925,7 +3929,8 @@ gimplify_parameters (gimple_seq *cleanup)
       if (data.arg.pass_by_reference)
 	{
 	  tree type = TREE_TYPE (data.arg.type);
-	  function_arg_info orig_arg (type, data.arg.named);
+	  function_arg_info orig_arg (type, data.arg.named,
+				      data.arg.last_named);
 	  if (reference_callee_copied (&all.args_so_far_v, orig_arg))
 	    {
 	      tree local, t;
@@ -4031,7 +4036,7 @@ locate_and_pad_parm (machine_mode passed_mode, tree type, int in_regs,
 		     tree fndecl ATTRIBUTE_UNUSED,
 		     struct args_size *initial_offset_ptr,
 		     struct locate_and_pad_arg_data *locate,
-		     bool named_p)
+		     bool named_p, bool last_named_p)
 {
   tree sizetree;
   pad_direction where_pad;
@@ -4068,10 +4073,18 @@ locate_and_pad_parm (machine_mode passed_mode, tree type, int in_regs,
   where_pad = targetm.calls.function_arg_padding (passed_mode, type);
   boundary = targetm.calls.function_arg_boundary (passed_mode, type);
   if (named_p)
-    round_boundary = targetm.calls.function_arg_round_boundary (passed_mode,
-							        type);
+    {
+      round_boundary = targetm.calls.function_arg_round_boundary (passed_mode,
+							          type);
+      if (last_named_p)
+        round_boundary = PARM_BOUNDARY;
+    }
   else
-    round_boundary = PARM_BOUNDARY;
+    {
+      /* Force everything to be at least aligned to the parm boundary.  */
+      boundary = MAX (boundary, PARM_BOUNDARY);
+      round_boundary = PARM_BOUNDARY;
+    }
 
   locate->where_pad = where_pad;
 
