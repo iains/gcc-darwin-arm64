@@ -1354,7 +1354,8 @@ initialize_argument_information (int num_actuals ATTRIBUTE_UNUSED,
 	 with those made by function.c.  */
 
       /* See if this argument should be passed by invisible reference.  */
-      function_arg_info arg (type, argpos < n_named_args);
+      function_arg_info arg (type, argpos < n_named_args,
+			     argpos == n_named_args - 1);
       if (pass_by_reference (args_so_far_pnt, arg))
 	{
 	  const bool callee_copies
@@ -1528,7 +1529,8 @@ initialize_argument_information (int num_actuals ATTRIBUTE_UNUSED,
 			     reg_parm_stack_space,
 			     args[i].pass_on_stack ? 0 : args[i].partial,
 			     fndecl, args_size, &args[i].locate,
-			     argpos < n_named_args);
+			     argpos < n_named_args,
+			     argpos == n_named_args - 1);
 #ifdef BLOCK_REG_PADDING
       else
 	/* The argument is passed entirely in registers.  See at which
