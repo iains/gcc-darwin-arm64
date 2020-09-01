@@ -466,6 +466,8 @@ Offset within page of TLVP slot, scaled by r_length [add imm, ld/st].
 Must be followed by `ARM64_RELOC_PAGE21` or `ARM64_RELOC_PAGEOFF12`.
 (no source representation)
 
+The addend is a signed 24bit quantity (+/- 8M range).
+
 `ARM64_RELOC_ADDEND = 10`
 
 
