@@ -22554,6 +22554,16 @@ aarch64_output_simd_mov_immediate (rtx const_vector, unsigned width,
     }
 
   gcc_assert (CONST_INT_P (info.u.mov.value));
+  unsigned HOST_WIDE_INT value = UINTVAL (info.u.mov.value);
+
+  /* We have signed chars which can result in a sign-extended 8bit value
+     which is then emitted as an unsigned hex value, and the LLVM back end
+     assembler rejects that as being too big.  */
+  if (TARGET_MACHO && (known_eq (GET_MODE_BITSIZE (info.elt_mode), 8)))
+    {
+      unsigned HOST_WIDE_INT mask = (1U << GET_MODE_BITSIZE (info.elt_mode))-1;
+      value &= mask;
+    }
 
   if (which == AARCH64_CHECK_MOV)
     {
@@ -22562,16 +22572,16 @@ aarch64_output_simd_mov_immediate (rtx const_vector, unsigned width,
 		  ? "msl" : "lsl");
       if (lane_count == 1)
 	snprintf (templ, sizeof (templ), "%s\t%%d0, " HOST_WIDE_INT_PRINT_HEX,
-		  mnemonic, UINTVAL (info.u.mov.value));
+		  mnemonic, value);
       else if (info.u.mov.shift)
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, "
 		  HOST_WIDE_INT_PRINT_HEX ", %s %d", mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value), shift_op,
+		  element_char, value, shift_op,
 		  info.u.mov.shift);
       else
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, "
 		  HOST_WIDE_INT_PRINT_HEX, mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value));
+		  element_char, value);
     }
   else
     {
@@ -22580,12 +22590,12 @@ aarch64_output_simd_mov_immediate (rtx const_vector, unsigned width,
       if (info.u.mov.shift)
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, #"
 		  HOST_WIDE_INT_PRINT_DEC ", %s #%d", mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value), "lsl",
+		  element_char, value, "lsl",
 		  info.u.mov.shift);
       else
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, #"
 		  HOST_WIDE_INT_PRINT_DEC, mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value));
+		  element_char, value);
     }
   return templ;
 }
