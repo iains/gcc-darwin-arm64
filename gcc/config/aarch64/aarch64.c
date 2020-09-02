@@ -11932,6 +11932,16 @@ aarch64_anchor_offset (HOST_WIDE_INT offset, HOST_WIDE_INT size,
   return offset & (~0xfff * size);
 }
 
+#if TARGET_MACHO
+/* Section anchors are only usable in limited circumstances with the Mach-O
+   linker atom model.  TODO: figure out when it's worthwhile.  */
+static bool
+aarch64_darwin_use_anchor_for_sym_p (const_rtx)
+{
+  return false;
+}
+#endif
+
 static rtx
 aarch64_legitimize_address (rtx x, rtx /* orig_x  */, machine_mode mode)
 {
@@ -26863,6 +26873,11 @@ aarch64_libgcc_floating_mode_supported_p
    to determine the size of the access.  We assume accesses are aligned.  */
 #undef TARGET_MAX_ANCHOR_OFFSET
 #define TARGET_MAX_ANCHOR_OFFSET 4095
+
+#if TARGET_MACHO
+#undef  TARGET_USE_ANCHORS_FOR_SYMBOL_P
+#define TARGET_USE_ANCHORS_FOR_SYMBOL_P aarch64_darwin_use_anchor_for_sym_p
+#endif
 
 #undef TARGET_VECTOR_ALIGNMENT
 #define TARGET_VECTOR_ALIGNMENT aarch64_simd_vector_alignment
