@@ -10370,6 +10370,10 @@ aarch64_address_valid_for_prefetch_p (rtx x, bool strict_p)
   if (!res)
     return false;
 
+  /* Darwinpcs allows addresses on the stack that are not DImode aligned.  */
+  if (TARGET_MACHO && addr.offset && (INTVAL (addr.offset) & 0x07))
+    return false;
+
   /* ... except writeback forms.  */
   return addr.type != ADDRESS_REG_WB;
 }
