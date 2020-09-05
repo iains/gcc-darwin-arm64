@@ -20103,7 +20103,7 @@ aarch64_init_libfuncs (void)
 static machine_mode
 aarch64_c_mode_for_suffix (char suffix)
 {
-  if (suffix == 'q')
+  if (suffix == 'q' && !TARGET_MACHO)
     return TFmode;
 
   return VOIDmode;
