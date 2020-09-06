@@ -13659,12 +13659,17 @@ aarch64_init_builtins ()
 {
   aarch64_general_init_builtins ();
   aarch64_sve::init_builtins ();
+  aarch64_init_subtarget_builtins ();
 }
 
 /* Implement TARGET_FOLD_BUILTIN.  */
 static tree
 aarch64_fold_builtin (tree fndecl, int nargs, tree *args, bool)
 {
+#ifdef SUBTARGET_FOLD_BUILTIN
+  if (tree res = SUBTARGET_FOLD_BUILTIN (fndecl, nargs, args, false))
+    return res;
+#endif
   unsigned int code = DECL_MD_FUNCTION_CODE (fndecl);
   unsigned int subcode = code >> AARCH64_BUILTIN_SHIFT;
   tree type = TREE_TYPE (TREE_TYPE (fndecl));
