@@ -151,7 +151,7 @@ darwin_find_version_from_kernel (void)
 
   /* Darwin20 sees a transition to macOS 11.  */
   if (major_vers >= 20)
-    asprintf (&new_flag, "11.%d.0", major_vers - 20);
+    asprintf (&new_flag, "11.%02d.00", major_vers - 20);
   else if (major_vers - 4 <= 4)
     /* On 10.4 and earlier, the old linker is used which does not
        support three-component system versions.
