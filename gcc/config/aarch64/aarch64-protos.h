@@ -724,6 +724,7 @@ void aarch64_override_options_internal (struct gcc_options *);
 
 const char *aarch64_general_mangle_builtin_type (const_tree);
 void aarch64_general_init_builtins (void);
+void aarch64_init_subtarget_builtins (void);
 tree aarch64_general_fold_builtin (unsigned int, tree, unsigned int, tree *);
 gimple *aarch64_general_gimple_fold_builtin (unsigned int, gcall *);
 rtx aarch64_general_expand_builtin (unsigned int, tree, rtx, int);
