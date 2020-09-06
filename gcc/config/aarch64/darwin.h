@@ -196,6 +196,13 @@ along with GCC; see the file COPYING3.  If not see
   } while (0); 								\
   SUBSUBTARGET_OVERRIDE_OPTIONS
 
+#undef  SUBTARGET_INIT_BUILTINS
+#define SUBTARGET_INIT_BUILTINS						\
+  do {									\
+    aarch64_builtin_decls[AARCH64_BUILTIN_CFSTRING]			\
+      = darwin_init_cfstring_builtins ((AARCH64_BUILTIN_CFSTRING << AARCH64_BUILTIN_SHIFT) | AARCH64_BUILTIN_GENERAL); \
+  } while(0)
+
 /* Darwin on Arm64 uses dwarf-2.  */
 #ifndef DARWIN_PREFER_DWARF
 # undef PREFERRED_DEBUGGING_TYPE
