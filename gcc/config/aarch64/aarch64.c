@@ -9358,10 +9358,6 @@ aarch64_classify_address (struct aarch64_address_info *info,
 	  rtx sym, addend;
 
 	  split_const (x, &sym, &addend);
-	  if (TARGET_MACHO && INTVAL (addend) < 0)
-	    /* ld64 doesn't like sym-offset, it looks like a violation of atom
-	       rules.  */
-	    return false;
 	  return ((GET_CODE (sym) == LABEL_REF
 		   || (GET_CODE (sym) == SYMBOL_REF
 		       && CONSTANT_POOL_ADDRESS_P (sym)
@@ -9378,8 +9374,6 @@ aarch64_classify_address (struct aarch64_address_info *info,
 	{
 	  rtx sym, offs;
 	  split_const (info->offset, &sym, &offs);
-	  if (TARGET_MACHO && INTVAL (offs) < 0)
-	    return false;
 	  if (GET_CODE (sym) == SYMBOL_REF
 	      && (aarch64_classify_symbol (sym, INTVAL (offs))
 		  == SYMBOL_SMALL_ABSOLUTE))
