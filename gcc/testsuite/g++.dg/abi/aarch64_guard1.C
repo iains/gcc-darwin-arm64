@@ -13,5 +13,5 @@ int *foo ()
 }
 
 // { dg-final { scan-assembler _ZGVZ3foovE1x,8,8 { target { ! *-*-darwin* } } } }
-// { dg-final { scan-assembler __DATA,__common,__ZGVZ3foovE1x,8,3 { target *-*-darwin* } } }
+// { dg-final { scan-assembler __DATA,__bss,__ZGVZ3foovE1x,8,3 { target *-*-darwin* } } }
 // { dg-final { scan-tree-dump "& 1" "original" } }
