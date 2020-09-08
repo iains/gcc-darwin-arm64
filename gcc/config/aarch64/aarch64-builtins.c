@@ -1459,7 +1459,9 @@ aarch64_general_init_builtins (void)
 void
 aarch64_init_subtarget_builtins (void)
 {
+#ifdef SUBTARGET_INIT_BUILTINS
   SUBTARGET_INIT_BUILTINS;
+#endif
 }
 
 /* Implement TARGET_BUILTIN_DECL for the AARCH64_BUILTIN_GENERAL group.  */
