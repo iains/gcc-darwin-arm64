@@ -87,10 +87,10 @@ along with GCC; see the file COPYING3.  If not see
 #define DARWIN_ARCH_SPEC "arm64"
 
 #undef SUBTARGET_EXTRA_SPECS
-#define SUBTARGET_EXTRA_SPECS                                   \
-  DARWIN_EXTRA_SPECS                                            \
+#define SUBTARGET_EXTRA_SPECS					\
+  DARWIN_EXTRA_SPECS						\
   { "darwin_arch", DARWIN_ARCH_SPEC },				\
-  { "darwin_crt2", "" },                                        \
+  { "darwin_crt2", "" },					\
   { "darwin_subarch", DARWIN_ARCH_SPEC },
 
 #undef TARGET_ASM_FILE_END
