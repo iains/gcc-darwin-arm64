@@ -157,6 +157,11 @@ along with GCC; see the file COPYING3.  If not see
     1, 1			/* FFR and FFRT */	\
   }
 
+/* Although we cannot use executable stack, we still need to assign
+   a static chain regnum.  At the moment using R16 (IP0) is available.  */
+#undef STATIC_CHAIN_REGNUM
+#define STATIC_CHAIN_REGNUM	R16_REGNUM
+
 #define SUBTARGET_ENCODE_SECTION_INFO  darwin_encode_section_info
 
 #undef ASM_MAYBE_OUTPUT_ENCODED_ADDR_RTX
