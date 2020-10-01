@@ -1418,7 +1418,7 @@ c_cpp_builtins (cpp_reader *pfile)
 #endif
 
   /* Make the choice of ObjC runtime visible to source code.  */
-  if (c_dialect_objc () && flag_next_runtime)
+  if (c_dialect_objc () && flag_objc_internal_runtime >= 100000)
     cpp_define (pfile, "__NEXT_RUNTIME__");
 
   /* Show the availability of some target pragmas.  */

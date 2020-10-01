@@ -1438,7 +1438,8 @@ darwin_objc2_section (tree decl ATTRIBUTE_UNUSED, tree meta, section * base)
   gcc_assert (TREE_CODE (ident) == IDENTIFIER_NODE);
   p = IDENTIFIER_POINTER (ident);
 
-  gcc_checking_assert (flag_next_runtime == 1 && flag_objc_abi == 2);
+  gcc_checking_assert (flag_objc_internal_runtime >= 100000
+		       && flag_objc_abi == 2);
 
   objc_metadata_seen = 1;
 
@@ -1508,7 +1509,8 @@ darwin_objc1_section (tree decl ATTRIBUTE_UNUSED, tree meta, section * base)
   gcc_assert (TREE_CODE (ident) == IDENTIFIER_NODE);
   p = IDENTIFIER_POINTER (ident);
 
-  gcc_checking_assert (flag_next_runtime == 1 && flag_objc_abi < 2);
+  gcc_checking_assert (flag_objc_internal_runtime >= 100000
+		       && flag_objc_abi < 2);
 
   objc_metadata_seen = 1;
 
@@ -1725,7 +1727,7 @@ machopic_select_section (tree decl,
 
       if (!strcmp (IDENTIFIER_POINTER (name), "__builtin_ObjCString"))
 	{
-	  if (flag_next_runtime)
+	  if (flag_objc_internal_runtime >= 100000)
 	    {
 	      if (flag_objc_abi == 2)
 		return darwin_sections[objc2_constant_string_object_section];
@@ -1740,7 +1742,7 @@ machopic_select_section (tree decl,
       else
 	return base_section;
     }
-  else if (flag_next_runtime
+  else if (flag_objc_internal_runtime >= 100000
 	   && VAR_P (decl)
 	   && DECL_NAME (decl)
 	   && TREE_CODE (DECL_NAME (decl)) == IDENTIFIER_NODE
@@ -2941,7 +2943,7 @@ darwin_file_end (void)
      some) then we output the fix-and-continue marker (Image Info).
      This applies to Objective C, Objective C++ and LTO with either language
      as part of the input.  */
-  if (flag_next_runtime && objc_metadata_seen)
+  if (flag_objc_internal_runtime >= 100000 && objc_metadata_seen)
     {
       unsigned int flags = 0;
       if (flag_objc_abi >= 2)
@@ -3154,16 +3156,21 @@ darwin_override_options (void)
      should check for correctness re. the ABI.  TODO: check and provide the
      flags (runtime & ABI) from the lto wrapper).  */
 
+  /* If we don't see 'macosx', assume we want gnu runtime.  */
+  if (flag_objc_runtime && strncmp (flag_objc_runtime, "macosx", 6) != 0)
+    flag_objc_internal_runtime = 0;
+
+  bool next_runtime_p = flag_objc_internal_runtime >= 100000;
   /* Unless set, force ABI=2 for NeXT and m64, 0 otherwise.  */
   if (!global_options_set.x_flag_objc_abi)
     global_options.x_flag_objc_abi
-	= (!flag_next_runtime)
+	= (!next_runtime_p)
 		? 0
 		: (TARGET_64BIT ? 2
 				: (generating_for_darwin_version >= 9) ? 1
 								       : 0);
 
-  if (global_options_set.x_flag_objc_abi && flag_next_runtime)
+  if (global_options_set.x_flag_objc_abi && next_runtime_p)
     {
       if (TARGET_64BIT && global_options.x_flag_objc_abi != 2)
 	/* The Objective-C family ABI 2 is the only valid version NeXT/m64.  */
@@ -3228,7 +3235,7 @@ darwin_override_options (void)
        one valid choice of exception scheme for each runtime.  */
     if (!global_options_set.x_flag_objc_sjlj_exceptions)
       global_options.x_flag_objc_sjlj_exceptions =
-				flag_next_runtime && !TARGET_64BIT;
+				next_runtime_p && !TARGET_64BIT;
 
     /* FIXME: and this could be eliminated then too.  */
     if (!global_options_set.x_flag_exceptions

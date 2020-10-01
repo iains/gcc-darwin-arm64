@@ -107,7 +107,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 /* Default to using the NeXT-style runtime, since that's what is
    pre-installed on Darwin systems.  */
 
-#define NEXT_OBJC_RUNTIME 1
+#define NEXT_OBJC_RUNTIME 100508
 
 /* Don't default to pcc-struct-return, because gcc is the only compiler, and
    we want to retain compatibility with older gcc versions.  */
@@ -284,7 +284,7 @@ extern GTY(()) int darwin_ms_struct;
    %:remove-outfile(-ldl) \
    %:remove-outfile(-lm) \
    %:remove-outfile(-lpthread) \
-   %{fgnu-runtime: %{static|static-libgcc: \
+   %{fobjc-runtime=gcc*: %{static|static-libgcc: \
                      %:replace-outfile(-lobjc libobjc-gnu.a%s); \
                     :%:replace-outfile(-lobjc -lobjc-gnu ) } }\
    %{static|static-libgcc|static-libgfortran:%:replace-outfile(-lgfortran libgfortran.a%s)}\
@@ -394,7 +394,7 @@ extern GTY(()) int darwin_ms_struct;
 "%{static-libgcc|static:						\
     %:version-compare(!> 10.6 mmacosx-version-min= -lgcc_eh)		\
     %:version-compare(>= 10.6 mmacosx-version-min= -lemutls_w) -lgcc;	\
-   shared-libgcc|static-libstdc++|fexceptions|fobjc-exceptions|fgnu-runtime:\
+   shared-libgcc|static-libstdc++|fexceptions|fobjc-exceptions|fobjc-runtime=gcc*:\
     -lgcc_s.2	\
     %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)	   \
     %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4) \

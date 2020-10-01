@@ -379,10 +379,11 @@ objc_init (void)
   interface_hash_init ();
   hash_init ();
   objc_encoding_init ();
+  bool next_runtime_p = flag_objc_internal_runtime >= 100000;
   /* ... and then check flags and set-up for the selected runtime ... */
-  if (flag_next_runtime && flag_objc_abi >= 2)
+  if (next_runtime_p && flag_objc_abi >= 2)
     ok = objc_next_runtime_abi_02_init (&runtime);
-  else if (flag_next_runtime)
+  else if (next_runtime_p)
     ok = objc_next_runtime_abi_01_init (&runtime);
   else
     ok = objc_gnu_runtime_abi_01_init (&runtime);
@@ -3165,7 +3166,7 @@ objc_build_string_object (tree string)
      literal.  On Darwin (Mac OS X), for example, we may wish to obtain a
      constant CFString reference instead.
      At present, this is only supported for the NeXT runtime.  */
-  if (flag_next_runtime
+  if (flag_objc_internal_runtime >= 100000
       && targetcm.objc_construct_string_object)
     {
       tree constructor = (*targetcm.objc_construct_string_object) (string);
@@ -3656,7 +3657,7 @@ objc_generate_write_barrier (tree lhs, enum tree_code modifycode, tree rhs)
 
   /* This function is currently only used with the next runtime with
      garbage collection enabled (-fobjc-gc).  */
-  gcc_assert (flag_next_runtime);
+  gcc_assert (flag_objc_internal_runtime >= 100000);
 
   /* See if we have any lhs casts, and strip them out.  NB: The lvalue casts
      will have been transformed to the form '*(type *)&expr'.  */

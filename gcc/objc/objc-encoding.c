@@ -254,7 +254,7 @@ encode_pointer (tree type, int curtype, int format)
 {
   tree pointer_to = TREE_TYPE (type);
 
-  if (flag_next_runtime)
+  if (flag_objc_internal_runtime >= 100000)
     {
       /* This code is used to be compatible with gcc-3.3.  */
       /* For historical/compatibility reasons, the read-only qualifier
@@ -322,7 +322,7 @@ encode_pointer (tree type, int curtype, int format)
 	 other pointers to char are encoded as *.   */
       if (strcmp (IDENTIFIER_POINTER (pname), "BOOL"))
 	{
-	  if (!flag_next_runtime)
+	  if (flag_objc_internal_runtime < 100000)
 	    {
 	      /* The NeXT runtime adds the 'r' before getting here.  */
 
@@ -489,7 +489,7 @@ encode_aggregate_within (tree type, int curtype, int format, int left,
   bool inline_contents = false;
   bool pointed_to = false;
 
-  if (flag_next_runtime)
+  if (flag_objc_internal_runtime >= 100000)
     {
       if (ob_size > 0
 	  && *((char *) obstack_next_free (&util_obstack) - 1) == '^')
@@ -596,6 +596,7 @@ static void
 encode_type (tree type, int curtype, int format)
 {
   enum tree_code code = TREE_CODE (type);
+  bool next_runtime_p = flag_objc_internal_runtime >= 100000;
 
   /* Ignore type qualifiers other than 'const' when encoding a
      type.  */
@@ -603,7 +604,7 @@ encode_type (tree type, int curtype, int format)
   if (type == error_mark_node)
     return;
 
-  if (!flag_next_runtime)
+  if (!next_runtime_p)
     {
       if (TYPE_READONLY (type))
 	obstack_1grow (&util_obstack, 'r');
@@ -612,7 +613,7 @@ encode_type (tree type, int curtype, int format)
   switch (code)
     {
     case ENUMERAL_TYPE:
-      if (flag_next_runtime)
+      if (next_runtime_p)
 	{
 	  /* Kludge for backwards-compatibility with gcc-3.3: enums
 	     are always encoded as 'i' no matter what type they
@@ -633,7 +634,7 @@ encode_type (tree type, int curtype, int format)
 	  case 32:
 	    {
 	      tree int_type = type;
-	      if (flag_next_runtime)
+	      if (next_runtime_p)
 		{
 		  /* Another legacy kludge for compatibility with
 		     gcc-3.3: 32-bit longs are encoded as 'l' or 'L',
@@ -724,7 +725,7 @@ encode_type (tree type, int curtype, int format)
       break;
     }
 
-  if (flag_next_runtime)
+  if (next_runtime_p)
     {
       /* Super-kludge.  Some ObjC qualifier and type combinations need
 	 to be rearranged for compatibility with gcc-3.3.  */
@@ -825,7 +826,7 @@ encode_field (tree field_decl, int curtype, int format)
     {
       int size = tree_to_uhwi (DECL_SIZE (field_decl));
 
-      if (flag_next_runtime)
+      if (flag_objc_internal_runtime >= 100000)
 	encode_next_bitfield (size);
       else
 	encode_gnu_bitfield (int_bit_position (field_decl),

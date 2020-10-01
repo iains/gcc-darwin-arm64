@@ -836,7 +836,7 @@ c_common_post_options (const char **pfilename)
 
   /* Default to ObjC sjlj exception handling if NeXT runtime.  */
   if (flag_objc_sjlj_exceptions < 0)
-    flag_objc_sjlj_exceptions = flag_next_runtime;
+    flag_objc_sjlj_exceptions = flag_objc_internal_runtime >= 100000;
   if (flag_objc_exceptions && !flag_objc_sjlj_exceptions)
     flag_exceptions = 1;
 
