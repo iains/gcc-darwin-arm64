@@ -2114,9 +2114,6 @@ build_v2_classrefs_table (void)
           expr = create_extern_decl (objc_v2_class_template, name);
 	  expr = convert (objc_class_type, build_fold_addr_expr (expr));
 	}
-      /* The runtime wants this, even if it appears unused, so we must force the
-	 output.
-      DECL_PRESERVE_P (decl) = 1; */
       finish_var_decl (decl, expr);
     }
 }
@@ -2827,8 +2824,8 @@ generate_v2_protocols (void)
 	 it...  */
       p = objc_v2_get_class_reference (get_identifier (PROTOCOL_OBJECT_CLASS_NAME));
       /* ... but since we don't specifically use the reference...  we
-         need to force it.  */
-      DECL_PRESERVE_P (p) = 1;
+         need to force it.  
+      DECL_PRESERVE_P (p) = 1;*/
     }
 }
 
@@ -2912,7 +2909,7 @@ static void
 generate_v2_category (struct imp_entry *impent)
 {
   tree initlist, cat_name_expr, class_name_expr;
-  tree protocol_decl, category, props, t;
+  tree protocol_decl, category, props;
   tree inst_methods = NULL_TREE, class_methods = NULL_TREE;
   tree cat = impent->imp_context;
   tree cat_decl = impent->class_decl;
@@ -2920,13 +2917,6 @@ generate_v2_category (struct imp_entry *impent)
   char buf[BUFSIZE];
 
   loc = DECL_SOURCE_LOCATION (cat_decl);
-
-  /* ??? not sure this is really necessary, the following references should
-     force appropriate linkage linkage...
-     -- but ... ensure a reference to the class...  */
-  t = objc_v2_get_class_reference (CLASS_NAME (cat));
-  /* ... which we ignore so force it out.. */
-  DECL_PRESERVE_P (t) = 1;
 
   snprintf (buf, BUFSIZE, "OBJC_CLASS_$_%s", IDENTIFIER_POINTER (CLASS_NAME (cat)));
   class_name_expr = create_extern_decl (objc_v2_class_template, buf);
