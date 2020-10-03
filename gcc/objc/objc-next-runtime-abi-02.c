@@ -760,6 +760,9 @@ build_v2_super_template (void)
      const struct _prop_list_t * const properties;
      const uint32_t size;
      const uint32_t flags;
+     const char ** extended_method_types;
+     const char * demangled_name;
+     const struct _prop_list_t * class_properties;
    }
 */
 static void
@@ -800,6 +803,16 @@ build_v2_protocol_template (void)
 
   /* const uint32_t flags; */
   add_field_decl (integer_type_node, "flags", &chain);
+
+  /* const char **extendedMethodTypes; */
+  tree ptr_to_ptr_to_char = build_pointer_type (string_type_node);
+  add_field_decl (ptr_to_ptr_to_char, "extended_method_types", &chain);
+
+  /* const char *demangledName; */
+  add_field_decl (string_type_node, "demangled_name", &chain);
+
+  /* const struct _prop_list_t *class_properties; */
+  add_field_decl (objc_prop_list_ptr, "class_properties", &chain);
 
   objc_finish_struct (objc_v2_protocol_template, decls);
 }
@@ -907,21 +920,25 @@ create_extern_decl (tree type, const char *name)
 
 /* Create a globally visible definition for variable NAME of a given TYPE. The
    finish_var_decl() routine will need to be called on it afterwards.  */
+static tree
+create_global_decl (tree type, const char *name, bool is_def = false);
 
 static tree
-create_global_decl (tree type, const char *name)
+create_global_decl (tree type, const char *name, bool is_def)
 {
   tree id = get_identifier (name);
   tree var = hash_name_lookup (extern_names, id);
   if (var)
-    {
-      DECL_EXTERNAL (var) = 0;
-      TREE_STATIC (var) = 1;
-    }
+    is_def = true;
   else
     {
       var = start_var_decl (type, name);
       hash_name_enter (extern_names, var);
+    }
+  if (is_def)
+    {
+      DECL_EXTERNAL (var) = 0;
+      TREE_STATIC (var) = 1;
     }
   TREE_PUBLIC (var) = 1;
   return var;
@@ -929,11 +946,13 @@ create_global_decl (tree type, const char *name)
 
 /* Create a symbol with __attribute__ ((visibility ("hidden")))
    attribute (private extern).  */
+static tree
+create_hidden_decl (tree type, const char *name, bool is_def = false);
 
 static tree
-create_hidden_decl (tree type, const char *name)
+create_hidden_decl (tree type, const char *name, bool is_def)
 {
-    tree decl = create_global_decl (type, name);
+    tree decl = create_global_decl (type, name, is_def);
     DECL_VISIBILITY (decl) = VISIBILITY_HIDDEN;
     DECL_VISIBILITY_SPECIFIED (decl) = 1;
     return decl;
@@ -984,9 +1003,9 @@ next_runtime_abi_02_category_decl (tree klass)
 {
   tree decl;
   char buf[BUFSIZE];
-  snprintf (buf, BUFSIZE, "_OBJC_Category_%s_on_%s",
-	    IDENTIFIER_POINTER (CLASS_SUPER_NAME (klass)),
-	    IDENTIFIER_POINTER (CLASS_NAME (klass)));
+  snprintf (buf, BUFSIZE, "_OBJC_Category_%s_%s",
+	    IDENTIFIER_POINTER (CLASS_NAME (klass)),
+	    IDENTIFIER_POINTER (CLASS_SUPER_NAME (klass)));
   decl = start_var_decl (objc_v2_category_template, buf);
   OBJCMETA (decl, objc_meta, meta_category);
   return decl;
@@ -1001,7 +1020,8 @@ next_runtime_abi_02_protocol_decl (tree p)
   /* static struct _objc_protocol _OBJC_Protocol_<mumble>; */
   snprintf (buf, BUFSIZE, "_OBJC_Protocol_%s",
 	    IDENTIFIER_POINTER (PROTOCOL_NAME (p)));
-  decl = start_var_decl (objc_v2_protocol_template, buf);
+  decl = create_hidden_decl (objc_v2_protocol_template, buf);
+  DECL_WEAK (decl) = true;
   OBJCMETA (decl, objc_meta, meta_protocol);
   return decl;
 }
@@ -2288,7 +2308,8 @@ build_v2_protocol_list_address_table (void)
       gcc_assert (ref->id && TREE_CODE (ref->id) == PROTOCOL_INTERFACE_TYPE);
       snprintf (buf, BUFSIZE, "_OBJC_LabelProtocol_%s",
 		IDENTIFIER_POINTER (PROTOCOL_NAME (ref->id)));
-      decl = create_global_decl (objc_protocol_type, buf);
+      decl = create_hidden_decl (objc_protocol_type, buf, /*is def=*/true);
+      DECL_WEAK (decl) = true;
       expr = convert (objc_protocol_type, build_fold_addr_expr (ref->refdecl));
       OBJCMETA (decl, objc_meta, meta_label_protocollist);
       finish_var_decl (decl, expr);
@@ -2438,9 +2459,10 @@ build_v2_method_list_template (tree list_type, int size)
    objc_method_prototype_template which is missing this field.  */
 static tree
 generate_v2_meth_descriptor_table (tree chain, tree protocol,
-				   const char *prefix, tree attr)
+				   const char *prefix, tree attr,
+				   vec<tree>& all_meths)
 {
-  tree method_list_template, initlist, decl, methods;
+  tree method_list_template, initlist, decl;
   int size, entsize;
   vec<constructor_elt, va_gc> *v = NULL;
   char buf[BUFSIZE];
@@ -2448,13 +2470,14 @@ generate_v2_meth_descriptor_table (tree chain, tree protocol,
   if (!chain || !prefix)
     return NULL_TREE;
 
-  methods = chain;
+  tree method = chain;
   size = 0;
-  while (methods)
+  while (method)
     {
-      if (! METHOD_ENCODING (methods))
-	METHOD_ENCODING (methods) = encode_method_prototype (methods);
-      methods = TREE_CHAIN (methods);
+      if (! METHOD_ENCODING (method))
+	METHOD_ENCODING (method) = encode_method_prototype (method);
+      all_meths.safe_push (method);
+      method = TREE_CHAIN (method);
       size++;
     }
 
@@ -2476,6 +2499,31 @@ generate_v2_meth_descriptor_table (tree chain, tree protocol,
   /* Get into the right section.  */
   OBJCMETA (decl, objc_meta, attr);
   finish_var_decl (decl, objc_build_constructor (method_list_template, v));
+  return decl;
+}
+
+static tree
+generate_v2_meth_type_list (vec<tree>& all_meths, tree protocol,
+			    const char *prefix)
+{
+  if (all_meths.is_empty () || !prefix)
+    return NULL_TREE;
+
+  unsigned size = all_meths.length ();
+  tree list_type = build_sized_array_type (string_type_node, size);
+  char *nam;
+  asprintf (&nam, "%s_%s", prefix,
+	    IDENTIFIER_POINTER (PROTOCOL_NAME (protocol)));
+  tree decl = start_var_decl (list_type, nam);
+  free (nam);
+  OBJCMETA (decl, objc_meta, meta_base);
+  vec<constructor_elt, va_gc> *v = NULL;
+
+  for (unsigned i = 0; i < size; ++i)
+    CONSTRUCTOR_APPEND_ELT (v, NULL_TREE,
+			    add_objc_string (METHOD_ENCODING (all_meths[i]),
+					     meth_var_types));
+  finish_var_decl (decl, objc_build_constructor (list_type, v));
   return decl;
 }
 
@@ -2553,9 +2601,7 @@ generate_v2_property_table (tree context, tree klass_ctxt)
 {
   tree x, decl, initlist, property_list_template;
   bool is_proto = false;
-  vec<constructor_elt, va_gc> *inits = NULL;
   int init_val, size = 0;
-  char buf[BUFSIZE];
 
   if (context)
     {
@@ -2581,15 +2627,18 @@ generate_v2_property_table (tree context, tree klass_ctxt)
 							   : klass_ctxt);
 
   init_val = TREE_INT_CST_LOW (TYPE_SIZE_UNIT (objc_v2_property_template));
+  char *name;
   if (is_proto)
-    snprintf (buf, BUFSIZE, "_OBJC_ProtocolPropList_%s",
+    asprintf (&name, "_OBJC_ProtocolPropList_%s",
 	      IDENTIFIER_POINTER (PROTOCOL_NAME (context)));
   else
-    snprintf (buf, BUFSIZE, "_OBJC_ClassPropList_%s",
+    asprintf (&name, "_OBJC_ClassPropList_%s",
 	      IDENTIFIER_POINTER (CLASS_NAME (klass_ctxt)));
 
-  decl = start_var_decl (property_list_template, buf);
+  decl = start_var_decl (property_list_template, name);
+  free (name);
 
+  vec<constructor_elt, va_gc> *inits = NULL;
   CONSTRUCTOR_APPEND_ELT (inits, NULL_TREE,
 			  build_int_cst (NULL_TREE, init_val));
   CONSTRUCTOR_APPEND_ELT (inits, NULL_TREE,
@@ -2605,7 +2654,8 @@ static tree
 build_v2_protocol_initializer (tree type, tree protocol_name, tree protocol_list,
 			      tree inst_methods, tree class_methods,
 			      tree opt_ins_meth, tree opt_cls_meth,
-			      tree property_list)
+			      tree property_list, tree ext_meth_types,
+			      tree demangled_name, tree class_prop_list)
 {
   tree expr, ttyp;
   location_t loc;
@@ -2660,7 +2710,28 @@ build_v2_protocol_initializer (tree type, tree protocol_name, tree protocol_list
   /* const uint32_t flags; = 0 */
   CONSTRUCTOR_APPEND_ELT (inits, NULL_TREE, integer_zero_node);
 
-  return objc_build_constructor (type, inits);
+  ttyp = build_pointer_type (string_type_node);
+  if (ext_meth_types)
+    expr = convert (ttyp, build_unary_op (loc, ADDR_EXPR, ext_meth_types, 0));
+  else
+    expr = convert (ttyp, null_pointer_node);
+  CONSTRUCTOR_APPEND_ELT (inits, NULL_TREE, expr);
+
+  ttyp = string_type_node;
+   if (demangled_name)
+    expr = convert (ttyp, build_unary_op (loc, ADDR_EXPR, demangled_name, 0));
+  else
+    expr = convert (ttyp, null_pointer_node);
+  CONSTRUCTOR_APPEND_ELT (inits, NULL_TREE, expr);
+
+  ttyp = objc_prop_list_ptr;
+   if (class_prop_list)
+    expr = convert (ttyp, build_unary_op (loc, ADDR_EXPR, class_prop_list, 0));
+  else
+    expr = convert (ttyp, null_pointer_node);
+  CONSTRUCTOR_APPEND_ELT (inits, NULL_TREE, expr);
+
+ return objc_build_constructor (type, inits);
 }
 
 /* Main routine to build all meta data for all protocols used in a
@@ -2696,25 +2767,26 @@ generate_v2_protocols (void)
       loc = DECL_SOURCE_LOCATION (decl);
       some = true;
 
+      vec<tree> all_meths = vNULL;
       inst_meth =
 	generate_v2_meth_descriptor_table (PROTOCOL_NST_METHODS (p), p,
 					   "_OBJC_ProtocolInstanceMethods",
-					   meta_proto_nst_meth);
+					   meta_proto_nst_meth, all_meths);
 
       class_meth =
 	generate_v2_meth_descriptor_table (PROTOCOL_CLS_METHODS (p), p,
 					   "_OBJC_ProtocolClassMethods",
-					   meta_proto_cls_meth);
+					   meta_proto_cls_meth, all_meths);
 
       opt_inst_meth =
 	generate_v2_meth_descriptor_table (PROTOCOL_OPTIONAL_NST_METHODS (p), p,
-					   "_OBJC_OptProtocolInstMethods",
-					   meta_proto_nst_meth);
+					   "_OBJC_ProtocolOptInstMethods",
+					   meta_proto_nst_meth, all_meths);
 
       opt_class_meth =
 	generate_v2_meth_descriptor_table (PROTOCOL_OPTIONAL_CLS_METHODS (p), p,
-					   "_OBJC_OptProtocolClassMethods",
-					   meta_proto_cls_meth);
+					   "_OBJC_ProtocolOptClassMethods",
+					   meta_proto_cls_meth, all_meths);
 
       if (PROTOCOL_LIST (p))
 	refs_decl = generate_v2_protocol_list (p, NULL_TREE);
@@ -2732,13 +2804,21 @@ generate_v2_protocols (void)
 
       props = generate_v2_property_table (p, NULL_TREE);
 
+      tree ext_meth_types
+	= generate_v2_meth_type_list (all_meths, p,
+				      "_OBJC_ProtocolMethodTypes");
+      tree demangled_name = NULL_TREE;
+      tree class_prop_list = NULL_TREE;
+
       initlist = build_v2_protocol_initializer (TREE_TYPE (decl),
 						protocol_name_expr, refs_expr,
 						inst_meth, class_meth,
 						opt_inst_meth, opt_class_meth,
-						props);
+						props, ext_meth_types,
+						demangled_name,class_prop_list);
       finish_var_decl (decl, initlist);
       objc_add_to_protocol_list (p, decl);
+      all_meths.truncate (0);
     }
 
   if (some)
