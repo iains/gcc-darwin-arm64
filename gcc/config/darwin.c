@@ -136,7 +136,7 @@ output_objc_section_asm_op (const void *directive)
      order in the object.  The code below implements this by emitting
      a section header for each ObjC section the first time that an ObjC
      section is requested.  */
-  if (! been_here)
+  if (! been_here && darwin_symbol_stubs)
     {
       section *saved_in_section = in_section;
       static const enum darwin_section_enum tomark[] =
@@ -176,24 +176,24 @@ output_objc_section_asm_op (const void *directive)
 	{
 	  objc2_method_names_section,
 	  objc2_message_refs_section,
+	  objc2_selector_refs_section,
+	  objc2_ivar_section,
 	  objc2_classdefs_section,
 	  objc2_metadata_section,
 	  objc2_classrefs_section,
 	  objc2_class_names_section,
 	  objc2_classlist_section,
 	  objc2_categorylist_section,
-	  objc2_selector_refs_section,
 	  objc2_nonlazy_class_section,
 	  objc2_nonlazy_category_section,
 	  objc2_protocollist_section,
 	  objc2_protocolrefs_section,
 	  objc2_super_classrefs_section,
+	  objc2_constant_string_object_section,
 	  objc2_image_info_section,
-	  objc2_constant_string_object_section
 	} ;
       size_t i;
 
-      been_here = true;
       if (flag_objc_abi < 2)
 	{
 	  for (i = 0; i < ARRAY_SIZE (tomark); i++)
@@ -208,6 +208,7 @@ output_objc_section_asm_op (const void *directive)
       /* Make sure we don't get varasm.c out of sync with us.  */
       switch_to_section (saved_in_section);
     }
+  been_here = true;
   output_section_asm_op (directive);
 }
 
