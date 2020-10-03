@@ -1020,8 +1020,13 @@ next_runtime_abi_02_protocol_decl (tree p)
   /* static struct _objc_protocol _OBJC_Protocol_<mumble>; */
   snprintf (buf, BUFSIZE, "_OBJC_Protocol_%s",
 	    IDENTIFIER_POINTER (PROTOCOL_NAME (p)));
-  decl = create_hidden_decl (objc_v2_protocol_template, buf);
-  DECL_WEAK (decl) = true;
+  if (flag_objc_internal_runtime > FIXUP_NEEDED)
+    {
+      decl = create_hidden_decl (objc_v2_protocol_template, buf);
+      DECL_WEAK (decl) = true;
+    }
+  else
+    decl = start_var_decl (objc_v2_protocol_template, buf);
   OBJCMETA (decl, objc_meta, meta_protocol);
   return decl;
 }
@@ -2303,8 +2308,13 @@ build_v2_protocol_list_address_table (void)
       gcc_assert (ref->id && TREE_CODE (ref->id) == PROTOCOL_INTERFACE_TYPE);
       snprintf (buf, BUFSIZE, "_OBJC_LabelProtocol_%s",
 		IDENTIFIER_POINTER (PROTOCOL_NAME (ref->id)));
-      decl = create_hidden_decl (objc_protocol_type, buf, /*is def=*/true);
-      DECL_WEAK (decl) = true;
+      if (flag_objc_internal_runtime > FIXUP_NEEDED)
+	{
+	  decl = create_hidden_decl (objc_protocol_type, buf, /*is def=*/true);
+	  DECL_WEAK (decl) = true;
+	}
+      else
+	decl = create_global_decl (objc_protocol_type, buf, /*is def=*/true);
       expr = convert (objc_protocol_type, build_fold_addr_expr (ref->refdecl));
       OBJCMETA (decl, objc_meta, meta_label_protocollist);
       finish_var_decl (decl, expr);
