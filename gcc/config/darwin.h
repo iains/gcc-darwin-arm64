@@ -819,34 +819,35 @@ int darwin_label_is_anonymous_local_objc_name (const char *name);
 
 #undef	ASM_OUTPUT_LABELREF
 #define ASM_OUTPUT_LABELREF(FILE,NAME)					     \
-  do {									     \
-       const char *xname = (NAME);					     \
-       if (! strcmp (xname, MACHOPIC_FUNCTION_BASE_NAME))		     \
-         machopic_output_function_base_name(FILE);                           \
-       else if (xname[0] == '&' || xname[0] == '*')			     \
-         {								     \
-           int len = strlen (xname);					     \
-	   if (len > 6 && !strcmp ("$stub", xname + len - 5))		     \
-	     machopic_validate_stub_or_non_lazy_ptr (xname);		     \
-	   else if (len > 7 && !strcmp ("$stub\"", xname + len - 6))	     \
-	     machopic_validate_stub_or_non_lazy_ptr (xname);		     \
-	   else if (len > 14 && !strcmp ("$non_lazy_ptr", xname + len - 13)) \
-	     machopic_validate_stub_or_non_lazy_ptr (xname);		     \
-	   else if (len > 15 && !strcmp ("$non_lazy_ptr\"", xname + len - 14)) \
-	     machopic_validate_stub_or_non_lazy_ptr (xname);		     \
-	   if (xname[1] != '"' && name_needs_quotes (&xname[1]))	     \
-	     fprintf (FILE, "\"%s\"", &xname[1]);			     \
-	   else								     \
-	     fputs (&xname[1], FILE); 					     \
-	 }								     \
-       else if (xname[0] == '+' || xname[0] == '-')			     \
-         fprintf (FILE, "\"%s\"", xname);				     \
-       else if (darwin_label_is_anonymous_local_objc_name (xname))	     \
-         fprintf (FILE, "L%s", xname);					     \
-       else if (xname[0] != '"' && name_needs_quotes (xname))		     \
+  do									     \
+    {									     \
+      const char *xname = (NAME);					     \
+      if (! strcmp (xname, MACHOPIC_FUNCTION_BASE_NAME))		     \
+	machopic_output_function_base_name(FILE);			     \
+      else if (xname[0] == '&' || xname[0] == '*')			     \
+	{								     \
+	  int len = strlen (xname);					     \
+	  if (len > 6 && !strcmp ("$stub", xname + len - 5))		     \
+	    machopic_validate_stub_or_non_lazy_ptr (xname);		     \
+	  else if (len > 7 && !strcmp ("$stub\"", xname + len - 6))	     \
+	    machopic_validate_stub_or_non_lazy_ptr (xname);		     \
+	  else if (len > 14 && !strcmp ("$non_lazy_ptr", xname + len - 13))  \
+	    machopic_validate_stub_or_non_lazy_ptr (xname);		     \
+	  else if (len > 15 && !strcmp ("$non_lazy_ptr\"", xname + len - 14))\
+	    machopic_validate_stub_or_non_lazy_ptr (xname);		     \
+	  if (xname[1] != '"' && name_needs_quotes (&xname[1]))		     \
+	    fprintf (FILE, "\"%s\"", &xname[1]);			     \
+	  else								     \
+	    fputs (&xname[1], FILE); 					     \
+	}								     \
+      else if (xname[0] == '+' || xname[0] == '-')			     \
+	fprintf (FILE, "\"%s\"", xname);				     \
+      else if (darwin_label_is_anonymous_local_objc_name (xname))	     \
+	fprintf (FILE, "l%s", xname);					     \
+      else if (xname[0] != '"' && name_needs_quotes (xname))		     \
 	 asm_fprintf (FILE, "\"%U%s\"", xname);				     \
-       else								     \
-         asm_fprintf (FILE, "%U%s", xname);				     \
+      else								     \
+	asm_fprintf (FILE, "%U%s", xname);				     \
   } while (0)
 
 /* Output before executable code.  */
