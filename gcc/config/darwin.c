@@ -1878,7 +1878,7 @@ darwin_globalize_label (FILE *stream, const char *name)
 {
   if (!!strncmp (name, "_OBJC_", 6))
     default_globalize_label (stream, name);
-  if (flag_objc_abi < 2 || flag_objc_internal_runtime < 100600)
+  if (flag_objc_abi < 2 || flag_objc_internal_runtime < 100700)
     return;
   /* We have some Objective C cases that need to be global.  */
   if (!strncmp (name+6, "LabelPro", 8))
@@ -1905,7 +1905,7 @@ darwin_label_is_anonymous_local_objc_name (const char *name)
   }
   if (strncmp ((const char *)p, "_OBJC_", 6) != 0)
     return false;
-  if (flag_objc_abi < 2 || flag_objc_internal_runtime < 100600)
+  if (flag_objc_abi < 2 || flag_objc_internal_runtime < 100700)
     return true;
 
   /* We need some of the objective c meta-data symbols to be visible to the
@@ -3190,7 +3190,9 @@ darwin_override_options (void)
   /* Keep track of which (major) version we're generating code for.  */
   if (darwin_macosx_version_min)
     {
-      if (strverscmp (darwin_macosx_version_min, "10.6") >= 0)
+      if (strverscmp (darwin_macosx_version_min, "10.7") >= 0)
+	generating_for_darwin_version = 11;
+      else if (strverscmp (darwin_macosx_version_min, "10.6") >= 0)
 	generating_for_darwin_version = 10;
       else if (strverscmp (darwin_macosx_version_min, "10.5") >= 0)
 	generating_for_darwin_version = 9;
@@ -3212,9 +3214,8 @@ darwin_override_options (void)
   /* If we don't see 'macosx', assume we want gnu runtime.  */
   if (flag_objc_runtime && strncmp (flag_objc_runtime, "macosx", 6) != 0)
     flag_objc_internal_runtime = 0;
-  else if (!global_options_set.x_flag_objc_internal_runtime
-	   && generating_for_darwin_version > 9)
-    flag_objc_internal_runtime = 100600;
+  else if (!global_options_set.x_flag_objc_internal_runtime)
+    flag_objc_internal_runtime = generating_for_darwin_version > 10 ? 100700 : 100600;
 
   bool next_runtime_p = flag_objc_internal_runtime >= 100000;
   /* Unless set, force ABI=2 for NeXT and m64, 0 otherwise.  */
