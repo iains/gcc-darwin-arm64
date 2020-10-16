@@ -65,7 +65,9 @@
 
 #define STACK_BOUNDARY		128
 
-#define FUNCTION_BOUNDARY	32
+/* Custom function descriptors use bit 2 so function alignment must be
+   at least 64 to work with this.  */
+#define FUNCTION_BOUNDARY	64
 
 #define EMPTY_FIELD_BOUNDARY	32
 
