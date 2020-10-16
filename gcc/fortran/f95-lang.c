@@ -175,6 +175,8 @@ static const struct attribute_spec gfc_attribute_table[] =
 #define LANG_HOOKS_BUILTIN_FUNCTION	gfc_builtin_function
 #define LANG_HOOKS_GET_ARRAY_DESCR_INFO	gfc_get_array_descr_info
 #define LANG_HOOKS_ATTRIBUTE_TABLE	gfc_attribute_table
+#undef LANG_HOOKS_CUSTOM_FUNCTION_DESCRIPTORS
+#define LANG_HOOKS_CUSTOM_FUNCTION_DESCRIPTORS true
 
 struct lang_hooks lang_hooks = LANG_HOOKS_INITIALIZER;
 
