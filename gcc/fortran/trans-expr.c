@@ -7642,6 +7642,8 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
   arglist = retargs;
 
   /* Generate the actual call.  */
+  bool is_proc_ptr_comp = gfc_is_proc_ptr_comp (expr);
+
   if (base_object == NULL_TREE)
     conv_function_val (se, sym, expr, args);
   else
@@ -7667,6 +7669,11 @@ gfc_conv_procedure_call (gfc_se * se, gfc_symbol * sym,
 
   fntype = TREE_TYPE (TREE_TYPE (se->expr));
   se->expr = build_call_vec (TREE_TYPE (fntype), se->expr, arglist);
+  tree ff = CALL_EXPR_FN (se->expr);
+  if (ff && INDIRECT_REF_P (ff))
+    ff = TREE_OPERAND (ff, 0);
+  if (is_proc_ptr_comp || !ff || VAR_P (ff) || TREE_CODE (ff) == PARM_DECL)
+    CALL_EXPR_BY_DESCRIPTOR (se->expr) = true;
 
   /* Allocatable scalar function results must be freed and nullified
      after use. This necessitates the creation of a temporary to
