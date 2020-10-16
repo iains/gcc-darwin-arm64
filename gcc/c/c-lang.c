@@ -38,6 +38,9 @@ enum c_language_kind c_language = clk_c;
 #undef LANG_HOOKS_INIT_TS
 #define LANG_HOOKS_INIT_TS c_common_init_ts
 
+#undef LANG_HOOKS_CUSTOM_FUNCTION_DESCRIPTORS
+#define LANG_HOOKS_CUSTOM_FUNCTION_DESCRIPTORS true
+
 #if CHECKING_P
 #undef LANG_HOOKS_RUN_LANG_SELFTESTS
 #define LANG_HOOKS_RUN_LANG_SELFTESTS selftest::run_c_tests
