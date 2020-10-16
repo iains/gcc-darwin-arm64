@@ -26429,9 +26429,9 @@ aarch64_libgcc_floating_mode_supported_p
 #define TARGET_DWARF_POLY_INDETERMINATE_VALUE \
   aarch64_dwarf_poly_indeterminate_value
 
-/* The architecture reserves bits 0 and 1 so use bit 2 for descriptors.  */
+/* The architecture reserves bits 0 and 1 but hack 1 for now.  */
 #undef TARGET_CUSTOM_FUNCTION_DESCRIPTORS
-#define TARGET_CUSTOM_FUNCTION_DESCRIPTORS 4
+#define TARGET_CUSTOM_FUNCTION_DESCRIPTORS 2
 
 #undef TARGET_HARD_REGNO_NREGS
 #define TARGET_HARD_REGNO_NREGS aarch64_hard_regno_nregs

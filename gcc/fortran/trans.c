@@ -332,6 +332,14 @@ gfc_build_addr_expr (tree type, tree t)
   else
     natural_type = build_pointer_type (base_type);
 
+  /* If this is a nested function that uses the static chain, or if
+     optimization is disabled (a static chain will be added automatically)
+     then call by descriptor.  */
+  bool fn_with_static_chain = false;
+  if (TREE_CODE (t) == FUNCTION_DECL
+      && (DECL_STATIC_CHAIN (t) || (!optimize && decl_function_context (t))))
+    fn_with_static_chain = true;
+
   if (TREE_CODE (t) == INDIRECT_REF)
     {
       if (!type)
@@ -349,6 +357,9 @@ gfc_build_addr_expr (tree type, tree t)
 
   if (type && natural_type != type)
     t = convert (type, t);
+
+  if (fn_with_static_chain)
+    FUNC_ADDR_BY_DESCRIPTOR (t) = true;
 
   return t;
 }
