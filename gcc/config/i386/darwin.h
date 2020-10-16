@@ -308,3 +308,8 @@ along with GCC; see the file COPYING3.  If not see
 #define CLEAR_INSN_CACHE(beg, end)				\
   extern void sys_icache_invalidate(void *start, size_t len);	\
   sys_icache_invalidate ((beg), (size_t)((end)-(beg)))
+
+/* Make sure that any code we generate is compatible with the Fortran/Ada
+   function descriptor impl.  */
+#undef FUNCTION_BOUNDARY
+#define FUNCTION_BOUNDARY 16
