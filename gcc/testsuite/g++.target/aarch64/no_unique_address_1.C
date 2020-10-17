@@ -1,5 +1,5 @@
 /* { dg-options "-std=c++11 -O -foptimize-sibling-calls -fpeephole2" } */
-/* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { lp64 && { ! aarch64*-*-darwin* } } } } } */
 
 struct X { };
 struct Y { int : 0; };
