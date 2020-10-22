@@ -2,7 +2,7 @@
 /* { dg-require-effective-target arm_v8_2a_bf16_neon_ok } */
 /* { dg-add-options arm_v8_2a_bf16_neon }  */
 /* { dg-additional-options "-O3 --save-temps -std=gnu90" } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 #include <arm_bf16.h>
 
