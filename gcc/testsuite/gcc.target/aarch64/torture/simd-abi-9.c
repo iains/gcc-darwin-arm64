@@ -1,7 +1,7 @@
 /* { dg-do compile } */
 /* { dg-options "-fshrink-wrap -ffat-lto-objects" } */
 /* { dg-skip-if "" { *-*-* } { "-O0" } { "" } } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 int callee (void);
 
