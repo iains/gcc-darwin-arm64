@@ -12,4 +12,4 @@ foo (unsigned a)
   return ~a;
 }
 
-/* { dg-final { check-function-bodies "**" "" "" } } */
+/* { dg-final { check-function-bodies "**" "" ""  { target { ! aarch64*-*-darwin*  } } } } */
