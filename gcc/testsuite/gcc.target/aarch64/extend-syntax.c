@@ -126,4 +126,4 @@ int cmp2(unsigned long long x, int y)
   return x == ((unsigned long long)y << 3);
 }
 
-/* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { lp64 && { ! aarch64*-*-darwin* } } } } } */
