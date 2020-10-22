@@ -1,6 +1,6 @@
 /* { dg-do compile { target { aarch64*-*-* } } } */
 /* { dg-options "-O2" } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 /*
 ** foo:
