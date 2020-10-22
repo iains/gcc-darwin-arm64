@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O" } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 #include <stdint.h>
 
