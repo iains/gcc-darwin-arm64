@@ -1,7 +1,7 @@
 /* { dg-do assemble { target { aarch64*-*-* } } } */
 /* { dg-require-effective-target arm_v8_2a_bf16_neon_ok } */
 /* { dg-additional-options "-march=armv8.2-a -O3 --save-temps" } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 #include <arm_neon.h>
 
