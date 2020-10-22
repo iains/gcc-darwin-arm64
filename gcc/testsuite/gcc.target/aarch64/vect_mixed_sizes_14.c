@@ -1,5 +1,5 @@
 /* { dg-options "-O2 -ftree-vectorize" } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 /*
 ** foo:

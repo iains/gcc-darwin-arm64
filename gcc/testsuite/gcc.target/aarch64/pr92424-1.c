@@ -1,6 +1,6 @@
 /* { dg-do "compile" } */
 /* { dg-options "-O1" } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
 
 /* Note: this test only checks the instructions in the function bodies,
    not the placement of the patch label or nops before the futncion.  */
