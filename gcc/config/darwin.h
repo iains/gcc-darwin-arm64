@@ -241,8 +241,6 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOCOMPACT_UNWIND \
     "}}}}}}} %<pie %<no-pie %<rdynamic %<X "
 
-#define DSYMUTIL "\ndsymutil"
-
 #define DSYMUTIL_SPEC \
    "%{!fdump=*:%{!fsyntax-only:%{!c:%{!M:%{!MM:%{!E:%{!S:\
     %{v} \
