@@ -1331,7 +1331,7 @@ case "${host}" in
   hppa*-*)	
     host_makefile_frag="config/mh-pa"
     ;;
-  *-*-darwin*)
+  i[[3456789]]86-*-darwin* | powerpc-*-darwin*)
     host_makefile_frag="config/mh-darwin"
     ;;
   powerpc-*-aix*)
