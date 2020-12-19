@@ -479,6 +479,9 @@ extern (C) bool runModuleUnitTests()
 
         static extern (C) void unittestSegvHandler( int signum, siginfo_t* info, void* ptr )
         {
+            version(Darwin) {}
+            else
+            {
             import core.stdc.stdio;
             fprintf(stderr, "Segmentation fault while running unittests:\n");
             fprintf(stderr, "----------------\n");
@@ -489,6 +492,7 @@ extern (C) bool runModuleUnitTests()
 
             foreach (size_t i, const(char[]) msg; bt)
                 fprintf(stderr, "%s\n", msg.ptr ? msg.ptr : "???");
+            }
         }
 
         sigaction_t action = void;
@@ -513,11 +517,15 @@ extern (C) bool runModuleUnitTests()
 
         static extern (C) void unittestSegvHandler( int signum, siginfo_t* info, void* ptr ) nothrow
         {
+            version(Darwin) {}
+            else
+            {
             static enum MAXFRAMES = 128;
             void*[MAXFRAMES]  callstack;
 
             auto numframes = backtrace( callstack.ptr, MAXFRAMES );
             backtrace_symbols_fd( callstack.ptr, numframes, 2 );
+            }
         }
 
         sigaction_t action = void;
