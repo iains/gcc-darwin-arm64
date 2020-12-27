@@ -307,9 +307,11 @@ darwin_driver_init (unsigned int *decoded_options_count,
 	    seenPPC = true;
 	  else if (!strcmp ((*decoded_options)[i].arg, "ppc64"))
 	    seenPPC64 = true;
-#if !DARWIN_ARM64
 	  else if (!strcmp ((*decoded_options)[i].arg, "arm64"))
+#if !DARWIN_ARM64
 	    seenArm64 = true;
+#else
+	    ; /* We accept the option, but don't need to act on it.  */
 #endif
 	  else
 	    error ("this compiler does not support %s",
