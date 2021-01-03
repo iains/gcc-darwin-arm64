@@ -232,11 +232,33 @@ case ${host} in
       *-darwin*)
         echo "but is needed after macOS 10.11 (setting it on)" 1>&2
         tmake_file="$tmake_file t-darwin-rpath "
+        enable_darwin_at_rpath=yes
         ;;
     esac
   else
     echo "enable_darwin_at_rpath is '$enable_darwin_at_rpath'" 1>&2
   fi
+  case ${host} in
+    *-*-darwin20* | *-*-darwin1[89]*)
+      tmake_file="t-darwin-min-8 $tmake_file"
+      ;;
+    *-*-darwin9* | *-*-darwin1[0-7]*)
+      if test "x$enable_darwin_at_rpath" = "xyes"; then
+        tmake_file="t-darwin-min-5 $tmake_file"
+      else
+        tmake_file="t-darwin-min-4 $tmake_file"
+      fi
+      ;;
+    *-*-darwin[4-8]*)
+      tmake_file="t-darwin-min-1 $tmake_file"
+      ;;
+    *)
+      # Fall back to configuring for the oldest system known to work with the
+      # current sources.
+      tmake_file="t-darwin-min-5 $tmake_file"
+      echo "Warning: libgcc configured to support macOS 10.5" 1>&2
+      ;;
+  esac
   extra_parts="crt3.o d10-uwfef.o crttms.o crttme.o libemutls_w.a"
   ;;
 *-*-dragonfly*)
