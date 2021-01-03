@@ -1,5 +1,2 @@
 # Use @rpath and add a search path to exes and dylibs that depend on this.
 SHLIB_RPATH = @rpath
-
-# Which does not work for Darwin < 9
-HOST_LIBGCC2_CFLAGS += -mmacosx-version-min=10.5
