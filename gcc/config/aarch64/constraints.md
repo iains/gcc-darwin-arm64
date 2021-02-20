@@ -583,6 +583,11 @@
  An address valid for a prefetch instruction."
  (match_test "aarch64_address_valid_for_prefetch_p (op, true)"))
 
+(define_address_constraint "Du"
+  "@internal
+ An address valid for a prefetch instruction with an unscaled offset."
+ (match_test "aarch64_address_valid_for_unscaled_prefetch_p (op, true)"))
+
 (define_constraint "vgb"
   "@internal
    A constraint that matches an immediate offset valid for SVE LD1B
