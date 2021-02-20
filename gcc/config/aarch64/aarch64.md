@@ -1054,6 +1054,37 @@
   [(set_attr "type" "load_4")]
 )
 
+(define_insn "prefetch_unscaled"
+  [(prefetch (match_operand:DI 0 "aarch64_unscaled_prefetch_operand" "Du")
+            (match_operand:QI 1 "const_int_operand" "")
+            (match_operand:QI 2 "const_int_operand" ""))]
+  ""
+  {
+    const char * pftype[2][4] =
+    {
+      {"prfum\\tPLDL1STRM, %0",
+       "prfum\\tPLDL3KEEP, %0",
+       "prfum\\tPLDL2KEEP, %0",
+       "prfum\\tPLDL1KEEP, %0"},
+      {"prfum\\tPSTL1STRM, %0",
+       "prfum\\tPSTL3KEEP, %0",
+       "prfum\\tPSTL2KEEP, %0",
+       "prfum\\tPSTL1KEEP, %0"},
+    };
+
+    int locality = INTVAL (operands[2]);
+
+    gcc_assert (IN_RANGE (locality, 0, 3));
+
+    /* PRFUM accepts the same addresses as a 64-bit LDR so wrap
+       the address into a DImode MEM so that aarch64_print_operand knows
+       how to print it.  */
+    operands[0] = gen_rtx_MEM (DImode, operands[0]);
+    return pftype[INTVAL(operands[1])][locality];
+  }
+  [(set_attr "type" "load_4")]
+)
+
 (define_insn "trap"
   [(trap_if (const_int 1) (const_int 8))]
   ""
