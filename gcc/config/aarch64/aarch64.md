@@ -1397,7 +1397,8 @@
        the address into a DImode MEM so that aarch64_print_operand knows
        how to print it.  */
     operands[0] = gen_rtx_MEM (DImode, operands[0]);
-    return pftype[INTVAL (operands[1]) & 1][locality];
+    return aarch64_output_prefetch (pftype[INTVAL (operands[1]) & 1][locality],
+				    operands[0]);
   }
   [(set_attr "type" "load_4")]
 )
@@ -1419,7 +1420,7 @@
   ""
   {
     operands[1] = gen_rtx_MEM (DImode, operands[1]);
-    return "prfm\\t%0, %1";
+    return aarch64_output_prefetch ("prfm\\t%0, %1", operands[1]);
   }
   [(set_attr "type" "load_4")]
 )

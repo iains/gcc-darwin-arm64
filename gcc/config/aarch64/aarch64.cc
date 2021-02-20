@@ -12221,8 +12221,30 @@ aarch64_address_valid_for_prefetch_p (rtx x, bool strict_p)
   if (!res)
     return false;
 
+  /* ld64 does not accept a PAGEOFF12 relocation on PRFM.  */
+  if (TARGET_MACHO && addr.type == ADDRESS_LO_SUM)
+    return false;
+
   /* ... except writeback forms.  */
   return addr.type != ADDRESS_REG_WB;
+}
+
+/* Return TMPL, a PRFM output template for the memory operand MEM, with PRFUM
+   in place of PRFM where only the unscaled form can encode the offset.  GAS
+   makes that substitution itself; the LLVM assembler used on Mach-O does
+   not.  */
+
+const char *
+aarch64_output_prefetch (const char *tmpl, rtx mem)
+{
+  rtx x = XEXP (mem, 0);
+  if (!TARGET_MACHO || GET_CODE (x) != PLUS || !CONST_INT_P (XEXP (x, 1))
+      || (INTVAL (XEXP (x, 1)) >= 0 && !(INTVAL (XEXP (x, 1)) & 7)))
+    return tmpl;
+  gcc_checking_assert (startswith (tmpl, "prfm\t"));
+  static char buf[32];
+  snprintf (buf, sizeof buf, "prfum%s", tmpl + 4);
+  return buf;
 }
 
 bool
