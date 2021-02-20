@@ -635,6 +635,11 @@
        (match_test "IN_RANGE (ival, -1008, -1)
 		    && !(ival & 0xf)")))
 
+(define_address_constraint "Du"
+  "@internal
+ An address valid for a prefetch instruction with an unscaled offset."
+ (match_test "aarch64_address_valid_for_unscaled_prefetch_p (op, true)"))
+
 (define_constraint "vgb"
   "@internal
    A constraint that matches an immediate offset valid for SVE LD1B
