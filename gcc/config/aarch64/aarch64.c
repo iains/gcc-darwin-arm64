@@ -10221,6 +10221,29 @@ aarch64_address_valid_for_prefetch_p (rtx x, bool strict_p)
   return addr.type != ADDRESS_REG_WB;
 }
 
+/* Return true if the address X is valid for a PRFUM instruction.
+   STRICT_P is true if we should do strict checking with
+   aarch64_classify_address.  */
+
+bool
+aarch64_address_valid_for_unscaled_prefetch_p (rtx x, bool strict_p)
+{
+  struct aarch64_address_info addr;
+
+  /* PRFUM accepts the same addresses as DImode, but constrained to a range
+     -256..255.  */
+  bool res = aarch64_classify_address (&addr, x, DImode, strict_p);
+  if (!res)
+    return false;
+
+  if (addr.offset && ((INTVAL (addr.offset) > 255)
+		       || (INTVAL (addr.offset) < -256)))
+     return false;
+
+  /* ... except writeback forms.  */
+  return addr.type != ADDRESS_REG_WB;
+}
+
 bool
 aarch64_symbolic_address_p (rtx x)
 {
