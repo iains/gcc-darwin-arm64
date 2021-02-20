@@ -10191,9 +10191,31 @@ aarch64_address_valid_for_prefetch_p (rtx x, bool strict_p)
   if (!res)
     return false;
 
-  /* Darwinpcs allows addresses on the stack that are not DImode aligned.  */
-  if (TARGET_MACHO && addr.offset && (INTVAL (addr.offset) & 0x07))
-    return false;
+  /* For ELF targets using GAS, we emit prfm unconditionally; GAS will alter
+     the instruction to pick the prfum form where possible (i.e. when the
+     offset is in the range -256..255) and fall back to prfm otherwise.
+     We can reject cases where the offset exceeds the range usable by both
+     insns [-256..32760], or for offsets > 255 when the value is not divisible
+     by 8.
+     For Mach-O (Darwin) where the assembler uses the LLVM back end, that does
+     not yet do the substitution, so we must reject all prfum cases.  */
+  if (addr.offset)
+    {
+      HOST_WIDE_INT offs = INTVAL (addr.offset);
+      if (offs < -256) /* Out of range for both prfum and prfm.  */
+	return false;
+      if (offs > 32760) /* Out of range for prfm.  */
+	return false;
+      if (offs & 0x07) /* We cannot use prfm.  */
+	{
+	  if (offs > 255) /* Out of range for prfum.  */
+	    return false;
+	  if (TARGET_MACHO)
+	    return false;
+	}
+      if (TARGET_MACHO && offs < 0)
+	return false;
+    }
 
   /* ... except writeback forms.  */
   return addr.type != ADDRESS_REG_WB;
