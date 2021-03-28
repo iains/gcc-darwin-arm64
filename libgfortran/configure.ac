@@ -282,6 +282,7 @@ LT_LIB_M
 ACX_LT_HOST_FLAGS
 AC_SUBST(enable_shared)
 AC_SUBST(enable_static)
+AM_CONDITIONAL([ENABLE_DARWIN_AT_RPATH], [test x$enable_darwin_at_rpath = xyes])
 #AC_MSG_NOTICE([====== Finished libtool configuration]) ; sleep 10
 
 # We need gfortran to compile parts of the library
@@ -291,8 +292,8 @@ AC_PROG_FC(gfortran)
 
 # extra LD Flags which are required for targets
 case "${host}" in
-  *-darwin*)
-    # Darwin needs -single_module when linking libgfortran
+  *-*-darwin[[4567]]*)
+    # Earlier Darwin needs -single_module when linking libgfortran
     extra_ldflags_libgfortran=-Wl,-single_module
     ;;
 esac
