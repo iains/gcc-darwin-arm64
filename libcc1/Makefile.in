@@ -90,6 +90,9 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 @DARWIN_DYNAMIC_LOOKUP_TRUE@am__append_1 = -Wl,-undefined,dynamic_lookup
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_2 = -nodefaultrpaths -Wl,-rpath,@loader_path
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_3 = -nodefaultrpaths -Wl,-rpath,@loader_path
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_4 = -nodefaultrpaths -Wl,-rpath,@loader_path
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/acx.m4 \
@@ -405,7 +408,8 @@ shared_source = callbacks.cc callbacks.hh connection.cc connection.hh \
 
 marshall_c_source = marshall-c.hh
 marshall_cxx_source = marshall-cp.hh
-libcc1plugin_la_LDFLAGS = -module -export-symbols $(srcdir)/libcc1plugin.sym
+libcc1plugin_la_LDFLAGS = -module -export-symbols \
+	$(srcdir)/libcc1plugin.sym $(am__append_2)
 libcc1plugin_la_SOURCES = libcc1plugin.cc context.cc context.hh \
 	$(shared_source) $(marshall_c_source)
 
@@ -416,7 +420,8 @@ libcc1plugin_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
 	$(CXXFLAGS) $(libcc1plugin_la_LDFLAGS) $(LTLDFLAGS) -o $@
 
-libcp1plugin_la_LDFLAGS = -module -export-symbols $(srcdir)/libcp1plugin.sym
+libcp1plugin_la_LDFLAGS = -module -export-symbols \
+	$(srcdir)/libcp1plugin.sym $(am__append_3)
 libcp1plugin_la_SOURCES = libcp1plugin.cc context.cc context.hh \
 	$(shared_source) $(marshall_cxx_source)
 
@@ -428,7 +433,8 @@ libcp1plugin_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(CXXFLAGS) $(libcp1plugin_la_LDFLAGS) $(LTLDFLAGS) -o $@
 
 LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS))
-libcc1_la_LDFLAGS = -module -export-symbols $(srcdir)/libcc1.sym
+libcc1_la_LDFLAGS = -module -export-symbols $(srcdir)/libcc1.sym \
+	$(am__append_4)
 libcc1_la_SOURCES = findcomp.cc libcc1.cc libcp1.cc \
 		compiler.cc compiler.hh names.cc names.hh $(shared_source) \
 		$(marshall_c_source) $(marshall_cxx_source)
