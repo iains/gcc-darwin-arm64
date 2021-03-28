@@ -38,6 +38,7 @@ AM_MAINTAINER_MODE
 LT_INIT([disable-static])
 AM_PROG_LIBTOOL
 AC_PROG_CXX
+AM_CONDITIONAL([ENABLE_DARWIN_AT_RPATH], [test x$enable_darwin_at_rpath = xyes])
 
 visibility=
 if test "$GXX" = yes; then
