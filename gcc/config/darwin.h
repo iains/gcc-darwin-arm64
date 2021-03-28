@@ -132,6 +132,7 @@ extern GTY(()) int darwin_ms_struct;
 "%{gsplit-dwarf:%ngsplit-dwarf is not supported on this platform} \
    %<gsplit-dwarf",							\
 "%{gused:-g -feliminate-unused-debug-symbols} %<gused",			\
+"%{rpath*: -Xlinker -rpath -Xlinker %*}",					\
 "%{shared:-Zdynamiclib} %<shared",					\
 "%{static:%{Zdynamic:%e conflicting code gen style switches are used}}",\
 "%{y*:%nthe y option is obsolete and ignored} %<y*",			\
@@ -238,8 +239,8 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
-    "%{!r:%{!nostdlib:%{!rpath:%(darwin_rpaths)}}}" \
-    "}}}}}}} %<pie %<no-pie %<rdynamic %<X "
+    "%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpath:%(darwin_rpaths)}}}} " \
+    "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
 
 /* Spec that controls whether the debug linker is run automatically for
    a link step.  This needs to be done if there is a source file on the
@@ -464,10 +465,8 @@ extern GTY(()) int darwin_ms_struct;
 /* FIXME: it would be great to have a version-compare that accepts multiple
    arguments.  */
 #define DARWIN_RPATH_SPEC \
-  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath)		\
-   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path/.)	\
-   %:version-compare(>= 10.5 mmacosx-version-min= -rpath)		\
-   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path/../lib)	\
+  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath) \
+   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path) \
    %P "
 
 #ifdef HAVE_AS_MMACOSX_VERSION_MIN_OPTION
