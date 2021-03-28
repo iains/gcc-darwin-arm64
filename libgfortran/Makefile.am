@@ -37,6 +37,10 @@ else
 version_arg =
 version_dep =
 endif
+if ENABLE_DARWIN_AT_RPATH
+extra_ldflags_libgfortran += -nodefaultrpaths -nodefaultexport
+extra_ldflags_libgfortran += -Wl,-rpath,@loader_path/
+endif
 
 gfor_c_HEADERS = ISO_Fortran_binding.h
 gfor_cdir = $(libdir)/gcc/$(target_alias)/$(gcc_version)/include
