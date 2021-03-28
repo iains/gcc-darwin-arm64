@@ -379,7 +379,7 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
-    "%{!r:%{!nostdlib:%{!rpath:%(darwin_rpaths)}}}" \
+    "%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpath:%(darwin_rpaths)}}}} " \
     "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
 
 /* Spec that controls whether the debug linker is run automatically for
@@ -543,10 +543,8 @@ extern GTY(()) int darwin_ms_struct;
 /* FIXME: it would be great to have a version-compare that accepts multiple
    arguments.  */
 #define DARWIN_RPATH_SPEC \
-  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath)		\
-   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path/.)	\
-   %:version-compare(>= 10.5 mmacosx-version-min= -rpath)		\
-   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path/../lib)	\
+  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath) \
+   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path) \
    %P "
 
 #ifdef HAVE_AS_MMACOSX_VERSION_MIN_OPTION
