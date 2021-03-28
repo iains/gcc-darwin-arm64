@@ -143,7 +143,7 @@ darwin_find_version_from_kernel (void)
   if (sysctl (osversion_name, ARRAY_SIZE (osversion_name), osversion,
 	      &osversion_len, NULL, 0) == -1)
     {
-      warning (0, "sysctl for kern.osversion failed: %m");
+      warning (0, "%<sysctl%> for %<kern.osversion%> failed: %m");
       return NULL;
     }
 
@@ -189,7 +189,7 @@ darwin_find_version_from_kernel (void)
   return new_flag;
 
  parse_failed:
-  warning (0, "couldn%'t understand kern.osversion %q.*s",
+  warning (0, "could not understand %<kern.osversion%> %q.*s",
 	   (int) osversion_len, osversion);
   return NULL;
 }
@@ -229,7 +229,7 @@ darwin_default_min_version (void)
       const char *checked = validate_macosx_version_min (new_flag);
       if (checked == NULL)
 	{
-	  warning (0, "could not understand version %s", new_flag);
+	  warning (0, "could not understand version %qs", new_flag);
 	  return NULL;
 	}
       new_flag = xstrndup (checked, strlen (checked));
@@ -305,7 +305,7 @@ darwin_driver_init (unsigned int *decoded_options_count,
 	  else if (!strcmp ((*decoded_options)[i].arg, "ppc64"))
 	    seenPPC64 = true;
 	  else
-	    error ("this compiler does not support %s",
+	    error ("this compiler does not support %qs",
 		   (*decoded_options)[i].arg);
 	  /* Now we've examined it, drop the -arch arg.  */
 	  if (*decoded_options_count > i) {
@@ -382,11 +382,12 @@ darwin_driver_init (unsigned int *decoded_options_count,
   /* TODO: determine if these warnings would better be errors.  */
 #if DARWIN_X86
   if (seenPPC || seenPPC64)
-    warning (0, "this compiler does not support PowerPC (arch flags ignored)");
+    warning (0, "this compiler does not support %<PowerPC%>"
+	     " (arch flags ignored)");
   if (seenX86)
     {
       if (seenX86_64 || seenM64)
-	warning (0, "%s conflicts with i386 (arch flags ignored)",
+	warning (0, "%qs conflicts with %<i386%> (arch flags ignored)",
 	        (seenX86_64? "x86_64": "m64"));
       else if (! seenM32) /* Add -m32 if the User didn't. */
 	appendM32 = true;
@@ -394,18 +395,18 @@ darwin_driver_init (unsigned int *decoded_options_count,
   else if (seenX86_64)
     {
       if (seenX86 || seenM32)
-	warning (0, "%s conflicts with x86_64 (arch flags ignored)",
+	warning (0, "%qs conflicts with %<x86_64%> (arch flags ignored)",
 		 (seenX86? "i386": "m32"));
       else if (! seenM64) /* Add -m64 if the User didn't. */
 	appendM64 = true;
     }  
 #elif DARWIN_PPC
   if (seenX86 || seenX86_64)
-    warning (0, "this compiler does not support X86 (arch flags ignored)");
+    warning (0, "this compiler does not support %<x86%> (arch flags ignored)");
   if (seenPPC)
     {
       if (seenPPC64 || seenM64)
-	warning (0, "%s conflicts with ppc (arch flags ignored)",
+	warning (0, "%qs conflicts with %<ppc%> (arch flags ignored)",
 		 (seenPPC64? "ppc64": "m64"));
       else if (! seenM32) /* Add -m32 if the User didn't. */
 	appendM32 = true;
@@ -413,7 +414,7 @@ darwin_driver_init (unsigned int *decoded_options_count,
   else if (seenPPC64)
     {
       if (seenPPC || seenM32)
-	warning (0, "%s conflicts with ppc64 (arch flags ignored)",
+	warning (0, "%qs conflicts with %<ppc64%> (arch flags ignored)",
 		 (seenPPC? "ppc": "m32"));
       else if (! seenM64) /* Add -m64 if the User didn't. */
 	appendM64 = true;
