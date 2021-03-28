@@ -296,6 +296,18 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_CC1_SPEC							\
   "%<dynamic %<dynamiclib %<force_cpusubtype_ALL "
 
+/* When we are using embedded runpaths DARWIN_AT_RPATH is set. */
+#if DARWIN_AT_RPATH
+# define DARWIN_RPATH_LINK \
+"%{!r:%{!nostdlib:%{!nodefaultrpaths:%(darwin_rpaths)}}}"
+# define DARWIN_SHARED_LIBGCC "-lgcc_s.1.1"
+#else
+# define DARWIN_RPATH_LINK ""
+# define DARWIN_SHARED_LIBGCC \
+"%:version-compare(!> 10.11 mmacosx-version-min= -lgcc_s.1.1) \
+ %:version-compare(>= 10.11 mmacosx-version-min= -lemutls_w) "
+#endif
+
 #define SUBSUBTARGET_OVERRIDE_OPTIONS					\
   do {									\
     darwin_override_options ();						\
@@ -387,7 +399,8 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
-    "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
+    DARWIN_RPATH_LINK \
+    "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath %<nodefaultrpaths "
 
 /* Spec that controls whether the debug linker is run automatically for
    a link step.  This needs to be done if there is a source file on the
@@ -503,8 +516,7 @@ extern GTY(()) int darwin_ms_struct;
     %:version-compare(!> 10.6 mmacosx-version-min= -lgcc_eh)		  \
     %:version-compare(>= 10.6 mmacosx-version-min= -lemutls_w);		  \
    shared-libgcc|fexceptions|fobjc-exceptions|fgnu-runtime:		  \
-    %:version-compare(!> 10.11 mmacosx-version-min= -lgcc_s.1.1)	  \
-    %:version-compare(>= 10.11 mmacosx-version-min= -lemutls_w)		  \
+   " DARWIN_SHARED_LIBGCC "						  \
     %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)		  \
     %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4)   \
     %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5);	  \
@@ -539,7 +551,8 @@ extern GTY(()) int darwin_ms_struct;
   { "darwin_crt2", DARWIN_CRT2_SPEC },					\
   { "darwin_crt3", DARWIN_CRT3_SPEC },					\
   { "darwin_dylib1", DARWIN_DYLIB1_SPEC },				\
-  { "darwin_bundle1", DARWIN_BUNDLE1_SPEC },
+  { "darwin_bundle1", DARWIN_BUNDLE1_SPEC },				\
+  { "darwin_rpaths", DARWIN_RPATH_SPEC },
 
 #define DARWIN_CRT1_SPEC						\
   "%:version-compare(!> 10.5 mmacosx-version-min= -lcrt1.o)		\
@@ -564,6 +577,17 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_BUNDLE1_SPEC \
 "%{!static:%:version-compare(< 10.6 mmacosx-version-min= -lbundle1.o)	\
 	   %{fgnu-tm: -lcrttms.o}}"
+
+#if DARWIN_AT_RPATH
+/* A default rpath, that picks up dependent libraries installed in the same 
+   director as one being loaded.  */
+#define DARWIN_RPATH_SPEC \
+  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath) \
+   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path) \
+   %P "
+#else
+#define DARWIN_RPATH_SPEC ""
+#endif
 
 #ifdef HAVE_AS_MMACOSX_VERSION_MIN_OPTION
 /* Emit macosx version (but only major).  */
