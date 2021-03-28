@@ -36,7 +36,11 @@ if LIBBACKTRACE_SUPPORTED
 libubsan_la_LIBADD += $(top_builddir)/libbacktrace/libsanitizer_libbacktrace.la
 endif
 libubsan_la_LIBADD += $(LIBSTDCXX_RAW_CXX_LDFLAGS)
-libubsan_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` $(link_libubsan)
+if ENABLE_DARWIN_AT_RPATH
+libubsan_darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+endif
+libubsan_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` \
+	$(link_libubsan) $(libubsan_darwin_rpath)
 
 # Use special rules for files that require RTTI support.
 ubsan_handlers_cxx.% ubsan_type_hash.% ubsan_type_hash_itanium.% : AM_CXXFLAGS += -frtti
