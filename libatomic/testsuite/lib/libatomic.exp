@@ -153,6 +153,7 @@ proc libatomic_init { args } {
     lappend ALWAYS_CFLAGS "additional_flags=-I${srcdir}/.."
 
     if [istarget *-*-darwin*] {
+	lappend ALWAYS_CFLAGS "additional_flags=-B${blddir}/.libs"
 	lappend ALWAYS_CFLAGS "additional_flags=-shared-libgcc"
     }
 
