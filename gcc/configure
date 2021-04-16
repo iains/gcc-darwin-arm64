@@ -739,6 +739,7 @@ ORIGINAL_AS_FOR_TARGET
 gcc_cv_as
 enable_fast_install
 objdir
+enable_darwin_at_rpath
 ENABLE_DARWIN_AT_RPATH_FALSE
 ENABLE_DARWIN_AT_RPATH_TRUE
 OTOOL64
@@ -17686,6 +17687,7 @@ else
 fi
 
 
+
   archive_cmds_need_lc=no
   hardcode_direct=no
   hardcode_automatic=yes
@@ -19501,7 +19503,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 19504 "configure"
+#line 19506 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19607,7 +19609,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 19610 "configure"
+#line 19612 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -20531,6 +20533,7 @@ else
   ENABLE_DARWIN_AT_RPATH_TRUE='#'
   ENABLE_DARWIN_AT_RPATH_FALSE=
 fi
+
 
 
   archive_cmds_need_lc_CXX=no
