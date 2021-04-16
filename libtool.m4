@@ -1080,6 +1080,7 @@ m4_defun([_LT_DARWIN_LINKER_FEATURES],
   ])
 
   AM_CONDITIONAL([ENABLE_DARWIN_AT_RPATH], [test "x$enable_darwin_at_rpath" = "xyes"])
+  AC_SUBST(enable_darwin_at_rpath)
 
   _LT_TAGVAR(archive_cmds_need_lc, $1)=no
   _LT_TAGVAR(hardcode_direct, $1)=no
