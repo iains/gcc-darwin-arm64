@@ -103,8 +103,10 @@ int OpenInet6 (char const **e, char const *name, int port)
   hints.ai_next = nullptr;
 
   /* getaddrinfo requires a port number, but is quite happy to accept
-     invalid ones.  So don't rely on it.  */
-  if (int err = getaddrinfo (name, "0", &hints, &addrs))
+     invalid ones.  So don't rely on it.  Use "00000" to work around a
+     bug in some Darwin libc implementations that segv for a single
+     char "0".  */
+  if (int err = getaddrinfo (name, "00000", &hints, &addrs))
     {
       errstr = gai_strerror (err);
       // What's the best errno to set?
