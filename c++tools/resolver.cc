@@ -307,3 +307,10 @@ module_resolver::IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
   return 0;
 }
 
+int
+module_resolver::ModuleCompiledRequest (Cody::Server *s, Cody::Flags,
+				      std::string &)
+{
+  s->OKResponse();
+  return 0;
+}
