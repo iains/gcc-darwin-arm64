@@ -62,6 +62,11 @@ along with GCC; see the file COPYING3.  If not see
 #define DIR_SEPARATOR '/'
 #endif
 
+#ifndef gcc_assert
+#define gcc_assert(EXPR)                                                \
+   ((void)(!(EXPR) ? fancy_abort (__FILE__, __LINE__, __FUNCTION__), 0 : 0))
+#endif
+
 module_resolver::module_resolver (bool map, bool xlate)
   : default_map (map), default_translate (xlate)
 {
