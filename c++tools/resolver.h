@@ -43,6 +43,7 @@ private:
   int fd_repo = -1;
   bool default_map = true;
   bool default_translate = true;
+  bool isGCC = true;
 
 public:
   module_resolver (bool map = true, bool xlate = false);
