@@ -193,25 +193,32 @@ module_resolver::read_tuple_file (int fd, char const *prefix, bool force)
 char const *
 module_resolver::GetCMISuffix ()
 {
-  return "gcm";
+  return isGCC ? "gcm" : "pcm";
 }
 
 module_resolver *
 module_resolver::ConnectRequest (Cody::Server *s, unsigned version,
 				 std::string &a, std::string &i)
 {
-  if (!version || version > Cody::Version)
+  std::string info;
+  if (!version || version > Cody::Version) {
     s->ErrorResponse ("version mismatch");
-  else if (a != "GCC")
+    info = "FAILED : version mismatch";
+  } else if (a != "GCC" && a != "clang") {
     // Refuse anything but GCC
-    ErrorResponse (s, std::string ("only GCC supported"));
-  else if (!ident.empty () && ident != i)
+    ErrorResponse (s, std::string ("only GCC and clang supported"));
+    info = "FAILED : only GCC and clang supported";
+  } else if (!ident.empty () && ident != i) {
     // Failed ident check
     ErrorResponse (s, std::string ("bad ident"));
-  else
+    info = "FAILED : bad ident";
+  } else {
     // Success!
-    s->ConnectResponse ("gcc");
-
+    isGCC = a == "GCC";
+    s->ConnectResponse (isGCC ? "gcc" : "g++-mapper-server");
+    info = "OK : connection from ";
+    info += isGCC ? "gcc" : "clang";
+  }
   return this;
 }
 
