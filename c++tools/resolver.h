@@ -44,9 +44,10 @@ private:
   bool default_map = true;
   bool default_translate = true;
   bool isGCC = true;
+  bool noisy = false;
 
 public:
-  module_resolver (bool map = true, bool xlate = false);
+  module_resolver (bool map = true, bool xlate = false, bool noisy = false);
   virtual ~module_resolver () override;
 
 public:
