@@ -63,8 +63,9 @@ along with GCC; see the file COPYING3.  If not see
 #define DIR_SEPARATOR '/'
 #endif
 
-module_resolver::module_resolver (bool map, bool xlate)
-  : default_map (map), default_translate (xlate)
+
+module_resolver::module_resolver (bool map, bool xlate, bool noisy)
+  : default_map (map), default_translate (xlate), noisy (noisy)
 {
 }
 
@@ -219,6 +220,8 @@ module_resolver::ConnectRequest (Cody::Server *s, unsigned version,
     info = "OK : connection from ";
     info += isGCC ? "gcc" : "clang";
   }
+  if (noisy)
+    fprintf(stderr, "%s\n", info.c_str());
   return this;
 }
 
@@ -240,11 +243,15 @@ module_resolver::cmi_response (Cody::Server *s, std::string &module)
       iter = res.first;
     }
 
-  if (iter->second.empty ())
+  if (iter->second.empty ()) {
+    if (noisy)
+      fprintf(stderr, " no such module (%s)\n", module.c_str());
     s->ErrorResponse ("no such module");
-  else
+  } else {
+    if (noisy)
+      fprintf(stderr, " OK : %s\n", iter->second.c_str());
     s->PathnameResponse (iter->second);
-
+  }
   return 0;
 }
 
@@ -252,6 +259,8 @@ int
 module_resolver::ModuleExportRequest (Cody::Server *s, Cody::Flags,
 				      std::string &module)
 {
+  if (noisy)
+    fprintf(stderr, "ModuleExportRequest : %s :", module.c_str());
   return cmi_response (s, module);
 }
 
@@ -259,6 +268,8 @@ int
 module_resolver::ModuleImportRequest (Cody::Server *s, Cody::Flags,
 				      std::string &module)
 {
+  if (noisy)
+    fprintf(stderr, "ModuleImportRequest : %s :", module.c_str());
   return cmi_response (s, module);
 }
 
@@ -266,6 +277,8 @@ int
 module_resolver::IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
 					  std::string &include)
 {
+  if (noisy)
+    fprintf(stderr, "IncludeTranslateRequest : %s :", include.c_str());
   auto iter = map.find (include);
   if (iter == map.end () && default_translate)
     {
@@ -308,11 +321,15 @@ module_resolver::IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
       iter = res.first;
     }
 
-  if (iter == map.end () || iter->second.empty ())
+  if (iter == map.end () || iter->second.empty ()) {
+    if (noisy)
+      fprintf(stderr, " NO\n");
     s->BoolResponse (false);
-  else
+  } else {
+    if (noisy)
+      fprintf(stderr, " OK : %s\n", iter->second.c_str());
     s->PathnameResponse (iter->second);
-
+  }
   return 0;
 }
 
@@ -322,8 +339,10 @@ module_resolver::IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
 
 int
 module_resolver::ModuleCompiledRequest (Cody::Server *s, Cody::Flags,
-				      std::string &)
+				      std::string &module)
 {
+  if (noisy)
+    fprintf(stderr, "ModuleCompiledRequest : %s done\n", module.c_str());
   s->OKResponse();
   return 0;
 }
