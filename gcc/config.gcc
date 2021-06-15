@@ -702,6 +702,11 @@ case ${target} in
       *-*-darwin[4-9]* | *-*-darwin1[0-9]*)
         macos_min=`expr $darwin_maj - 4`
         ;;
+      *-*-darwin21*)
+        # Darwin 20 corresponds to macOS 11.
+        macos_maj=12
+        def_ld64=750
+        ;;
       *-*-darwin20*)
         # Darwin 20 corresponds to macOS 11.
         macos_maj=11
