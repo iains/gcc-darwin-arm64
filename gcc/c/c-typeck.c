@@ -1947,7 +1947,14 @@ function_to_pointer_conversion (location_t loc, tree exp)
 
   copy_warning (exp, orig_exp);
 
-  return build_unary_op (loc, ADDR_EXPR, exp, false);
+  tree r = build_unary_op (loc, ADDR_EXPR, exp, false);
+
+  if (TREE_CODE(r) == ADDR_EXPR
+      && targetm.calls.custom_function_descriptors > 0
+      && flag_trampolines == 0)
+    FUNC_ADDR_BY_DESCRIPTOR (r) = 1;
+
+  return r;
 }
 
 /* Mark EXP as read, not just set, for set but not used -Wunused
@@ -3223,6 +3230,12 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
   else
     result = build_call_array_loc (loc, TREE_TYPE (fntype),
 				   function, nargs, argarray);
+
+  if (TREE_CODE (result) == CALL_EXPR
+      && targetm.calls.custom_function_descriptors > 0
+      && flag_trampolines == 0)
+    CALL_EXPR_BY_DESCRIPTOR (result) = 1;
+
   /* If -Wnonnull warning has been diagnosed, avoid diagnosing it again
      later.  */
   if (warned_p && TREE_CODE (result) == CALL_EXPR)
