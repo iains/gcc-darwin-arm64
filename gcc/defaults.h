@@ -1036,7 +1036,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 /* Force minimum alignment to be able to use the least significant bits
    for distinguishing descriptor addresses from code addresses.  */
 #define FUNCTION_ALIGNMENT(ALIGN)					\
-  (lang_hooks.custom_function_descriptors				\
+  ((lang_hooks.custom_function_descriptors || flag_trampolines == 0)    \
    && targetm.calls.custom_function_descriptors > 0			\
    ? MAX ((ALIGN),						\
 	  2 * targetm.calls.custom_function_descriptors * BITS_PER_UNIT)\
