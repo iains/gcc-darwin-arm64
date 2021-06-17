@@ -1662,6 +1662,12 @@ process_options (void)
       flag_prefetch_loop_arrays = 0;
     }
 
+  if (flag_trampolines == 0 && targetm.calls.custom_function_descriptors == -1)
+   {
+     warning_at (UNKNOWN_LOCATION, 0,
+                 "-fno-trampolines not supported for this target");
+   }
+
   /* The presence of IEEE signaling NaNs, implies all math can trap.  */
   if (flag_signaling_nans)
     flag_trapping_math = 1;
