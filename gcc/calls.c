@@ -225,7 +225,7 @@ prepare_call_address (tree fndecl_or_type, rtx funexp, rtx static_chain_value,
     {
       /* If it's an indirect call by descriptor, generate code to perform
 	 runtime identification of the pointer and load the descriptor.  */
-      if ((flags & ECF_BY_DESCRIPTOR) && !flag_trampolines)
+      if (flags & ECF_BY_DESCRIPTOR)
 	{
 	  const int bit_val = targetm.calls.custom_function_descriptors;
 	  rtx call_lab = gen_label_rtx ();

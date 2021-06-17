@@ -2775,7 +2775,7 @@ convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
 	continue;
 
       /* Decide whether to generate a descriptor or a trampoline. */
-      descr = FUNC_ADDR_BY_DESCRIPTOR (t) && !flag_trampolines;
+      descr = FUNC_ADDR_BY_DESCRIPTOR (t);
 
       if (descr)
 	x = lookup_descr_for_decl (i, decl, INSERT);
