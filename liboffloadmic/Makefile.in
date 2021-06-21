@@ -426,6 +426,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_darwin_at_rpath = @enable_darwin_at_rpath@
 exec_prefix = @exec_prefix@
 get_gcc_base_ver = @get_gcc_base_ver@
 host = @host@
