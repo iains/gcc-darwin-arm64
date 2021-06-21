@@ -412,6 +412,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_darwin_at_rpath = @enable_darwin_at_rpath@
 enable_shared = @enable_shared@
 enable_static = @enable_static@
 exec_prefix = @exec_prefix@
@@ -481,7 +482,8 @@ libitm_version_info = -version-info $(libtool_VERSION)
 # want or need libstdc++.
 libitm_la_DEPENDENCIES = $(libitm_version_dep)
 libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
-libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script)
+@ENABLE_DARWIN_AT_RPATH_TRUE@libitm_darwin_rpath = -Wl,-rpath,@loader_path
+libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script) $(libitm_darwin_rpath)
 libitm_la_SOURCES = aatree.cc alloc.cc alloc_c.cc alloc_cpp.cc \
 	barrier.cc beginend.cc clone.cc eh_cpp.cc local.cc query.cc \
 	retry.cc rwlock.cc useraction.cc util.cc sjlj.S tls.cc \

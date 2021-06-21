@@ -123,10 +123,10 @@ subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../config/acx.m4 \
 	$(top_srcdir)/../../config/depstand.m4 \
-	$(top_srcdir)/../../config/toolexeclibdir.m4 \
 	$(top_srcdir)/../../config/lead-dot.m4 \
 	$(top_srcdir)/../../config/multi.m4 \
 	$(top_srcdir)/../../config/override.m4 \
+	$(top_srcdir)/../../config/toolexeclibdir.m4 \
 	$(top_srcdir)/../../libtool.m4 \
 	$(top_srcdir)/../../ltoptions.m4 \
 	$(top_srcdir)/../../ltsugar.m4 \
@@ -338,6 +338,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_darwin_at_rpath = @enable_darwin_at_rpath@
 exec_prefix = @exec_prefix@
 get_gcc_base_ver = @get_gcc_base_ver@
 host = @host@
