@@ -1085,6 +1085,7 @@ case ${target} in
   tm_defines="$tm_defines OFF_STACK_TRAMPOLINES_INIT=1"
   ;;
 *)
+  tm_defines="$tm_defines STACK_USE_CUMULATIVE_ARGS_INIT=0"
   tm_defines="$tm_defines OFF_STACK_TRAMPOLINES_INIT=0"
   ;;
 esac
