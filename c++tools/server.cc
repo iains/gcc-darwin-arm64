@@ -61,6 +61,10 @@ along with GCC; see the file COPYING3.  If not see
 # define gai_strerror(X) ""
 #endif
 
+#ifndef AI_NUMERICSERV
+#define AI_NUMERICSERV 0
+#endif
+
 #include <getopt.h>
 
 // Select or epoll
@@ -90,6 +94,11 @@ along with GCC; see the file COPYING3.  If not see
 #endif
 #ifndef DIR_SEPARATOR
 #define DIR_SEPARATOR '/'
+#endif
+
+#ifndef gcc_assert
+#define gcc_assert(EXPR)                                                \
+   ((void)(!(EXPR) ? fancy_abort (__FILE__, __LINE__, __FUNCTION__), 0 : 0))
 #endif
 
 #if NETWORKING
@@ -882,7 +891,7 @@ main (int argc, char *argv[])
 
   std::string name;
   int sock_fd = -1; /* Socket fd, otherwise stdin/stdout.  */
-  module_resolver r (flag_map, flag_xlate);
+  module_resolver r (flag_map, flag_xlate, flag_noisy);
 
   if (argno != argc)
     {
