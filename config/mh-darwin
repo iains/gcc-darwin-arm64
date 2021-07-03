@@ -7,6 +7,13 @@
 # We use Werror, since some versions of clang report unknown command line flags
 # as a warning only.
 
+# In addition, all versions of clang released to date treat -fno-PIE in -m32
+# compilations  as switching PIC code off too, which means that -fno-PIE,
+# without -mdynamic-no-pic produces broken relocations (and we cannot enable
+# -mdynamic-no-pic because the inverse setting doesn't work).  To work around
+# this, we need to ensure that the no-PIE option is followed by -fPIE, when
+# the compiler does not support mdynamic-no-pic.
+
 # We only need to determine this for the host tool used to build stage1 (or a
 # non-bootstrapped compiler), later stages will be built by GCC which supports
 # the required flags.
@@ -18,21 +25,24 @@ BOOTSTRAP_TOOL_CAN_USE_MDYNAMIC_NO_PIC := $(shell \
 @if gcc-bootstrap
 ifeq (${BOOTSTRAP_TOOL_CAN_USE_MDYNAMIC_NO_PIC},true)
 STAGE1_CFLAGS += -mdynamic-no-pic
+STAGE1_NO_PIE_CFLAGS = -fno-PIE
 else
 STAGE1_CFLAGS += -fPIC
+STAGE1_NO_PIE_CFLAGS = -fno-PIE -fPIC
 endif
 # Add -mdynamic-no-pic to later stages when we know it is built with GCC.
 BOOT_CFLAGS += -mdynamic-no-pic
+BOOT_NO_PIE_CFLAGS = -fno-PIE
 @endif gcc-bootstrap
 
 @unless gcc-bootstrap
 ifeq (${BOOTSTRAP_TOOL_CAN_USE_MDYNAMIC_NO_PIC},true)
-# FIXME: we should also enable this for cross and non-bootstrap builds but
-# that needs amendment to libcc1.
-# CFLAGS += -mdynamic-no-pic
-# CXXFLAGS += -mdynamic-no-pic
+CFLAGS += -mdynamic-no-pic
+CXXFLAGS += -mdynamic-no-pic
+STAGE1_NO_PIE_CFLAGS = -fno-PIE
 else
 CFLAGS += -fPIC
 CXXFLAGS += -fPIC
+STAGE1_NO_PIE_CFLAGS = -fno-PIE -fPIC
 endif
 @endunless gcc-bootstrap

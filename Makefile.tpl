@@ -573,6 +573,20 @@ all:
 @host_makefile_frag@
 ###
 
+# Allow host makefile fragment to override PIE settings.
+ifneq ($(STAGE1_NO_PIE_CFLAGS),)
+  HOST_EXPORTS += export NO_PIE_CFLAGS="$(STAGE1_NO_PIE_CFLAGS)";
+endif
+ifneq ($(STAGE1_NO_PIE_FLAG),)
+  HOST_EXPORTS += export NO_PIE_FLAG="$(STAGE1_NO_PIE_FLAG)";
+endif
+ifneq ($(BOOT_NO_PIE_CFLAGS),)
+  POSTSTAGE1_HOST_EXPORTS += export NO_PIE_CFLAGS="$(BOOT_NO_PIE_CFLAGS)";
+endif
+ifneq ($(BOOT_NO_PIE_FLAG),)
+  POSTSTAGE1_HOST_EXPORTS += export NO_PIE_FLAG="$(BOOT_NO_PIE_FLAG)";
+endif
+
 # This is the list of directories that may be needed in RPATH_ENVVAR
 # so that programs built for the target machine work.
 TARGET_LIB_PATH = [+ FOR target_modules +][+
