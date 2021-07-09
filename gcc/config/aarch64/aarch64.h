@@ -1019,6 +1019,8 @@ typedef struct
 				   when placing smaller items for darwinpcs.  */
   int darwinpcs_sub_word_pos;	/* The next byte available within the word for
 				   darwinpcs.  */
+  int darwinpcs_n_named;        /* Number of named arguments.  */
+  int darwinpcs_n_args_processed; /* Number of arguments processed so far.  */
   bool silent_p;		/* True if we should act silently, rather than
 				   raise an error for invalid calls.  */
 } CUMULATIVE_ARGS;
@@ -1031,6 +1033,9 @@ typedef struct
 
 #define INIT_CUMULATIVE_ARGS(CUM, FNTYPE, LIBNAME, FNDECL, N_NAMED_ARGS) \
   aarch64_init_cumulative_args (&(CUM), FNTYPE, LIBNAME, FNDECL, N_NAMED_ARGS)
+
+#define INIT_CUMULATIVE_INCOMING_ARGS(CUM, FNTYPE, LIBNAME) \
+  aarch64_init_cumulative_incoming_args (&(CUM), FNTYPE, LIBNAME)
 
 #define FUNCTION_ARG_REGNO_P(REGNO) \
   aarch64_function_arg_regno_p(REGNO)
