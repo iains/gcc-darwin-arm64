@@ -1080,6 +1080,9 @@ esac
 
 # Figure out if we need to enable -foff-stack-trampolines by default
 case ${target} in
+aarch64*-*darwin2*)
+  tm_defines="$tm_defines STACK_USE_CUMULATIVE_ARGS_INIT=1"
+  ;;
 *-*-darwin2*)
   # Currently, we do this for macOS 11 and above.
   tm_defines="$tm_defines OFF_STACK_TRAMPOLINES_INIT=1"

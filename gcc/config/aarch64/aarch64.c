@@ -7064,6 +7064,8 @@ aarch64_init_cumulative_args (CUMULATIVE_ARGS *pcum,
   pcum->darwinpcs_stack_bytes = 0;
   pcum->darwinpcs_sub_word_offset = 0;
   pcum->darwinpcs_sub_word_pos = 0;
+  pcum->darwinpcs_n_named = n_named;
+  pcum->darwinpcs_n_args_processed = 0;
   pcum->silent_p = silent_p;
   pcum->aapcs_vfp_rmode = VOIDmode;
 
@@ -7094,6 +7096,20 @@ aarch64_init_cumulative_args (CUMULATIVE_ARGS *pcum,
     }
 }
 
+void
+aarch64_init_cumulative_incoming_args (CUMULATIVE_ARGS *pcum,
+				       const_tree fntype,
+				       rtx libname ATTRIBUTE_UNUSED)
+{
+#if !TARGET_MACHO
+  INIT_CUMULATIVE_ARGS (*pcum, fntype, libname, current_function_decl, -1);
+#else
+  int n_named_args = (list_length (TYPE_ARG_TYPES (fntype)));
+
+  aarch64_init_cumulative_args (pcum, fntype, libname, current_function_decl, n_named_args);
+#endif
+}
+
 static void
 aarch64_function_arg_advance (cumulative_args_t pcum_v,
 			      const function_arg_info &arg)
@@ -7114,6 +7130,7 @@ aarch64_function_arg_advance (cumulative_args_t pcum_v,
       pcum->aapcs_stack_size += pcum->aapcs_stack_words;
       pcum->aapcs_stack_words = 0;
       pcum->aapcs_reg = NULL_RTX;
+      pcum->darwinpcs_n_args_processed++;
     }
 }
 
@@ -7169,6 +7186,19 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
 #endif
 }
 
+static unsigned int
+aarch64_function_arg_boundary_ca (machine_mode mode, const_tree type,
+				  cumulative_args_t ca)
+{
+  CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
+  bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
+
+  if (named_p)
+    return aarch64_function_arg_boundary (mode, type);
+  else
+    return MAX (aarch64_function_arg_boundary (mode, type), PARM_BOUNDARY);
+}
+
 #if TARGET_MACHO
 /* Implement TARGET_FUNCTION_ARG_ROUND_BOUNDARY for darwinpcs which allows
    non-standard passing of byte-aligned items [D.2].
@@ -7179,6 +7209,26 @@ aarch64_function_arg_round_boundary (machine_mode, const_tree)
 {
   return BITS_PER_UNIT;
 }
+
+static unsigned int
+aarch64_function_arg_round_boundary_ca (machine_mode mode, const_tree type,
+					cumulative_args_t ca)
+{
+  CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
+  bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
+  bool last_named_p = pcum->darwinpcs_n_args_processed + 1 == pcum->darwinpcs_n_named;
+
+  if (named_p)
+    {
+      if (last_named_p)
+	return PARM_BOUNDARY;
+      else
+	return aarch64_function_arg_round_boundary (mode, type);
+    }
+  else
+    return PARM_BOUNDARY;
+}
+
 #endif
 
 /* Implement TARGET_GET_RAW_RESULT_MODE and TARGET_GET_RAW_ARG_MODE.  */
@@ -26930,9 +26980,15 @@ aarch64_run_selftests (void)
 #undef TARGET_FUNCTION_ARG_BOUNDARY
 #define TARGET_FUNCTION_ARG_BOUNDARY aarch64_function_arg_boundary
 
+#undef TARGET_FUNCTION_ARG_BOUNDARY_CA
+#define TARGET_FUNCTION_ARG_BOUNDARY_CA aarch64_function_arg_boundary_ca
+
 #if TARGET_MACHO
 #undef  TARGET_FUNCTION_ARG_ROUND_BOUNDARY
 #define TARGET_FUNCTION_ARG_ROUND_BOUNDARY aarch64_function_arg_round_boundary
+
+#undef  TARGET_FUNCTION_ARG_ROUND_BOUNDARY_CA
+#define TARGET_FUNCTION_ARG_ROUND_BOUNDARY_CA aarch64_function_arg_round_boundary_ca
 #endif
 
 #undef TARGET_FUNCTION_ARG_PADDING
