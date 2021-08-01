@@ -148,9 +148,19 @@ m4_rename_force([real_PRECIOUS],[_AC_ARG_VAR_PRECIOUS])
 # extra LD Flags which are required for targets
 ACX_LT_HOST_FLAGS
 case "${host}" in
-  *-darwin*)
-    # Darwin needs -single_module when linking libobjc
+  *-darwin[[4567]]*)
+    # Earlier Darwin versions need -single_module when linking libobjc; they
+    # do not support @rpath.
     extra_ldflags_libobjc='$(lt_host_flags) -Wl,-single_module'
+    ;;
+  *-darwin*)
+    # Otherwise, single_module is the default and multi-module is ignored and
+    # obsolete.
+    if test "x$enable_darwin_at_rpath" = "xyes"; then
+      extra_ldflags_libobjc='$(lt_host_flags) -Wl,-rpath,@loader_path'
+    else
+      extra_ldflags_libobjc='$(lt_host_flags)'
+    fi
     ;;
   *-cygwin*|*-mingw*)
     # Tell libtool to build DLLs on Windows

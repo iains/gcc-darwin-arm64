@@ -272,8 +272,8 @@ AC_PROG_FC(gfortran)
 
 # extra LD Flags which are required for targets
 case "${host}" in
-  *-darwin*)
-    # Darwin needs -single_module when linking libgfortran
+  *-*-darwin[[4567]]*)
+    # Earlier Darwin needs -single_module when linking libgfortran
     extra_ldflags_libgfortran=-Wl,-single_module
     ;;
 esac
