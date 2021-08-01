@@ -62,8 +62,9 @@ along with GCC; see the file COPYING3.  If not see
 #define DIR_SEPARATOR '/'
 #endif
 
-module_resolver::module_resolver (bool map, bool xlate)
-  : default_map (map), default_translate (xlate)
+
+module_resolver::module_resolver (bool map, bool xlate, bool noisy)
+  : default_map (map), default_translate (xlate), noisy (noisy)
 {
 }
 
@@ -191,25 +192,34 @@ module_resolver::read_tuple_file (int fd, char const *prefix, bool force)
 char const *
 module_resolver::GetCMISuffix ()
 {
-  return "gcm";
+  return isGCC ? "gcm" : "pcm";
 }
 
 module_resolver *
 module_resolver::ConnectRequest (Cody::Server *s, unsigned version,
 				 std::string &a, std::string &i)
 {
-  if (!version || version > Cody::Version)
+  std::string info;
+  if (!version || version > Cody::Version) {
     s->ErrorResponse ("version mismatch");
-  else if (a != "GCC")
+    info = "FAILED : version mismatch";
+  } else if (a != "GCC" && a != "clang") {
     // Refuse anything but GCC
-    ErrorResponse (s, std::string ("only GCC supported"));
-  else if (!ident.empty () && ident != i)
+    ErrorResponse (s, std::string ("only GCC and clang supported"));
+    info = "FAILED : only GCC and clang supported";
+  } else if (!ident.empty () && ident != i) {
     // Failed ident check
     ErrorResponse (s, std::string ("bad ident"));
-  else
+    info = "FAILED : bad ident";
+  } else {
     // Success!
-    s->ConnectResponse ("gcc");
-
+    isGCC = a == "GCC";
+    s->ConnectResponse (isGCC ? "gcc" : "g++-mapper-server");
+    info = "OK : connection from ";
+    info += isGCC ? "gcc" : "clang";
+  }
+  if (noisy)
+    fprintf(stderr, "%s\n", info.c_str());
   return this;
 }
 
@@ -231,11 +241,15 @@ module_resolver::cmi_response (Cody::Server *s, std::string &module)
       iter = res.first;
     }
 
-  if (iter->second.empty ())
+  if (iter->second.empty ()) {
+    if (noisy)
+      fprintf(stderr, " no such module (%s)\n", module.c_str());
     s->ErrorResponse ("no such module");
-  else
+  } else {
+    if (noisy)
+      fprintf(stderr, " OK : %s\n", iter->second.c_str());
     s->PathnameResponse (iter->second);
-
+  }
   return 0;
 }
 
@@ -243,6 +257,8 @@ int
 module_resolver::ModuleExportRequest (Cody::Server *s, Cody::Flags,
 				      std::string &module)
 {
+  if (noisy)
+    fprintf(stderr, "ModuleExportRequest : %s :", module.c_str());
   return cmi_response (s, module);
 }
 
@@ -250,6 +266,8 @@ int
 module_resolver::ModuleImportRequest (Cody::Server *s, Cody::Flags,
 				      std::string &module)
 {
+  if (noisy)
+    fprintf(stderr, "ModuleImportRequest : %s :", module.c_str());
   return cmi_response (s, module);
 }
 
@@ -257,6 +275,8 @@ int
 module_resolver::IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
 					  std::string &include)
 {
+  if (noisy)
+    fprintf(stderr, "IncludeTranslateRequest : %s :", include.c_str());
   auto iter = map.find (include);
   if (iter == map.end () && default_translate)
     {
@@ -299,11 +319,24 @@ module_resolver::IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
       iter = res.first;
     }
 
-  if (iter == map.end () || iter->second.empty ())
+  if (iter == map.end () || iter->second.empty ()) {
+    if (noisy)
+      fprintf(stderr, " NO\n");
     s->BoolResponse (false);
-  else
+  } else {
+    if (noisy)
+      fprintf(stderr, " OK : %s\n", iter->second.c_str());
     s->PathnameResponse (iter->second);
-
+  }
   return 0;
 }
 
+int
+module_resolver::ModuleCompiledRequest (Cody::Server *s, Cody::Flags,
+				      std::string &module)
+{
+  if (noisy)
+    fprintf(stderr, "ModuleCompiledRequest : %s done\n", module.c_str());
+  s->OKResponse();
+  return 0;
+}

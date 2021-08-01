@@ -131,10 +131,10 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <netinet/in.h>]],[[
-sockaddr_un un;
+struct sockaddr_un un;
 un.sun_family = AF_UNSPEC;
 int fd = socket (AF_UNIX, SOCK_STREAM, 0);
-connect (fd, (sockaddr *)&un, sizeof (un));]])],
+connect (fd, (struct sockaddr *)&un, sizeof (un));]])],
 [ac_cv_af_unix=yes],
 [ac_cv_af_unix=no])])
 if test $ac_cv_af_unix = yes; then
@@ -150,7 +150,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>]],[[
-sockaddr_in6 in6;
+struct sockaddr_in6 in6;
 in6.sin6_family = AF_UNSPEC;
 struct addrinfo *addrs = 0;
 struct addrinfo hints;
@@ -165,7 +165,7 @@ int e = getaddrinfo ("localhost", 0, &hints, &addrs);
 const char *str = gai_strerror (e);
 freeaddrinfo (addrs);
 int fd = socket (AF_INET6, SOCK_STREAM, 0);
-connect (fd, (sockaddr *)&in6, sizeof (in6));]])],
+connect (fd, (struct sockaddr *)&in6, sizeof (in6));]])],
 [ac_cv_af_inet6=yes],
 [ac_cv_af_inet6=no])])
 if test $ac_cv_af_inet6 = yes; then
@@ -237,7 +237,7 @@ AC_CACHE_CHECK(for inet_ntop, ac_cv_inet_ntop, [
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <arpa/inet.h>
 #include <netinet/in.h>]],[[
-sockaddr_in6 in6;
+struct sockaddr_in6 in6;
 char buf[INET6_ADDRSTRLEN];
 const char *str = inet_ntop (AF_INET6, &in6, buf, sizeof (buf));]])],
 [ac_cv_inet_ntop=yes],
