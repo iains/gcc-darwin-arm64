@@ -43,9 +43,11 @@ private:
   int fd_repo = -1;
   bool default_map = true;
   bool default_translate = true;
+  bool isGCC = true;
+  bool noisy = false;
 
 public:
-  module_resolver (bool map = true, bool xlate = false);
+  module_resolver (bool map = true, bool xlate = false, bool noisy = false);
   virtual ~module_resolver () override;
 
 public:
@@ -95,6 +97,10 @@ public:
   virtual int IncludeTranslateRequest (Cody::Server *s, Cody::Flags,
 				       std::string &include)
     override;
+
+  using parent::ModuleCompiledRequest;
+  virtual int ModuleCompiledRequest (Cody::Server *s, Cody::Flags Flags,
+				     std::string &Module) override;
 
 private:
   using parent::GetCMISuffix;
