@@ -353,6 +353,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_darwin_at_rpath = @enable_darwin_at_rpath@
 exec_prefix = @exec_prefix@
 host = @host@
 host_alias = @host_alias@

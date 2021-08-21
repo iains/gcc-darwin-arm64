@@ -1,20 +1,34 @@
 # Set this as a minimum (unless overriden by arch t-files) since it's a
 # reasonable lowest common denominator that works for all our archs.
-HOST_LIBGCC2_CFLAGS += -mmacosx-version-min=10.4
+HOST_LIBGCC2_CFLAGS += $(DARWIN_MIN_LIB_VERSION)
 
 crt3.o: $(srcdir)/config/darwin-crt3.c
-	$(crt_compile) -mmacosx-version-min=10.4 -c $<
+	$(crt_compile) $(DARWIN_MIN_CRT_VERSION) -c $<
 
 crttms.o: $(srcdir)/config/darwin-crt-tm.c
-	$(crt_compile) -mmacosx-version-min=10.4 -DSTART -c $<
+	$(crt_compile) $(DARWIN_MIN_CRT_VERSION) -DSTART -c $<
 
 crttme.o: $(srcdir)/config/darwin-crt-tm.c
-	$(crt_compile) -mmacosx-version-min=10.4 -DEND -c $<
+	$(crt_compile) $(DARWIN_MIN_CRT_VERSION) -DEND -c $<
 
 # Use unwind-dw2-fde-darwin
 LIB2ADDEH = $(srcdir)/unwind-dw2.c $(srcdir)/config/unwind-dw2-fde-darwin.c \
   $(srcdir)/unwind-sjlj.c $(srcdir)/unwind-c.c
 
+# Make a weak version to use in static lib and as a crt.
+emutls.o: HOST_LIBGCC2_CFLAGS += -DEMUTLS_ATTR='__attribute__((__weak__))'
+
+# Make it a convenience lib so that it can be linked optionally.
+libemutls_w.a: emutls.o
+	$(AR_CREATE_FOR_TARGET) $@ $<
+	$(RANLIB_FOR_TARGET) $@
+
 # Patch to __Unwind_Find_Enclosing_Function for Darwin10.
+# This has to be built for 10.6, even if the toolchain will not target that
+# version
 d10-uwfef.o: $(srcdir)/config/darwin10-unwind-find-enc-func.c
 	$(crt_compile) -mmacosx-version-min=10.6 -c $<
+
+# Start with an empty list and allow the arch-specific t-darwin files to add in
+# any extras, with the main set added by t-slibgcc-darwin.
+SHLIB_MAPFILES =
