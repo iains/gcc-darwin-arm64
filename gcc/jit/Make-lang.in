@@ -59,7 +59,7 @@ LIBGCCJIT_AGE = 1
 LIBGCCJIT_BASENAME = libgccjit
 
 LIBGCCJIT_SONAME = \
-  ${libdir}/$(LIBGCCJIT_BASENAME).$(LIBGCCJIT_VERSION_NUM).dylib
+  $(DARWIN_RPATH)/$(LIBGCCJIT_BASENAME).$(LIBGCCJIT_VERSION_NUM).dylib
 LIBGCCJIT_FILENAME = $(LIBGCCJIT_BASENAME).$(LIBGCCJIT_VERSION_NUM).dylib
 LIBGCCJIT_LINKER_NAME = $(LIBGCCJIT_BASENAME).dylib
 
@@ -165,6 +165,7 @@ $(LIBGCCJIT_FILENAME): $(jit_OBJS) \
 	$(LIBDEPS) $(srcdir)/jit/libgccjit.map \
 	$(EXTRA_GCC_OBJS) $(jit.prev)
 	@$(call LINK_PROGRESS,$(INDEX.jit),start)
+	@
 	+$(LLINKER) $(ALL_LINKERFLAGS) $(LDFLAGS) -o $@ -shared \
 	     $(jit_OBJS) libbackend.a libcommon-target.a libcommon.a \
 	     $(CPPLIB) $(LIBDECNUMBER) $(EXTRA_GCC_LIBS) $(LIBS) $(BACKENDLIBS) \

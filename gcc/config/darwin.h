@@ -196,6 +196,14 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_NOCOMPACT_UNWIND \
 " %:version-compare(>= 10.6 mmacosx-version-min= -no_compact_unwind) "
 
+/* If we enabled default embedded rpaths, then add them.  */
+#ifdef USE_DEFAULT_RPATH
+#define DARWIN_DEFAULT_RPATH \
+"%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpath:%(darwin_rpaths)}}}} "
+#else
+#define DARWIN_DEFAULT_RPATH "%<nodefaultrpath "
+#endif
+
 /* In Darwin linker specs we can put -lcrt0.o and ld will search the library
    path for crt0.o or -lcrtx.a and it will search for for libcrtx.a.  As for
    other ports, we can also put xxx.{o,a}%s and get the appropriate complete
@@ -239,6 +247,7 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
+    DARWIN_DEFAULT_RPATH \
     "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
 
 /* Spec that controls whether the debug linker is run automatically for
@@ -259,14 +268,11 @@ extern GTY(()) int darwin_ms_struct;
 /* Tell collect2 to run dsymutil for us as necessary.  */
 #define COLLECT_RUN_DSYMUTIL 1
 
-/* Fix PR47558 by linking against libSystem ahead of libgcc. See also
-   PR 80556 and the fallout from this.  */
-
+/* We only want one instance of %G, since libSystem (Darwin's -lc) does not
+   depend on libgcc. */
 #undef  LINK_GCC_C_SEQUENCE_SPEC
 #define LINK_GCC_C_SEQUENCE_SPEC \
-"%{!static:%{!static-libgcc: \
-    %:version-compare(>= 10.6 mmacosx-version-min= -lSystem) } } \
-  %G %{!nolibc:%L}"
+ "%G %{!nolibc:%L} "
 
 /* ld64 supports a sysroot, it just has a different name and there's no easy
    way to check for it at config time.  */
@@ -306,7 +312,7 @@ extern GTY(()) int darwin_ms_struct;
      %{Zbundle_loader*:-bundle_loader %*} \
      %{client_name*} \
      %{compatibility_version*:%e-compatibility_version only allowed with -dynamiclib\
-} \
+   } \
      %{current_version*:%e-current_version only allowed with -dynamiclib} \
      %{Zforce_flat_namespace:-force_flat_namespace} \
      %{Zinstall_name*:%e-install_name only allowed with -dynamiclib} \
@@ -369,42 +375,43 @@ extern GTY(()) int darwin_ms_struct;
    %{whatsloaded} %{dylinker_install_name*} \
    %{dylinker} "
 
-
 /* Machine dependent libraries.  */
 
 #define LIB_SPEC "%{!static:-lSystem}"
 
-/* Support -mmacosx-version-min by supplying different (stub) libgcc_s.dylib
-   libraries to link against, and by not linking against libgcc_s on
-   earlier-than-10.3.9.  If we need exceptions, prior to 10.3.9, then we have
-   to link the static eh lib, since there's no shared version on the system.
-
-   Note that by default, except as above, -lgcc_eh is not linked against.
+/*
+   Note that by default, -lgcc_eh is not linked against.
    This is because,in general, we need to unwind through system libraries that
    are linked with the shared unwinder in libunwind (or libgcc_s for 10.4/5).
 
-   The static version of the current libgcc unwinder (which differs from the
-   implementation in libunwind.dylib on systems Darwin10 [10.6]+) can be used
-   by specifying -static-libgcc.
+   For -static-libgcc: < 10.6, use the unwinder in libgcc_eh (and find
+   the emultls impl. there too).
 
-   If libgcc_eh is linked against, it has to be before -lgcc, because it might
-   need symbols from -lgcc.  */
+   For -static-libgcc: >= 10.6, the unwinder *still* comes from libSystem and
+   we find the emutls impl from lemutls_w. In either case, the builtins etc.
+   are linked from -lgcc.
 
+   Otherwise, we just link the shared version of gcc_s.1.1 and pick up
+   exceptions:
+     * Prior to 10.3.9, then we have to link the static eh lib, since there
+       is no shared version on the system.
+     * from 10.3.9 to 10.5, from /usr/lib/libgcc_s.1.dylib
+     * from 10.6 onwards, from libSystem.dylib
+
+   In all cases, libgcc_s.1.1 will be installed with the compiler, or any app
+   built using it, so we can link the builtins and emutls shared on all.
+*/
 #undef REAL_LIBGCC_SPEC
-#define REAL_LIBGCC_SPEC						   \
-   "%{static-libgcc|static: -lgcc_eh -lgcc;				   \
-      shared-libgcc|fexceptions|fobjc-exceptions|fgnu-runtime:		   \
-       %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)	   \
-       %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4) \
-       %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5)   \
-       %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_ext.10.4) \
-       %:version-compare(>= 10.5 mmacosx-version-min= -lgcc_ext.10.5)	   \
-       -lgcc ;								   \
-      :%:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4) \
-       %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5)   \
-       %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_ext.10.4) \
-       %:version-compare(>= 10.5 mmacosx-version-min= -lgcc_ext.10.5)	   \
-       -lgcc }"
+#define REAL_LIBGCC_SPEC \
+"%{static-libgcc|static:						  \
+    %:version-compare(!> 10.6 mmacosx-version-min= -lgcc_eh)		  \
+    %:version-compare(>= 10.6 mmacosx-version-min= -lemutls_w) ;	  \
+   :									  \
+    -lgcc_s.1.1								  \
+    %:version-compare(!> 10.3.9 mmacosx-version-min= -lgcc_eh)		  \
+    %:version-compare(>< 10.3.9 10.5 mmacosx-version-min= -lgcc_s.10.4)   \
+    %:version-compare(>< 10.5 10.6 mmacosx-version-min= -lgcc_s.10.5)	  \
+  } -lgcc "
 
 /* We specify crt0.o as -lcrt0.o so that ld will search the library path.  */
 
@@ -417,7 +424,7 @@ extern GTY(()) int darwin_ms_struct;
                                %{!object:%{preload:-lgcrt0.o}		    \
                                  %{!preload:-lgcrt1.o                       \
                                  %:version-compare(>= 10.8 mmacosx-version-min= -no_new_main) \
-                                 %(darwin_crt2)}}}}    \
+                                 %(darwin_crt2)}}}}                         \
                 %{!pg:%{static:-lcrt0.o}				    \
                       %{!static:%{object:-lcrt0.o}			    \
                                 %{!object:%{preload:-lcrt0.o}		    \
@@ -427,6 +434,7 @@ extern GTY(()) int darwin_ms_struct;
 
 /* We want a destructor last in the list.  */
 #define TM_DESTRUCTOR "%{fgnu-tm: -lcrttme.o}"
+
 #define ENDFILE_SPEC TM_DESTRUCTOR
 
 #define DARWIN_EXTRA_SPECS						\
@@ -434,7 +442,8 @@ extern GTY(()) int darwin_ms_struct;
   { "darwin_crt2", DARWIN_CRT2_SPEC },					\
   { "darwin_crt3", DARWIN_CRT3_SPEC },					\
   { "darwin_dylib1", DARWIN_DYLIB1_SPEC },				\
-  { "darwin_bundle1", DARWIN_BUNDLE1_SPEC },
+  { "darwin_bundle1", DARWIN_BUNDLE1_SPEC },				\
+  { "darwin_rpaths", DARWIN_RPATH_SPEC },
 
 #define DARWIN_CRT1_SPEC						\
   "%:version-compare(!> 10.5 mmacosx-version-min= -lcrt1.o)		\
@@ -459,6 +468,16 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_BUNDLE1_SPEC \
 "%{!static:%:version-compare(< 10.6 mmacosx-version-min= -lbundle1.o)	\
 	   %{fgnu-tm: -lcrttms.o}}"
+
+#ifdef USE_DEFAULT_RPATH
+/* Find dylibs in the same dir as the exe and in the compiler's lib dirs.  */
+#define DARWIN_RPATH_SPEC \
+  "%:version-compare(>= 10.5 mmacosx-version-min= -rpath) \
+   %:version-compare(>= 10.5 mmacosx-version-min= @loader_path) \
+   %P "
+#else
+#define DARWIN_RPATH_SPEC ""
+#endif
 
 #ifdef HAVE_AS_MMACOSX_VERSION_MIN_OPTION
 /* Emit macosx version (but only major).  */

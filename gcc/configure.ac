@@ -6223,6 +6223,26 @@ if test x"$ld64_flag" = x"yes"; then
   [Define to 1 if ld64 supports '-export_dynamic'.])
 fi
 
+# We cannot test this in config.gcc because that is included before
+# AC_PROG_LIBTOOL.  Match the default from libtool but for the target in this
+# case, (we need the macro for tm.h)
+if test "x$enable_darwin_at_rpath" = "xyes"; then
+  case "$target" in
+    # It is valid for targets from Darwin9.
+    *-darwin2[[0-8]]* | *-darwin1[[0-9]]* | *-darwin9*)
+      tm_defines="$tm_defines USE_DEFAULT_RPATH "
+      ;;
+  esac
+elif test "x$enable_darwin_at_rpath" = "x"; then
+  # Match the default from libtool (we need the macro for tm.h)
+  case "$target" in
+    # It is default for targets from Darwin15.
+    *-darwin2[[0-8]]* | *-darwin1[[5-9]]*)
+      tm_defines="$tm_defines USE_DEFAULT_RPATH "
+      ;;
+  esac
+fi
+
 if test x"$dsymutil_flag" = x"yes"; then
 
     # If the user specified a dsymutil path, then we will already have the
