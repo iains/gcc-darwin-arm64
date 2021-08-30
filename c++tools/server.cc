@@ -910,7 +910,7 @@ main (int argc, char *argv[])
 
   std::string name;
   int sock_fd = -1; /* Socket fd, otherwise stdin/stdout.  */
-  module_resolver r (flag_map, flag_xlate);
+  module_resolver r (flag_map, flag_xlate, flag_noisy);
 
   if (argno != argc)
     {
