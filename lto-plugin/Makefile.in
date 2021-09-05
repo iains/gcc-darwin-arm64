@@ -297,6 +297,7 @@ datadir = @datadir@
 datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
+enable_darwin_at_rpath = @enable_darwin_at_rpath@
 exec_prefix = @exec_prefix@
 gcc_build_dir = @gcc_build_dir@
 get_gcc_base_ver = @get_gcc_base_ver@
@@ -350,8 +351,8 @@ libexecsub_LTLIBRARIES = liblto_plugin.la
 in_gcc_libs = $(foreach lib, $(libexecsub_LTLIBRARIES), $(gcc_build_dir)/$(lib))
 liblto_plugin_la_SOURCES = lto-plugin.c
 # Note that we intentionally override the bindir supplied by ACX_LT_HOST_FLAGS.
-liblto_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(lt_host_flags) -module -avoid-version \
-	-bindir $(libexecsubdir) $(if $(wildcard \
+liblto_plugin_la_LDFLAGS = $(AM_LDFLAGS) $(lt_host_flags) -module \
+	-avoid-version -bindir $(libexecsubdir) $(if $(wildcard \
 	$(libiberty_noasan)),, $(if $(wildcard \
 	$(libiberty_pic)),,-Wc,$(libiberty)))
 # Can be simplified when libiberty becomes a normal convenience library.
