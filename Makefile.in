@@ -11931,7 +11931,7 @@ configure-gcc:
 	  $$s/$$module_srcdir/configure \
 	  --srcdir=$${topdir}/$$module_srcdir \
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias}  \
+	  --target=${target_alias} @configure_host_pch_support@ \
 	  || exit 1
 @endif gcc
 
@@ -11966,7 +11966,8 @@ configure-stage1-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
+	  $(STAGE1_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stage2-gcc maybe-configure-stage2-gcc
@@ -11999,7 +12000,8 @@ configure-stage2-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
+	  $(STAGE2_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stage3-gcc maybe-configure-stage3-gcc
@@ -12032,7 +12034,8 @@ configure-stage3-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
+	  $(STAGE3_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stage4-gcc maybe-configure-stage4-gcc
@@ -12065,7 +12068,8 @@ configure-stage4-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
+	  $(STAGE4_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stageprofile-gcc maybe-configure-stageprofile-gcc
@@ -12098,7 +12102,8 @@ configure-stageprofile-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
+	  $(STAGEprofile_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stagetrain-gcc maybe-configure-stagetrain-gcc
@@ -12131,7 +12136,8 @@ configure-stagetrain-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
+	  $(STAGEtrain_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stagefeedback-gcc maybe-configure-stagefeedback-gcc
@@ -12164,7 +12170,8 @@ configure-stagefeedback-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
+	  $(STAGEfeedback_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stageautoprofile-gcc maybe-configure-stageautoprofile-gcc
@@ -12197,7 +12204,8 @@ configure-stageautoprofile-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
+	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 .PHONY: configure-stageautofeedback-gcc maybe-configure-stageautofeedback-gcc
@@ -12230,7 +12238,8 @@ configure-stageautofeedback-gcc:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
+	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif gcc-bootstrap
 
 
@@ -24705,7 +24714,7 @@ configure-libcpp:
 	  $$s/$$module_srcdir/configure \
 	  --srcdir=$${topdir}/$$module_srcdir \
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
-	  --target=${target_alias}  \
+	  --target=${target_alias} @configure_host_pch_support@ \
 	  || exit 1
 @endif libcpp
 
@@ -24740,7 +24749,8 @@ configure-stage1-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
+	  $(STAGE1_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stage2-libcpp maybe-configure-stage2-libcpp
@@ -24773,7 +24783,8 @@ configure-stage2-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
+	  $(STAGE2_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stage3-libcpp maybe-configure-stage3-libcpp
@@ -24806,7 +24817,8 @@ configure-stage3-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
+	  $(STAGE3_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stage4-libcpp maybe-configure-stage4-libcpp
@@ -24839,7 +24851,8 @@ configure-stage4-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
+	  $(STAGE4_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stageprofile-libcpp maybe-configure-stageprofile-libcpp
@@ -24872,7 +24885,8 @@ configure-stageprofile-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
+	  $(STAGEprofile_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stagetrain-libcpp maybe-configure-stagetrain-libcpp
@@ -24905,7 +24919,8 @@ configure-stagetrain-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
+	  $(STAGEtrain_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stagefeedback-libcpp maybe-configure-stagefeedback-libcpp
@@ -24938,7 +24953,8 @@ configure-stagefeedback-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
+	  $(STAGEfeedback_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stageautoprofile-libcpp maybe-configure-stageautoprofile-libcpp
@@ -24971,7 +24987,8 @@ configure-stageautoprofile-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
+	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 .PHONY: configure-stageautofeedback-libcpp maybe-configure-stageautofeedback-libcpp
@@ -25004,7 +25021,8 @@ configure-stageautofeedback-libcpp:
 	  $(HOST_CONFIGARGS) --build=${build_alias} --host=${host_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
+	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif libcpp-bootstrap
 
 
@@ -43534,7 +43552,7 @@ configure-target-libstdc++-v3:
 	  $$s/$$module_srcdir/configure \
 	  --srcdir=$${topdir}/$$module_srcdir \
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
-	  --target=${target_alias}  \
+	  --target=${target_alias} @configure_host_pch_support@ \
 	  || exit 1
 @endif target-libstdc++-v3
 
@@ -43581,7 +43599,8 @@ configure-stage1-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	   \
-	  $(STAGE1_CONFIGURE_FLAGS)
+	  $(STAGE1_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stage2-target-libstdc++-v3 maybe-configure-stage2-target-libstdc++-v3
@@ -43626,7 +43645,8 @@ configure-stage2-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE2_CONFIGURE_FLAGS)
+	  $(STAGE2_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stage3-target-libstdc++-v3 maybe-configure-stage3-target-libstdc++-v3
@@ -43671,7 +43691,8 @@ configure-stage3-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE3_CONFIGURE_FLAGS)
+	  $(STAGE3_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stage4-target-libstdc++-v3 maybe-configure-stage4-target-libstdc++-v3
@@ -43716,7 +43737,8 @@ configure-stage4-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGE4_CONFIGURE_FLAGS)
+	  $(STAGE4_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stageprofile-target-libstdc++-v3 maybe-configure-stageprofile-target-libstdc++-v3
@@ -43761,7 +43783,8 @@ configure-stageprofile-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEprofile_CONFIGURE_FLAGS)
+	  $(STAGEprofile_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stagetrain-target-libstdc++-v3 maybe-configure-stagetrain-target-libstdc++-v3
@@ -43806,7 +43829,8 @@ configure-stagetrain-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEtrain_CONFIGURE_FLAGS)
+	  $(STAGEtrain_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stagefeedback-target-libstdc++-v3 maybe-configure-stagefeedback-target-libstdc++-v3
@@ -43851,7 +43875,8 @@ configure-stagefeedback-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEfeedback_CONFIGURE_FLAGS)
+	  $(STAGEfeedback_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stageautoprofile-target-libstdc++-v3 maybe-configure-stageautoprofile-target-libstdc++-v3
@@ -43896,7 +43921,8 @@ configure-stageautoprofile-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautoprofile_CONFIGURE_FLAGS)
+	  $(STAGEautoprofile_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 .PHONY: configure-stageautofeedback-target-libstdc++-v3 maybe-configure-stageautofeedback-target-libstdc++-v3
@@ -43941,7 +43967,8 @@ configure-stageautofeedback-target-libstdc++-v3:
 	  $(TARGET_CONFIGARGS) --build=${build_alias} --host=${target_alias} \
 	  --target=${target_alias} \
 	  --with-build-libsubdir=$(HOST_SUBDIR) \
-	  $(STAGEautofeedback_CONFIGURE_FLAGS)
+	  $(STAGEautofeedback_CONFIGURE_FLAGS) \
+	  @configure_host_pch_support@
 @endif target-libstdc++-v3-bootstrap
 
 

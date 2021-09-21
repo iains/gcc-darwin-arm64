@@ -408,6 +408,41 @@ AC_ARG_ENABLE(compressed_debug_sections,
   fi
 ], [enable_compressed_debug_sections=])
 
+# Add a configure option to control whether the host will support pre-compiled
+# headers (PCH) for the c-family compilers.  At present, the default is 'yes'
+# for most platforms but this can be adjusted below for any that are unable to
+# support it.  'configure_host_pch_support' is passed as an additional config
+# arg to the configures for host and target modules that depend on the support
+# where this is not specified explicitly.
+configure_host_pch_support=
+AC_ARG_ENABLE(host_pch_support,
+[AS_HELP_STRING([--disable-host-pch-support],
+                [Disable support for C-family precompiled headers])],
+[
+  ENABLE_HOST_PCH=$enableval
+  case "${host}" in
+    aarch64-*-darwin* | arm64*-*-darwin*)
+      if test "x${ENABLE_HOST_PCH}" = xyes; then
+        AC_MSG_ERROR([PCH is not supported on aarch64/arm64 Darwin hosts])
+      fi
+      ;;
+    *)
+      ;;
+  esac
+],[
+  # The configure line does not specify, so set appropriate values to pass to
+  # module configures that depend on this.
+  case "${host}" in
+    aarch64-*-darwin* | arm64*-*-darwin*)
+      configure_host_pch_support='--enable-host-pch-support=no'
+      ;;
+    *) 
+      configure_host_pch_support='--enable-host-pch-support=yes'
+      ;;
+  esac
+])
+AC_SUBST(configure_host_pch_support)
+
 # Configure extra directories which are host specific
 
 case "${host}" in
