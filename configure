@@ -713,6 +713,7 @@ LDFLAGS
 CFLAGS
 CC
 extra_liboffloadmic_configure_flags
+configure_host_pch_support
 target_subdir
 host_subdir
 build_subdir
@@ -793,6 +794,7 @@ enable_offload_defaulted
 enable_gold
 enable_ld
 enable_compressed_debug_sections
+enable_host_pch_support
 enable_libquadmath
 enable_libquadmath_support
 enable_libada
@@ -1531,6 +1533,8 @@ Optional Features:
   --enable-compressed-debug-sections={all,gas,gold,ld,none}
                           Enable compressed debug sections for gas, gold or ld
                           by default
+  --disable-host-pch-support
+                          Disable support for C-family precompiled headers
   --disable-libquadmath   do not build libquadmath directory
   --disable-libquadmath-support
                           disable libquadmath support for Fortran
@@ -3108,6 +3112,44 @@ if test "${enable_compressed_debug_sections+set}" = set; then :
 else
   enable_compressed_debug_sections=
 fi
+
+
+# Add a configure option to control whether the host will support pre-compiled
+# headers (PCH) for the c-family compilers.  At present, the default is 'yes'
+# for most platforms but this can be adjusted below for any that are unable to
+# support it.  'configure_host_pch_support' is passed as an additional config
+# arg to the configures for host and target modules that depend on the support
+# where this is not specified explicitly.
+configure_host_pch_support=
+# Check whether --enable-host_pch_support was given.
+if test "${enable_host_pch_support+set}" = set; then :
+  enableval=$enable_host_pch_support;
+  ENABLE_HOST_PCH=$enableval
+  case "${host}" in
+    aarch64-*-darwin* | arm64*-*-darwin*)
+      if test "x${ENABLE_HOST_PCH}" = xyes; then
+        as_fn_error $? "PCH is not supported on aarch64/arm64 Darwin hosts" "$LINENO" 5
+      fi
+      ;;
+    *)
+      ;;
+  esac
+
+else
+
+  # The configure line does not specify, so set appropriate values to pass to
+  # module configures that depend on this.
+  case "${host}" in
+    aarch64-*-darwin* | arm64*-*-darwin*)
+      configure_host_pch_support='--enable-host-pch-support=no'
+      ;;
+    *)
+      configure_host_pch_support='--enable-host-pch-support=yes'
+      ;;
+  esac
+
+fi
+
 
 
 # Configure extra directories which are host specific
