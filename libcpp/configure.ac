@@ -183,6 +183,22 @@ if test x$ac_valgrind_checking != x ; then
  possible memory leaks because of libcpp use of interior pointers.])
 fi
 
+# The current default is that PCH is supported by the host unless otherwise
+# stated.
+AC_ARG_ENABLE(host_pch_support,
+AS_HELP_STRING([--disable-host-pch-support],
+	       [Disable host support for precompiled headers]),
+host_pch_support=$enableval,
+host_pch_support=yes)
+AC_SUBST(host_pch_support)
+HOST_PCH_SUPPORT=0
+if test x"$host_pch_support" != xno; then
+  AC_DEFINE(ENABLE_HOST_PCH_SUPPORT, 1,
+	    [Define this to 1 to enable support for precompiled headers.])
+else
+  AC_DEFINE(ENABLE_HOST_PCH_SUPPORT, 0)
+fi
+
 AC_ARG_ENABLE(canonical-system-headers,
 [  --enable-canonical-system-headers
                           enable or disable system headers canonicalization],

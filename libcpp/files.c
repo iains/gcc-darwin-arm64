@@ -168,8 +168,10 @@ struct file_hash_entry_pool
 };
 
 static bool open_file (_cpp_file *file);
+#if ENABLE_HOST_PCH_SUPPORT
 static bool pch_open_file (cpp_reader *pfile, _cpp_file *file,
 			   bool *invalid_pch);
+#endif
 static bool find_file_in_dir (cpp_reader *pfile, _cpp_file *file,
 			      bool *invalid_pch, location_t loc);
 static bool read_file_guts (cpp_reader *pfile, _cpp_file *file,
@@ -195,7 +197,9 @@ static char *read_filename_string (int ch, FILE *f);
 static void read_name_map (cpp_dir *dir);
 static char *remap_filename (cpp_reader *pfile, _cpp_file *file);
 static char *append_file_to_dir (const char *fname, cpp_dir *dir);
+#if ENABLE_HOST_PCH_SUPPORT
 static bool validate_pch (cpp_reader *, _cpp_file *file, const char *pchname);
+#endif
 static int pchf_save_compare (const void *e1, const void *e2);
 static int pchf_compare (const void *d_p, const void *e_p);
 static bool check_file_against_entries (cpp_reader *, _cpp_file *, bool);
@@ -272,6 +276,7 @@ open_file (_cpp_file *file)
   return false;
 }
 
+#if ENABLE_HOST_PCH_SUPPORT
 /* Temporary PCH intercept of opening a file.  Try to find a PCH file
    based on FILE->name and FILE->dir, and test those found for
    validity using PFILE->cb.valid_pch.  Return true iff a valid file is
@@ -347,6 +352,7 @@ pch_open_file (cpp_reader *pfile, _cpp_file *file, bool *invalid_pch)
 
   return valid;
 }
+#endif
 
 /* Canonicalize the path to FILE.  Return the canonical form if it is
    shorter, otherwise return NULL.  This function does NOT free the
@@ -420,8 +426,14 @@ find_file_in_dir (cpp_reader *pfile, _cpp_file *file, bool *invalid_pch,
 	}
 
       file->path = path;
+#if ENABLE_HOST_PCH_SUPPORT
+      /* If there is no PCH this does not set the validity flag, so it keeps
+	 whatever value it had on entry.  */
       if (pch_open_file (pfile, file, invalid_pch))
 	return true;
+#else
+      *invalid_pch = false;
+#endif
 
       if (open_file (file))
 	return true;
@@ -1858,6 +1870,7 @@ remap_filename (cpp_reader *pfile, _cpp_file *file)
     }
 }
 
+#if ENABLE_HOST_PCH_SUPPORT
 /* Returns true if PCHNAME is a valid PCH file for FILE.  */
 static bool
 validate_pch (cpp_reader *pfile, _cpp_file *file, const char *pchname)
@@ -1889,6 +1902,7 @@ validate_pch (cpp_reader *pfile, _cpp_file *file, const char *pchname)
   file->path = saved_path;
   return valid;
 }
+#endif
 
 /* Get the path associated with the _cpp_file F.  The path includes
    the base name from the include directive and the directory it was

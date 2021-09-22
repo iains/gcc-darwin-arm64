@@ -625,6 +625,7 @@ ac_includes_default="\
 ac_subst_vars='LTLIBOBJS
 CET_HOST_FLAGS
 PICFLAG
+host_pch_support
 MAINT
 USED_CATALOGS
 PACKAGE
@@ -735,6 +736,7 @@ with_libiconv_prefix
 with_libiconv_type
 enable_maintainer_mode
 enable_checking
+enable_host_pch_support
 enable_canonical_system_headers
 enable_host_shared
 enable_cet
@@ -1375,6 +1377,8 @@ Optional Features:
                           only specific categories of checks. Categories are:
                           yes,no,all,none,release. Flags are: misc,valgrind or
                           other strings
+  --disable-host-pch-support
+                          Disable host support for precompiled headers
   --enable-canonical-system-headers
                           enable or disable system headers canonicalization
   --enable-host-shared    build host code as shared libraries
@@ -7492,6 +7496,26 @@ fi
 if test x$ac_valgrind_checking != x ; then
 
 $as_echo "#define ENABLE_VALGRIND_CHECKING 1" >>confdefs.h
+
+fi
+
+# The current default is that PCH is supported by the host unless otherwise
+# stated.
+# Check whether --enable-host_pch_support was given.
+if test "${enable_host_pch_support+set}" = set; then :
+  enableval=$enable_host_pch_support; host_pch_support=$enableval
+else
+  host_pch_support=yes
+fi
+
+
+HOST_PCH_SUPPORT=0
+if test x"$host_pch_support" != xno; then
+
+$as_echo "#define ENABLE_HOST_PCH_SUPPORT 1" >>confdefs.h
+
+else
+  $as_echo "#define ENABLE_HOST_PCH_SUPPORT 0" >>confdefs.h
 
 fi
 
