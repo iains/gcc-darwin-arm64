@@ -103,7 +103,6 @@ if test "$enable_vtable_verify" = yes; then
   postdep_objects_CXX="${postdep_objects_CXX} ${glibcxx_builddir}/../libgcc/vtv_end.o"
 fi
 
-
 # libtool variables for C++ shared and position-independent compiles.
 #
 # Use glibcxx_lt_pic_flag to designate the automake variable
@@ -147,8 +146,16 @@ GLIBCXX_ENABLE_HOSTED
 # Enable descriptive messages to standard output on termination.
 GLIBCXX_ENABLE_VERBOSE
 
+# The current default is that PCH is supported by the host unless otherwise
+# stated.
+AC_ARG_ENABLE(host_pch_support,
+AS_HELP_STRING([--disable-host-pch-support],
+	       [Disable host support for precompiled headers]),
+host_pch_support=$enableval,
+host_pch_support=yes)
+
 # Enable compiler support that doesn't require linking.
-GLIBCXX_ENABLE_PCH($is_hosted)
+GLIBCXX_ENABLE_PCH($is_hosted, $host_pch_support)
 GLIBCXX_ENABLE_THREADS
 GLIBCXX_ENABLE_ATOMIC_BUILTINS
 GLIBCXX_ENABLE_LOCK_POLICY
