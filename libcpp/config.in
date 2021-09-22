@@ -20,6 +20,9 @@
 /* Define to enable system headers canonicalization. */
 #undef ENABLE_CANONICAL_SYSTEM_HEADERS
 
+/* Define this to 1 to enable support for precompiled headers. */
+#undef ENABLE_HOST_PCH_SUPPORT
+
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
