@@ -913,6 +913,7 @@ with_gnu_ld
 enable_libtool_lock
 enable_hosted_libstdcxx
 enable_libstdcxx_verbose
+enable_host_pch_support
 enable_libstdcxx_pch
 with_libstdcxx_lock_policy
 enable_cstdio
@@ -1601,8 +1602,10 @@ Optional Features:
                           only build freestanding C++ runtime support
   --disable-libstdcxx-verbose
                           disable termination messages to standard error
+  --disable-host-pch-support
+                          Disable host support for precompiled headers
   --enable-libstdcxx-pch  build pre-compiled libstdc++ headers
-                          [default=$is_hosted]
+                          [default=$can_pch]
   --enable-cstdio[=PACKAGE]
                           use target-specific I/O package [default=stdio]
   --enable-clocale[=MODEL]
@@ -12176,7 +12179,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12179 "configure"
+#line 12182 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12282,7 +12285,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 12285 "configure"
+#line 12288 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -15569,7 +15572,6 @@ if test "$enable_vtable_verify" = yes; then
   postdep_objects_CXX="${postdep_objects_CXX} ${glibcxx_builddir}/../libgcc/vtv_end.o"
 fi
 
-
 # libtool variables for C++ shared and position-independent compiles.
 #
 # Use glibcxx_lt_pic_flag to designate the automake variable
@@ -15665,8 +15667,23 @@ _ACEOF
 
 
 
+# The current default is that PCH is supported by the host unless otherwise
+# stated.
+# Check whether --enable-host_pch_support was given.
+if test "${enable_host_pch_support+set}" = set; then :
+  enableval=$enable_host_pch_support; host_pch_support=$enableval
+else
+  host_pch_support=yes
+fi
+
+
 # Enable compiler support that doesn't require linking.
 
+    if test "$is_hosted" = "yes" && test "$host_pch_support" = "yes"; then
+    can_pch=yes
+  else
+    can_pch=no
+  fi
    # Check whether --enable-libstdcxx-pch was given.
 if test "${enable_libstdcxx_pch+set}" = set; then :
   enableval=$enable_libstdcxx_pch;
@@ -15676,39 +15693,44 @@ if test "${enable_libstdcxx_pch+set}" = set; then :
       esac
 
 else
-  enable_libstdcxx_pch=$is_hosted
+  enable_libstdcxx_pch=$can_pch
 fi
 
 
   if test $enable_libstdcxx_pch = yes; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for compiler with PCH support" >&5
+    if test "$host_pch_support" != "yes"; then
+      glibcxx_cv_prog_CXX_pch=no
+      { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: PCH headers cannot be built since host PCH is disabled" >&5
+$as_echo "$as_me: WARNING: PCH headers cannot be built since host PCH is disabled" >&2;}
+    else
+      { $as_echo "$as_me:${as_lineno-$LINENO}: checking for compiler with PCH support" >&5
 $as_echo_n "checking for compiler with PCH support... " >&6; }
 if ${glibcxx_cv_prog_CXX_pch+:} false; then :
   $as_echo_n "(cached) " >&6
 else
   ac_save_CXXFLAGS="$CXXFLAGS"
-       CXXFLAGS="$CXXFLAGS -Werror -Winvalid-pch -Wno-deprecated"
+         CXXFLAGS="$CXXFLAGS -Werror -Winvalid-pch -Wno-deprecated"
 
-       ac_ext=cpp
+         ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
-       echo '#include <math.h>' > conftest.h
-       if $CXX $CXXFLAGS $CPPFLAGS -x c++-header conftest.h \
+         echo '#include <math.h>' > conftest.h
+         if $CXX $CXXFLAGS $CPPFLAGS -x c++-header conftest.h \
 			  -o conftest.h.gch 1>&5 2>&1 &&
 		echo '#error "pch failed"' > conftest.h &&
 	  echo '#include "conftest.h"' > conftest.cc &&
 	       $CXX -c $CXXFLAGS $CPPFLAGS conftest.cc 1>&5 2>&1 ;
-       then
-	 glibcxx_cv_prog_CXX_pch=yes
-       else
-	 glibcxx_cv_prog_CXX_pch=no
-       fi
-       rm -f conftest*
-       CXXFLAGS=$ac_save_CXXFLAGS
-       ac_ext=c
+         then
+	   glibcxx_cv_prog_CXX_pch=yes
+         else
+	   glibcxx_cv_prog_CXX_pch=no
+         fi
+         rm -f conftest*
+         CXXFLAGS=$ac_save_CXXFLAGS
+         ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
@@ -15718,6 +15740,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $glibcxx_cv_prog_CXX_pch" >&5
 $as_echo "$glibcxx_cv_prog_CXX_pch" >&6; }
+    fi
     enable_libstdcxx_pch=$glibcxx_cv_prog_CXX_pch
   fi
 
@@ -15964,7 +15987,7 @@ $as_echo "$glibcxx_cv_atomic_long_long" >&6; }
   # Fake what AC_TRY_COMPILE does.
 
     cat > conftest.$ac_ext << EOF
-#line 15967 "configure"
+#line 15990 "configure"
 int main()
 {
   typedef bool atomic_type;
@@ -15999,7 +16022,7 @@ $as_echo "$glibcxx_cv_atomic_bool" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 16002 "configure"
+#line 16025 "configure"
 int main()
 {
   typedef short atomic_type;
@@ -16034,7 +16057,7 @@ $as_echo "$glibcxx_cv_atomic_short" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 16037 "configure"
+#line 16060 "configure"
 int main()
 {
   // NB: _Atomic_word not necessarily int.
@@ -16070,7 +16093,7 @@ $as_echo "$glibcxx_cv_atomic_int" >&6; }
     rm -f conftest*
 
     cat > conftest.$ac_ext << EOF
-#line 16073 "configure"
+#line 16096 "configure"
 int main()
 {
   typedef long long atomic_type;
@@ -16223,7 +16246,7 @@ $as_echo "mutex" >&6; }
   # unnecessary for this test.
 
     cat > conftest.$ac_ext << EOF
-#line 16226 "configure"
+#line 16249 "configure"
 int main()
 {
   _Decimal32 d1;
@@ -16265,7 +16288,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
   # unnecessary for this test.
 
   cat > conftest.$ac_ext << EOF
-#line 16268 "configure"
+#line 16291 "configure"
 template<typename T1, typename T2>
   struct same
   { typedef T2 type; };
