@@ -3225,7 +3225,7 @@ AC_DEFUN([GLIBCXX_ENABLE_WCHAR_T], [
 ])
 
 
-dnl
+≈
 dnl Check to see if building and using a C++ precompiled header can be done.
 dnl
 dnl --enable-libstdcxx-pch=yes
@@ -3240,29 +3240,40 @@ dnl Substs:
 dnl  glibcxx_PCHFLAGS
 dnl
 AC_DEFUN([GLIBCXX_ENABLE_PCH], [
-  GLIBCXX_ENABLE(libstdcxx-pch,$1,,[build pre-compiled libstdc++ headers])
+  dnl This is only allowed if host support is enabled, and we are hosted.
+  if test "$1" = "yes" && test "$2" = "yes"; then
+    can_pch=yes
+  else
+    can_pch=no
+  fi
+  GLIBCXX_ENABLE(libstdcxx-pch,$can_pch,,[build pre-compiled libstdc++ headers])
   if test $enable_libstdcxx_pch = yes; then
-    AC_CACHE_CHECK([for compiler with PCH support],
-      [glibcxx_cv_prog_CXX_pch],
-      [ac_save_CXXFLAGS="$CXXFLAGS"
-       CXXFLAGS="$CXXFLAGS -Werror -Winvalid-pch -Wno-deprecated"
-       AC_LANG_SAVE
-       AC_LANG_CPLUSPLUS
-       echo '#include <math.h>' > conftest.h
-       if $CXX $CXXFLAGS $CPPFLAGS -x c++-header conftest.h \
+    if test "$2" != "yes"; then
+      glibcxx_cv_prog_CXX_pch=no
+      AC_MSG_WARN([PCH headers cannot be built since host PCH is disabled])
+    else
+      AC_CACHE_CHECK([for compiler with PCH support],
+        [glibcxx_cv_prog_CXX_pch],
+        [ac_save_CXXFLAGS="$CXXFLAGS"
+         CXXFLAGS="$CXXFLAGS -Werror -Winvalid-pch -Wno-deprecated"
+         AC_LANG_SAVE
+         AC_LANG_CPLUSPLUS
+         echo '#include <math.h>' > conftest.h
+         if $CXX $CXXFLAGS $CPPFLAGS -x c++-header conftest.h \
 			  -o conftest.h.gch 1>&5 2>&1 &&
 		echo '#error "pch failed"' > conftest.h &&
 	  echo '#include "conftest.h"' > conftest.cc &&
 	       $CXX -c $CXXFLAGS $CPPFLAGS conftest.cc 1>&5 2>&1 ;
-       then
-	 glibcxx_cv_prog_CXX_pch=yes
-       else
-	 glibcxx_cv_prog_CXX_pch=no
-       fi
-       rm -f conftest*
-       CXXFLAGS=$ac_save_CXXFLAGS
-       AC_LANG_RESTORE
-      ])
+         then
+	   glibcxx_cv_prog_CXX_pch=yes
+         else
+	   glibcxx_cv_prog_CXX_pch=no
+         fi
+         rm -f conftest*
+         CXXFLAGS=$ac_save_CXXFLAGS
+         AC_LANG_RESTORE
+        ])
+    fi
     enable_libstdcxx_pch=$glibcxx_cv_prog_CXX_pch
   fi
 
