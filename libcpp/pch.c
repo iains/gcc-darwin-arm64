@@ -22,6 +22,7 @@ along with this program; see the file COPYING3.  If not see
 #include "hashtab.h"
 #include "mkdeps.h"
 
+#if ENABLE_HOST_PCH_SUPPORT
 static int write_macdef (cpp_reader *, cpp_hashnode *, void *);
 static int save_idents (cpp_reader *, cpp_hashnode *, void *);
 static hashval_t hashmem (const void *, size_t);
@@ -876,3 +877,14 @@ cpp_read_state (cpp_reader *r, const char *name, FILE *f,
   cpp_errno (r, CPP_DL_ERROR, "while reading precompiled header");
   return -1;
 }
+#else
+
+int cpp_save_state (cpp_reader *, FILE *) { return 0; }
+int cpp_write_pch_deps (cpp_reader *, FILE *) { return 0; }
+int cpp_write_pch_state (cpp_reader *, FILE *) { return 0; }
+int cpp_valid_state (cpp_reader *, const char *, int) { return 0; }
+void cpp_prepare_state (cpp_reader *, struct save_macro_data **) {}
+int cpp_read_state (cpp_reader *, const char *, FILE *,
+			   struct save_macro_data *) { return 0; }
+
+#endif
