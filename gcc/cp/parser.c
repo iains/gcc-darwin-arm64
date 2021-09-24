@@ -47356,6 +47356,8 @@ cp_parser_initial_pragma (cp_token *first_token)
 
   cp_lexer_get_preprocessor_token (0, first_token);
 
+//#if ENABLE_HOST_PCH_SUPPORT
+
   tree name = NULL;
   if (first_token->type == CPP_STRING)
     {
@@ -47377,6 +47379,24 @@ cp_parser_initial_pragma (cp_token *first_token)
   /* Now actually load the PCH file.  */
   if (name)
     c_common_pch_pragma (parse_in, TREE_STRING_POINTER (name));
+
+//#else
+
+  /* Skip past the pragma, purely to avoid additional diagnostics.  */
+//  if (first_token->type == CPP_STRING)
+//    cp_lexer_get_preprocessor_token (0, first_token);
+
+  /* Skip to the end of the pragma.  */
+//  while (first_token->type != CPP_PRAGMA_EOL)
+//    cp_lexer_get_preprocessor_token (0, first_token);
+
+  /* If we see a pragma here, it means someone has generated a pre-processed
+     file with one compiler (with PCH support) and is now trying to consume
+     it with a second that does not have the support; this is broken.  */
+//  error_at (first_token->location,
+//	    "this compiler does not support precompiled headers");
+
+//#endif
 
   /* Read one more token to return to our caller.  We have to do this
      after reading the PCH file in, since its pointers have to be

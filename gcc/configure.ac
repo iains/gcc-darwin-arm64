@@ -1178,6 +1178,23 @@ AC_ARG_WITH(multilib-generator,
 :,
 with_multilib_generator=default)
 
+# The current default is that PCH is supported by the host unless otherwise
+# stated.
+AC_ARG_ENABLE(host_pch_support,
+AS_HELP_STRING([--disable-host-pch-support],
+	       [Disable host support for precompiled headers]),
+host_pch_support=$enableval,
+host_pch_support=yes)
+AC_SUBST(host_pch_support)
+
+if test x"$host_pch_support" != xno; then
+  AC_DEFINE(ENABLE_HOST_PCH_SUPPORT, 1,
+    [Define this to enable support for precompiled header (c-family).])
+else
+  AC_DEFINE(ENABLE_HOST_PCH_SUPPORT, 0)
+fi
+
+
 # -------------------------
 # Checks for other programs
 # -------------------------

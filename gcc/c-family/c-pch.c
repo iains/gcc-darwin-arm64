@@ -28,6 +28,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "c-pragma.h"
 #include "langhooks.h"
 #include "hosthooks.h"
+#include "diagnostic.h"
 
 /* This is a list of flag variables that must match exactly, and their
    names for the error message.  The possible values for *flag_var must
@@ -148,12 +149,14 @@ pch_cpp_save_state (void)
 {
   if (!pch_cpp_state_saved)
     {
+#if ENABLE_HOST_PCH_SUPPORT
       if (pch_outfile)
 	{
 	  cpp_save_state (parse_in, pch_outfile);
 	  pch_cpp_state_saved = true;
 	}
       else
+#endif
 	pch_ready_to_save_cpp_state = true;
     }
 }
@@ -172,6 +175,7 @@ c_common_write_pch (void)
 
   prepare_target_option_nodes_for_pch ();
 
+#if ENABLE_HOST_PCH_SUPPORT
   cpp_write_pch_deps (parse_in, pch_outfile);
 
   gt_pch_save (pch_outfile);
@@ -183,6 +187,10 @@ c_common_write_pch (void)
   if (fseek (pch_outfile, 0, SEEK_SET) != 0
       || fwrite (get_ident (), IDENT_LENGTH, 1, pch_outfile) != 1)
     fatal_error (input_location, "cannot write %s: %m", pch_file);
+#else
+   warning_at (input_location, 0,
+	       "precompiled headers are not supported by this compiler");
+#endif
 
   fclose (pch_outfile);
 
@@ -394,6 +402,7 @@ c_common_no_more_pch (void)
     }
 }
 
+#if ENABLE_HOST_PCH_SUPPORT
 /* Handle #pragma GCC pch_preprocess, to load in the PCH file.  */
 
 void
@@ -424,4 +433,16 @@ c_common_pch_pragma (cpp_reader *pfile, const char *name)
 
   close (fd);
 }
-
+#else
+void
+c_common_pch_pragma (cpp_reader *, const char *)
+{
+  /* We have encountered a PCH pragma, which presumably means that the user
+     has managed to emit a preprocessed file with a compiler supporting PCH
+     and is now trying to compile that on one without such support.  It is
+     not going to work and not clear how we could recover sensibly - so best
+     not to allow it.  */
+  fatal_error (input_location,
+	       "precompiled headers are not supported by this compiler");
+}
+#endif
