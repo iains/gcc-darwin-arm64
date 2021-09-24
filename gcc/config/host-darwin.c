@@ -23,6 +23,7 @@
 #include "diagnostic-core.h"
 #include "config/host-darwin.h"
 
+#if ENABLE_HOST_PCH_SUPPORT
 /* Yes, this is really supposed to work.  */
 /* This allows for a pagesize of 16384, which we have on Darwin20, but should
    continue to work OK for pagesize 4096 which we have on earlier versions.
@@ -79,3 +80,20 @@ darwin_gt_pch_use_address (void *addr, size_t sz, int fd, size_t off)
 
   return ret;
 }
+
+#else
+
+/* Dummy versions of the hooks that do nothing on Darwin versions without
+   PCH support, we also omit the allocation of the memory.  */
+void *
+darwin_gt_pch_get_address (size_t, int)
+{
+  return NULL;
+}
+
+int
+darwin_gt_pch_use_address (void *, size_t, int, size_t)
+{
+  return 0;
+}
+#endif

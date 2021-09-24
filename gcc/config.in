@@ -193,6 +193,12 @@
 #endif
 
 
+/* Define this to enable support for precompiled header (c-family). */
+#ifndef USED_FOR_TARGET
+#undef ENABLE_HOST_PCH_SUPPORT
+#endif
+
+
 /* Define if gcc should always pass --build-id to linker. */
 #ifndef USED_FOR_TARGET
 #undef ENABLE_LD_BUILDID
