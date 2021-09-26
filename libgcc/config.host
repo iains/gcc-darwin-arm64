@@ -214,11 +214,30 @@ esac
 case ${host} in
 *-*-darwin*)
   asm_hidden_op=.private_extern
-  tmake_file="$tmake_file t-darwin ${cpu_type}/t-darwin t-libgcc-pic"
-  extra_parts="crt3.o libd10-uwfef.a crttms.o crttme.o libemutls_w.a"
+  tmake_file="$tmake_file t-darwin ${cpu_type}/t-darwin t-libgcc-pic "
   # The unwinder is provided by the system shared libraries, do not add one
   # to the shared libgcc.
-  tmake_file="$tmake_file t-darwin-noeh t-slibgcc-darwin"
+  tmake_file="$tmake_file t-darwin-noeh t-slibgcc-darwin "
+  # We are not using libtool to build the libs here, so we need to replicate
+  # a little of the logic around setting Darwin rpaths.  Setting an explicit
+  # yes or no is honoured, otherwise we choose a suitable default.
+  # Sadly, this has to be kept in line with the rules in libtool.m4.
+  if test "x$enable_darwin_at_rpath" = "xyes"; then
+    tmake_file="$tmake_file t-darwin-rpath "
+  elif test "x$enable_darwin_at_rpath" = "x"; then
+    echo "enable_darwin_at_rpath is unset" 1>&2
+    case ${host} in
+      *-darwin[45678]*) ;;
+      *-darwin9* | *-darwin1[01234]*) ;; # We might default these on later.
+      *-darwin*)
+        echo "but is needed after macOS 10.11 (setting it on)" 1>&2
+        tmake_file="$tmake_file t-darwin-rpath "
+        ;;
+    esac
+  else
+    echo "enable_darwin_at_rpath is '$enable_darwin_at_rpath'" 1>&2
+  fi
+  extra_parts="crt3.o libd10-uwfef.a crttms.o crttme.o libemutls_w.a"
   ;;
 *-*-dragonfly*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip"
