@@ -3994,8 +3994,7 @@ coro_build_actor_or_destroy_function (tree orig, tree fn_type,
 				      tree coro_frame_ptr, bool actor_p)
 {
   location_t loc = DECL_SOURCE_LOCATION (orig);
-  tree fn
-    = build_lang_decl (FUNCTION_DECL, copy_node (DECL_NAME (orig)), fn_type);
+  tree fn = build_lang_decl (FUNCTION_DECL, DECL_NAME (orig), fn_type);
 
   /* Allow for locating the ramp (original) function from this one.  */
   if (!to_ramp)
