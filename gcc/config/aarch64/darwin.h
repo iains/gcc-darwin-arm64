@@ -54,6 +54,13 @@ along with GCC; see the file COPYING3.  If not see
 #undef LONG_DOUBLE_TYPE_SIZE
 #define LONG_DOUBLE_TYPE_SIZE	64
 
+/* Non-PIE executables are forbidden by the aarch64-darwin security model;
+   remove the option from link-lines since they just produce a warning from
+   ld64 and are then ignored anyway.  */
+#undef DARWIN_NOPIE_SPEC
+#define DARWIN_NOPIE_SPEC \
+" %<no-pie %<fno-pie %<fno-PIE "
+
 /* Hack alert - we want the exported cas etc.  */
 #undef LIB_SPEC
 #define LIB_SPEC "%{!static:-lSystem} -lgcc"
