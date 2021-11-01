@@ -3994,8 +3994,7 @@ coro_build_actor_or_destroy_function (tree orig, tree fn_type,
 				      tree coro_frame_ptr, bool actor_p)
 {
   location_t loc = DECL_SOURCE_LOCATION (orig);
-  tree fn
-    = build_lang_decl (FUNCTION_DECL, copy_node (DECL_NAME (orig)), fn_type);
+  tree fn = build_lang_decl (FUNCTION_DECL, DECL_NAME (orig), fn_type);
 
   /* Allow for locating the ramp (original) function from this one.  */
   if (!to_ramp)
@@ -4211,9 +4210,16 @@ coro_rewrite_function_body (location_t fn_start, tree fnbody, tree orig,
 	{
 	  /* Build a compound expression that sets the
 	     initial-await-resume-called variable true and then calls the
-	     initial suspend expression await resume.  */
+	     initial suspend expression await resume.
+	     In the case that the user decides to make the initial await
+	     await_resume() return a value, we need to discard it and, it is
+	     a reference type, look past the indirection.  */
+	  if (INDIRECT_REF_P (initial_await))
+	    initial_await = TREE_OPERAND (initial_await, 0);
 	  tree vec = TREE_OPERAND (initial_await, 3);
 	  tree aw_r = TREE_VEC_ELT (vec, 2);
+	  if (!VOID_TYPE_P (TREE_TYPE (aw_r)))
+	    aw_r = build1 (CONVERT_EXPR, void_type_node, aw_r);
 	  tree update = build2 (MODIFY_EXPR, boolean_type_node, i_a_r_c,
 				boolean_true_node);
 	  aw_r = cp_build_compound_expr (update, aw_r, tf_warning_or_error);
@@ -4595,8 +4601,8 @@ morph_fn_to_coro (tree orig, tree *resumer, tree *destroyer)
 	If the lookup finds an allocation function in the scope of the promise
 	type, overload resolution is performed on a function call created by
 	assembling an argument list.  The first argument is the amount of space
-	requested, and has type std::size_t.  The succeeding arguments are
-	those of the original function.  */
+	requested, and has type std::size_t.  The lvalues p1...pn are the
+	succeeding arguments..  */
       vec<tree, va_gc> *args = make_tree_vector ();
       vec_safe_push (args, resizeable); /* Space needed.  */
 
@@ -4616,6 +4622,8 @@ morph_fn_to_coro (tree orig, tree *resumer, tree *destroyer)
 					       tf_warning_or_error);
 	      vec_safe_push (args, this_ref);
 	    }
+	  else if (parm_i->rv_ref || parm_i->pt_ref)
+	    vec_safe_push (args, convert_from_reference (arg));
 	  else
 	    vec_safe_push (args, arg);
 	}
