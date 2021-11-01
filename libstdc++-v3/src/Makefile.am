@@ -317,14 +317,24 @@ endif
 if ENABLE_SYMVERS_DARWIN
 version_arg = -Wl,-exported_symbols_list,libstdc++-symbols.explist
 version_dep = libstdc++-symbols.explist
+# When building a shared object on Darwin, the support for emulated tls will
+# be included as a weak implementation.
+# We must include the weak symbols in the export list, otherwise they will get
+# hidden and emutls will then fail at runtime since dyld won't see them.
+# To do this, we build a dummy shared lib which uses tls and include that in
+# the list to be scanned.
+# Export NM_FOR_TARGET with -g to make sure that we're looking only at externs.
 libstdc++-symbols.explist : libstdc++-symbols.ver \
 		${glibcxx_srcdir}/scripts/make_exports.pl \
 		$(libstdc___la_OBJECTS) $(libstdc___la_LIBADD)
+	echo "__thread int x; int main() { x = 0; return x; }" | \
+	$(CXXCOMPILE) -shared -xc++ - -o temp.dylib
+	NM_FOR_TARGET = "nm -g"; export NM_FOR_TARGET; \
 	perl ${glibcxx_srcdir}/scripts/make_exports.pl \
 	  libstdc++-symbols.ver \
 	  $(libstdc___la_OBJECTS:%.lo=.libs/%.o) \
 	 `echo $(libstdc___la_LIBADD) | \
-	    sed 's,/\([^/.]*\)\.la,/.libs/\1.a,g'` \
+	    sed 's,/\([^/.]*\)\.la,/.libs/\1.a,g'` temp.dylib \
 	 > $@ || (rm -f $@ ; exit 1)
 endif
 

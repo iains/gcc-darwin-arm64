@@ -1063,14 +1063,24 @@ compatibility-condvar.o: compatibility-condvar.cc
 @ENABLE_SYMVERS_SUN_TRUE@@ENABLE_SYMVERS_TRUE@	 `echo ' $(libstdc___la_LIBADD) ' | \
 @ENABLE_SYMVERS_SUN_TRUE@@ENABLE_SYMVERS_TRUE@	    sed -e 's,/\([^/.]*\)\.la,/.libs/\1.a,g' -e 's/ -l[^ ]* / /'` \
 @ENABLE_SYMVERS_SUN_TRUE@@ENABLE_SYMVERS_TRUE@	 > $@ || (rm -f $@ ; exit 1)
+# When building a shared object on Darwin, the support for emulated tls will
+# be included as a weak implementation.
+# We must include the weak symbols in the export list, otherwise they will get
+# hidden and emutls will then fail at runtime since dyld won't see them.
+# To do this, we build a dummy shared lib which uses tls and include that in
+# the list to be scanned.
+# Export NM_FOR_TARGET with -g to make sure that we're looking only at externs.
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@libstdc++-symbols.explist : libstdc++-symbols.ver \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@		${glibcxx_srcdir}/scripts/make_exports.pl \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@		$(libstdc___la_OBJECTS) $(libstdc___la_LIBADD)
+@ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	echo "__thread int x; int main() { x = 0; return x; }" | \
+@ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	$(CXXCOMPILE) -shared -xc++ - -o temp.dylib
+@ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	NM_FOR_TARGET = "nm -g"; export NM_FOR_TARGET; \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	perl ${glibcxx_srcdir}/scripts/make_exports.pl \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	  libstdc++-symbols.ver \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	  $(libstdc___la_OBJECTS:%.lo=.libs/%.o) \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	 `echo $(libstdc___la_LIBADD) | \
-@ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	    sed 's,/\([^/.]*\)\.la,/.libs/\1.a,g'` \
+@ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	    sed 's,/\([^/.]*\)\.la,/.libs/\1.a,g'` temp.dylib \
 @ENABLE_SYMVERS_DARWIN_TRUE@@ENABLE_SYMVERS_TRUE@	 > $@ || (rm -f $@ ; exit 1)
 
 # Control additional build primary rules.
