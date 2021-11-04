@@ -54,6 +54,11 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 
 #define DO_GLOBAL_DTORS_BODY
 
+/* Register static destructors to run from __cxa_atexit instead of putting
+   them into a .mod_term_funcs section.  */
+
+#define TARGET_DTORS_FROM_CXA_ATEXIT true
+
 /* The string value for __SIZE_TYPE__.  */
 
 #ifndef SIZE_TYPE
@@ -1162,7 +1167,7 @@ extern void darwin_driver_init (unsigned int *,struct cl_decoded_option **);
 
 /* The Apple assembler and linker do not support constructor priorities.  */
 #undef SUPPORTS_INIT_PRIORITY
-#define SUPPORTS_INIT_PRIORITY 0
+#define SUPPORTS_INIT_PRIORITY 1
 
 #undef STACK_CHECK_STATIC_BUILTIN
 #define STACK_CHECK_STATIC_BUILTIN 1
