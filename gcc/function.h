@@ -314,7 +314,7 @@ struct GTY(()) function {
      global ranges.  If a pass wants on-demand ranges OTOH, it must
      call enable/disable_ranger().  The pointer is never null.  It
      should be queried by calling get_range_query().  */
-  range_query * GTY ((skip)) x_range_query;
+  range_query * GTY ((callback)) x_range_query;
 
   /* Last statement uid.  */
   int last_stmt_uid;
