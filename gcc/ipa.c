@@ -992,7 +992,7 @@ build_cdtor (bool ctor_p, const vec<tree> &cdtors)
 
       /* When there is only one cdtor and target supports them, do nothing.  */
       if (j == i + 1
-	  && targetm.have_ctors_dtors)
+	  && targetm.have_ctors_dtors && !targetm.dtors_from_cxa_atexit)
 	{
 	  i++;
 	  continue;
@@ -1116,10 +1116,14 @@ build_cxa_dtor_registrations (const vec<tree> &dtors, vec<tree> *ctors)
 
       /* Find the next batch of destructors with the same initialization
 	 priority.  */
+      bool has_dtor_attr = false;
       for (;i < j; i++)
 	{
 	  tree fn = dtors[i];
 	  DECL_STATIC_DESTRUCTOR (fn) = 0;
+	  if (DECL_ATTRIBUTES (fn) &&
+	      lookup_attribute ("destructor", DECL_ATTRIBUTES (fn)))
+	    has_dtor_attr = true;
 	  tree dtor_ptr = build1_loc (UNKNOWN_LOCATION, ADDR_EXPR,
 				      ptr_type_node, fn);
 	  tree call_cxa_atexit
@@ -1135,6 +1139,8 @@ build_cxa_dtor_registrations (const vec<tree> &dtors, vec<tree> *ctors)
 	= cgraph_build_static_cdtor_1 ('I', body, priority, true,
 				       DECL_FUNCTION_SPECIFIC_OPTIMIZATION (dtors[0]),
 				       DECL_FUNCTION_SPECIFIC_TARGET (dtors[0]));
+      if (has_dtor_attr)
+	DECL_ATTRIBUTES (new_ctor) = make_attribute ("constructor", "", NULL_TREE);
       /* Add this to the list of ctors.  */
       ctors->safe_push (new_ctor);
     }
@@ -1210,6 +1216,8 @@ compare_cdtor_tu_order (const void *p1, const void *p2)
 
   f1 = *(const tree *)p1;
   f2 = *(const tree *)p2;
+  bool has_cdtor_attr1;
+  bool has_cdtor_attr2;
   /* We process the DTORs first, and then remove their flag, so this order
      allows for functions that are declared as both CTOR and DTOR.  */
   if (DECL_STATIC_DESTRUCTOR (f1))
@@ -1217,20 +1225,32 @@ compare_cdtor_tu_order (const void *p1, const void *p2)
       gcc_checking_assert (DECL_STATIC_DESTRUCTOR (f2));
       priority1 = DECL_FINI_PRIORITY (f1);
       priority2 = DECL_FINI_PRIORITY (f2);
+      has_cdtor_attr1 = lookup_attribute ("destructor", DECL_ATTRIBUTES (f1));
+      has_cdtor_attr2 = lookup_attribute ("destructor", DECL_ATTRIBUTES (f2));
     }
   else
     {
       priority1 = DECL_INIT_PRIORITY (f1);
       priority2 = DECL_INIT_PRIORITY (f2);
+      has_cdtor_attr1 = lookup_attribute ("constructor", DECL_ATTRIBUTES (f1));
+      has_cdtor_attr2 = lookup_attribute ("constructor", DECL_ATTRIBUTES (f2));
     }
 
+fprintf (stderr, "f1: %s pr %5d order %d cd %d\n",
+	 IDENTIFIER_POINTER (DECL_NAME (f1)), priority1, cgraph_node::get (f1)->order, has_cdtor_attr1);
+fprintf (stderr, "f2: %s pr %5d order %d cd %d\n",
+	 IDENTIFIER_POINTER (DECL_NAME (f2)), priority2, cgraph_node::get (f2)->order, has_cdtor_attr2);
   if (priority1 < priority2)
     return -1;
   else if (priority1 > priority2)
     return 1;
+  else if (has_cdtor_attr1 && !has_cdtor_attr2)
+    return -1;
+  else if (!has_cdtor_attr1 && has_cdtor_attr2)
+    return 1;
   else
     /* For equal priority, sort into the order of definition in the TU.  */
-    return DECL_UID (f1) - DECL_UID (f2);
+    return cgraph_node::get (f1)->order - cgraph_node::get (f2)->order;
 }
 
 /* Generate functions to call static constructors and destructors
