@@ -628,7 +628,11 @@ gt_pch_restore (FILE *f)
   for (rt = gt_pch_scalar_rtab; *rt; rt++)
     for (rti = *rt; rti->base != NULL; rti++)
       if (fread (rti->base, rti->stride, 1, f) != 1)
-	fatal_error (input_location, "cannot read PCH file: %m");
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	// fatal_error (input_location, "cannot read PCH file: %m");
+	}
 
   /* Read in all the global pointers, in 6 easy loops.  */
   for (rt = gt_ggc_rtab; *rt; rt++)
@@ -636,10 +640,18 @@ gt_pch_restore (FILE *f)
       for (i = 0; i < rti->nelt; i++)
 	if (fread ((char *)rti->base + rti->stride * i,
 		   sizeof (void *), 1, f) != 1)
-	  fatal_error (input_location, "cannot read PCH file: %m");
+	  {
+	    fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	    exit(-1);;
+	  //fatal_error (input_location, "cannot read PCH file: %m");
+	  }
 
   if (fread (&mmi, sizeof (mmi), 1, f) != 1)
-    fatal_error (input_location, "cannot read PCH file: %m");
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+    //fatal_error (input_location, "cannot read PCH file: %m");
+    }
 
   result = host_hooks.gt_pch_use_address (mmi.preferred_base, mmi.size,
 					  fileno (f), mmi.offset);
@@ -647,12 +659,24 @@ gt_pch_restore (FILE *f)
     fatal_error (input_location, "had to relocate PCH");
   if (result == 0)
     {
-      if (fseek (f, mmi.offset, SEEK_SET) != 0
-	  || fread (mmi.preferred_base, mmi.size, 1, f) != 1)
-	fatal_error (input_location, "cannot read PCH file: %m");
+      if (fseek (f, mmi.offset, SEEK_SET) != 0)
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	}
+	  if ( fread (mmi.preferred_base, mmi.size, 1, f) != 1)
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	//fatal_error (input_location, "cannot read PCH file: %m");
+	}
     }
   else if (fseek (f, mmi.offset + mmi.size, SEEK_SET) != 0)
-    fatal_error (input_location, "cannot read PCH file: %m");
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+      // fatal_error (input_location, "cannot read PCH file: %m");
+    }
 
   ggc_pch_read (f, mmi.preferred_base);
 
@@ -662,7 +686,11 @@ gt_pch_restore (FILE *f)
   unsigned num_callbacks;
   if (fread (&pch_save, sizeof (pch_save), 1, f) != 1
       || fread (&num_callbacks, sizeof (num_callbacks), 1, f) != 1)
-    fatal_error (input_location, "cannot read PCH file: %m");
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+    //fatal_error (input_location, "cannot read PCH file: %m");
+    }
   if (pch_save != &gt_pch_save)
     {
       uintptr_t bias = (uintptr_t) &gt_pch_save - (uintptr_t) pch_save;
@@ -670,7 +698,11 @@ gt_pch_restore (FILE *f)
       unsigned i;
 
       if (fread (ptrs, sizeof (void *), num_callbacks, f) != num_callbacks)
-	fatal_error (input_location, "cannot read PCH file: %m");
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	//fatal_error (input_location, "cannot read PCH file: %m");
+	}
       for (i = 0; i < num_callbacks; ++i)
 	{
 	  memcpy (&pch_save, ptrs[i], sizeof (pch_save));
@@ -680,7 +712,11 @@ gt_pch_restore (FILE *f)
       XDELETE (ptrs);
     }
   else if (fseek (f, num_callbacks * sizeof (void *), SEEK_CUR) != 0)
-    fatal_error (input_location, "cannot read PCH file: %m");
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+    //fatal_error (input_location, "cannot read PCH file: %m");
+    }
 }
 
 /* Default version of HOST_HOOKS_GT_PCH_GET_ADDRESS when mmap is not present.
