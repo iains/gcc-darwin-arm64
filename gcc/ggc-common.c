@@ -246,6 +246,7 @@ saving_hasher::equal (const ptr_data *p1, const void *p2)
 }
 
 static hash_table<saving_hasher> *saving_htab;
+static vec<void *> callback_vec;
 
 /* Register an object in the hash table.  */
 
@@ -276,6 +277,23 @@ gt_pch_note_object (void *obj, void *note_ptr_cookie,
   else
     (*slot)->size = ggc_get_size (obj);
   return 1;
+}
+
+/* Register address of a callback pointer.  */
+void
+gt_pch_note_callback (void *obj, void *base)
+{
+  void *ptr;
+  memcpy (&ptr, obj, sizeof (void *));
+  if (ptr != NULL)
+    {
+      struct ptr_data *data
+	= (struct ptr_data *)
+	  saving_htab->find_with_hash (base, POINTER_HASH (base));
+      gcc_assert (data);
+      callback_vec.safe_push ((char *) data->new_addr
+			      + ((char *) obj - (char *) base));
+    }
 }
 
 /* Register an object in the hash table.  */
@@ -572,10 +590,20 @@ gt_pch_save (FILE *f)
   ggc_pch_finish (state.d, state.f);
   gt_pch_fixup_stringpool ();
 
+  unsigned num_callbacks = callback_vec.length ();
+  void (*pch_save) (FILE *) = &gt_pch_save;
+  if (fwrite (&pch_save, sizeof (pch_save), 1, f) != 1
+      || fwrite (&num_callbacks, sizeof (num_callbacks), 1, f) != 1
+      || (num_callbacks
+	  && fwrite (callback_vec.address (), sizeof (void *), num_callbacks,
+		     f) != num_callbacks))
+    fatal_error (input_location, "cannot write PCH file: %m");
+
   XDELETE (state.ptrs);
   XDELETE (this_object);
   delete saving_htab;
   saving_htab = NULL;
+  callback_vec.release ();
 }
 
 /* Read the state of the compiler back in from F.  */
@@ -600,7 +628,11 @@ gt_pch_restore (FILE *f)
   for (rt = gt_pch_scalar_rtab; *rt; rt++)
     for (rti = *rt; rti->base != NULL; rti++)
       if (fread (rti->base, rti->stride, 1, f) != 1)
-	fatal_error (input_location, "cannot read PCH file: %m");
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	// fatal_error (input_location, "cannot read PCH file: %m");
+	}
 
   /* Read in all the global pointers, in 6 easy loops.  */
   for (rt = gt_ggc_rtab; *rt; rt++)
@@ -608,10 +640,18 @@ gt_pch_restore (FILE *f)
       for (i = 0; i < rti->nelt; i++)
 	if (fread ((char *)rti->base + rti->stride * i,
 		   sizeof (void *), 1, f) != 1)
-	  fatal_error (input_location, "cannot read PCH file: %m");
+	  {
+	    fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	    exit(-1);;
+	  //fatal_error (input_location, "cannot read PCH file: %m");
+	  }
 
   if (fread (&mmi, sizeof (mmi), 1, f) != 1)
-    fatal_error (input_location, "cannot read PCH file: %m");
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+    //fatal_error (input_location, "cannot read PCH file: %m");
+    }
 
   result = host_hooks.gt_pch_use_address (mmi.preferred_base, mmi.size,
 					  fileno (f), mmi.offset);
@@ -619,16 +659,64 @@ gt_pch_restore (FILE *f)
     fatal_error (input_location, "had to relocate PCH");
   if (result == 0)
     {
-      if (fseek (f, mmi.offset, SEEK_SET) != 0
-	  || fread (mmi.preferred_base, mmi.size, 1, f) != 1)
-	fatal_error (input_location, "cannot read PCH file: %m");
+      if (fseek (f, mmi.offset, SEEK_SET) != 0)
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	}
+	  if ( fread (mmi.preferred_base, mmi.size, 1, f) != 1)
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	//fatal_error (input_location, "cannot read PCH file: %m");
+	}
     }
   else if (fseek (f, mmi.offset + mmi.size, SEEK_SET) != 0)
-    fatal_error (input_location, "cannot read PCH file: %m");
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+      // fatal_error (input_location, "cannot read PCH file: %m");
+    }
 
   ggc_pch_read (f, mmi.preferred_base);
 
   gt_pch_restore_stringpool ();
+
+  void (*pch_save) (FILE *);
+  unsigned num_callbacks;
+  if (fread (&pch_save, sizeof (pch_save), 1, f) != 1
+      || fread (&num_callbacks, sizeof (num_callbacks), 1, f) != 1)
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+    //fatal_error (input_location, "cannot read PCH file: %m");
+    }
+  if (pch_save != &gt_pch_save)
+    {
+      uintptr_t bias = (uintptr_t) &gt_pch_save - (uintptr_t) pch_save;
+      void **ptrs = XNEWVEC (void *, num_callbacks);
+      unsigned i;
+
+      if (fread (ptrs, sizeof (void *), num_callbacks, f) != num_callbacks)
+	{
+	  fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+	  exit(-1);
+	//fatal_error (input_location, "cannot read PCH file: %m");
+	}
+      for (i = 0; i < num_callbacks; ++i)
+	{
+	  memcpy (&pch_save, ptrs[i], sizeof (pch_save));
+	  pch_save = (void (*) (FILE *)) ((uintptr_t) pch_save + bias);
+	  memcpy (ptrs[i], &pch_save, sizeof (pch_save));
+	}
+      XDELETE (ptrs);
+    }
+  else if (fseek (f, num_callbacks * sizeof (void *), SEEK_CUR) != 0)
+    {
+      fprintf(stderr, "cannot read PCH file %d\n", __LINE__);
+      exit(-1);
+    //fatal_error (input_location, "cannot read PCH file: %m");
+    }
 }
 
 /* Default version of HOST_HOOKS_GT_PCH_GET_ADDRESS when mmap is not present.
