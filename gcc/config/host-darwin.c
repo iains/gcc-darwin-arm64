@@ -35,10 +35,10 @@
 # define TRY_EMPTY_VM_SPACE	0x60000000
 #elif defined(__i386)
 # define TRY_EMPTY_VM_SPACE	0x60000000
-#elif defined(__powerpc__) && defined(__LP64__)
+#elif defined(__POWERPC__) && defined(__LP64__)
 # define TRY_EMPTY_VM_SPACE	0x1000000000
-#elif defined(__powerpc__)
-# define TRY_EMPTY_VM_SPACE	0x60000000
+#elif defined(__POWERPC__)
+# define TRY_EMPTY_VM_SPACE	0x50000000
 #elif defined(__aarch64__)
 # define TRY_EMPTY_VM_SPACE	0x1000000000
 #else
@@ -115,7 +115,7 @@ darwin_gt_pch_use_address (void *addr, size_t sz, int fd, size_t off)
 
   /* Try to make an anonymous private mmap at the desired location.  */
   mapped_addr = mmap (addr, sz, PROT_READ | PROT_WRITE,
-	       MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	       MAP_PRIVATE | MAP_ANON, -1, 0);
 
   if (mapped_addr != addr)
     {
