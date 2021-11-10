@@ -244,7 +244,11 @@ is_capture_proxy (tree decl)
 	  && !(DECL_ARTIFICIAL (decl)
 	       && DECL_LANG_SPECIFIC (decl)
 	       && DECL_OMP_PRIVATIZED_MEMBER (decl))
-	  && LAMBDA_FUNCTION_P (DECL_CONTEXT (decl)));
+	  && (LAMBDA_FUNCTION_P (DECL_CONTEXT (decl))
+	      || (DECL_DECLARES_FUNCTION_P (DECL_CONTEXT (decl))
+		  && DECL_COROUTINE_P (DECL_CONTEXT (decl))
+		  && DECL_RAMP_FN (DECL_CONTEXT (decl))
+		  && LAMBDA_FUNCTION_P (DECL_RAMP_FN (DECL_CONTEXT (decl))))));
 }
 
 /* Returns true iff DECL is a capture proxy for a normal capture
