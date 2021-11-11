@@ -32087,7 +32087,12 @@ EOF
 if test "${enable_default_pie+set}" = set; then :
   enableval=$enable_default_pie; enable_default_pie=$enableval
 else
-  enable_default_pie=no
+  case $target in
+  # PIE is the default for Darwin 11+ (macOS 10.7+).
+  *-*-darwin1[1-9]* | *-*-darwin2*)
+    enable_default_pie=yes ;;
+  *) enable_default_pie=no ;;
+ esac
 fi
 
 if test x$enable_default_pie = xyes ; then

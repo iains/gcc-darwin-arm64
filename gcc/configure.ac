@@ -7535,7 +7535,12 @@ AC_ARG_ENABLE(default-pie,
 [AS_HELP_STRING([--enable-default-pie],
   [enable Position Independent Executable as default])],
 enable_default_pie=$enableval,
-enable_default_pie=no)
+[case $target in
+  # PIE is the default for Darwin 11+ (macOS 10.7+).
+  *-*-darwin1[[1-9]]* | *-*-darwin2*)
+    enable_default_pie=yes ;;
+  *) enable_default_pie=no ;;
+ esac])
 if test x$enable_default_pie = xyes ; then
   AC_DEFINE(ENABLE_DEFAULT_PIE, 1,
       [Define if your target supports default PIE and it is enabled.])
