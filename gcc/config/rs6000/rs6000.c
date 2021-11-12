@@ -8640,8 +8640,12 @@ darwin_rs6000_legitimate_lo_sum_const_p (rtx x, machine_mode mode)
   if (GET_CODE (x) == CONST)
     x = XEXP (x, 0);
 
+  bool machopic_offs_p = false;
   if (GET_CODE (x) == UNSPEC && XINT (x, 1) == UNSPEC_MACHOPIC_OFFSET)
-    x =  XVECEXP (x, 0, 0);
+    {
+      x =  XVECEXP (x, 0, 0);
+      machopic_offs_p = true;
+    }
 
   rtx sym = NULL_RTX;
   unsigned HOST_WIDE_INT offset = 0;
@@ -8673,6 +8677,10 @@ darwin_rs6000_legitimate_lo_sum_const_p (rtx x, machine_mode mode)
     {
       tree decl = SYMBOL_REF_DECL (sym);
 #if TARGET_MACHO
+      /* Unless we are in kernel mode, or mdynamic-no-pic, an address is only
+	 valid if it is an offset from the picbase.  */
+      if (MACHOPIC_PURE && !machopic_offs_p)
+	return false;
       if (MACHO_SYMBOL_INDIRECTION_P (sym))
       /* The decl in an indirection symbol is the original one, which might
 	 be less aligned than the indirection.  Our indirections are always
