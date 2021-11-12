@@ -1915,7 +1915,41 @@ AC_ARG_ENABLE(host-shared,
   x86_64-*-darwin* | aarch64-*-darwin*) host_shared=yes ;;
   *) host_shared=no ;;
  esac])
+
+# Check whether --enable-pie-tools was given.
+# Checked early because it can affect host make fragments.
+AC_ARG_ENABLE(pie-tools,
+[AS_HELP_STRING([--enable-pie-tools],
+  [build Position Independent Executables for the compilers and other tools])],
+[enable_pie_tools=$enableval
+ case $target in
+   aarch64-*-darwin1[[1-9]]*)
+     if test x$enable_pie_tools != xyes ; then
+       echo configure.ac: warning: aarch64-darwin must use PIE, pie-tools setting ignored. 1>&2
+       enable_pie_tools=yes
+       host_shared=yes
+     fi ;;
+    *) ;;
+ esac],
+[case $target in
+  # PIE is the default for macOS 10.7+ so reflect that in the configure.
+  # However, we build 32b toolchains mdynamic-no-pic by default which is
+  # not compatible with PIE.
+  x86_64-*-darwin1[[1-9]]* | *-*-darwin2*) enable_pie_tools=yes ;;
+  *) enable_pie_tools=no ;;
+ esac])
+
+case $target in
+  *-*-darwin*)
+    if test x$enable_pie_tools = xyes && test x$host_shared != xyes ; then
+      echo configure.ac: warning: for Darwin PIE requires PIC code, switching host-shared on 1>&2
+      host_shared=yes
+    fi ;;
+  *) ;;
+esac
+
 AC_SUBST(host_shared)
+AC_SUBST([enable_pie_tools])
 
 # By default, C and C++ are the only stage 1 languages.
 stage1_languages=,c,
