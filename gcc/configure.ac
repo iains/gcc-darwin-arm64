@@ -7484,6 +7484,19 @@ if test x$enable_default_pie = xyes ; then
 fi
 AC_SUBST([enable_default_pie])
 
+# Check whether --enable-pie-tools was given; this is passed automatically
+# from the top level where it has already been validated.
+AC_ARG_ENABLE(pie-tools,
+[AS_HELP_STRING([--enable-pie-tools],
+  [build Position Independent Executables for the compilers and other tools])],
+[enable_pie_tools=$enableval],
+[enable_pie_tools=no])
+if test x$enable_pie_tools = xyes ; then
+  AC_DEFINE(ENABLE_PIE_TOOLS, 1,
+      [Define if you build Position Independent Executables for the compilers and other tools.])
+fi
+AC_SUBST([enable_pie_tools])
+
 # Check if -fno-PIE works.
 AC_CACHE_CHECK([for -fno-PIE option],
   [gcc_cv_c_no_fpie],
