@@ -634,6 +634,7 @@ LIBOBJS
 CET_HOST_FLAGS
 NO_PIE_FLAG
 NO_PIE_CFLAGS
+enable_pie_tools
 enable_default_pie
 PICFLAG
 enable_host_shared
@@ -1030,6 +1031,7 @@ with_linker_hash_style
 with_diagnostics_color
 with_diagnostics_urls
 enable_default_pie
+enable_pie_tools
 enable_cet
 enable_s390_excess_float_precision
 '
@@ -1790,6 +1792,8 @@ Optional Features:
   --disable-libquadmath-support
                           disable libquadmath support for Fortran
   --enable-default-pie    enable Position Independent Executable as default
+  --enable-pie-tools      build Position Independent Executables for the
+                          compilers and other tools
   --enable-cet            enable Intel CET in host libraries [default=auto]
   --enable-s390-excess-float-precision
                           on s390 targets, evaluate float with double
@@ -19710,7 +19714,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 19713 "configure"
+#line 19717 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -19816,7 +19820,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 19819 "configure"
+#line 19823 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -32079,6 +32083,22 @@ fi
 if test x$enable_default_pie = xyes ; then
 
 $as_echo "#define ENABLE_DEFAULT_PIE 1" >>confdefs.h
+
+fi
+
+
+# Check whether --enable-pie-tools was given; this is passed automatically
+# from the top level where it has already been validated.
+# Check whether --enable-pie-tools was given.
+if test "${enable_pie_tools+set}" = set; then :
+  enableval=$enable_pie_tools; enable_pie_tools=$enableval
+else
+  enable_pie_tools=no
+fi
+
+if test x$enable_pie_tools = xyes ; then
+
+$as_echo "#define ENABLE_PIE_TOOLS 1" >>confdefs.h
 
 fi
 
