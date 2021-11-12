@@ -230,6 +230,13 @@
 #endif
 
 
+/* Define if you build Position Independent Executables for the compilers and
+   other tools. */
+#ifndef USED_FOR_TARGET
+#undef ENABLE_PIE_TOOLS
+#endif
+
+
 /* Define to enable plugin support. */
 #ifndef USED_FOR_TARGET
 #undef ENABLE_PLUGIN
