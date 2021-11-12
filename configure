@@ -686,6 +686,7 @@ extra_host_zlib_configure_flags
 extra_host_libiberty_configure_flags
 stage1_languages
 host_libs_picflag
+enable_pie_tools
 host_shared
 extra_linker_plugin_flags
 extra_linker_plugin_configure_flags
@@ -829,6 +830,7 @@ enable_lto
 enable_linker_plugin_configure_flags
 enable_linker_plugin_flags
 enable_host_shared
+enable_pie_tools
 enable_stage1_languages
 enable_objc_gc
 with_target_bdw_gc
@@ -1555,6 +1557,8 @@ Optional Features:
                           additional flags for configuring and building linker
                           plugins [none]
   --enable-host-shared    build host code as shared libraries
+  --enable-pie-tools      build Position Independent Executables for the
+                          compilers and other tools
   --enable-stage1-languages[=all]
                           choose additional languages to build during stage1.
                           Mostly useful for compiler development
@@ -8594,6 +8598,41 @@ else
   *) host_shared=no ;;
  esac
 fi
+
+
+# Check whether --enable-pie-tools was given.
+# Checked early because it can affect host make fragments.
+# Check whether --enable-pie-tools was given.
+if test "${enable_pie_tools+set}" = set; then :
+  enableval=$enable_pie_tools; enable_pie_tools=$enableval
+ case $target in
+   aarch64-*-darwin1[1-9]*)
+     if test x$enable_pie_tools != xyes ; then
+       echo configure.ac: warning: aarch64-darwin must use PIE, pie-tools setting ignored. 1>&2
+       enable_pie_tools=yes
+       host_shared=yes
+     fi ;;
+    *) ;;
+ esac
+else
+  case $target in
+  # PIE is the default for macOS 10.7+ so reflect that in the configure.
+  # However, we build 32b toolchains mdynamic-no-pic by default which is
+  # not compatible with PIE.
+  x86_64-*-darwin1[1-9]* | *-*-darwin2*) enable_pie_tools=yes ;;
+  *) enable_pie_tools=no ;;
+ esac
+fi
+
+
+case $target in
+  *-*-darwin*)
+    if test x$enable_pie_tools = xyes && test x$host_shared != xyes ; then
+      echo configure.ac: warning: for Darwin PIE requires PIC code, switching host-shared on 1>&2
+      host_shared=yes
+    fi ;;
+  *) ;;
+esac
 
 
 
