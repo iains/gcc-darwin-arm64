@@ -11,7 +11,8 @@
 # non-bootstrapped compiler), later stages will be built by GCC which supports
 # the required flags.
 
-# We cannot use mdynamic-no-pic when building shared host resources.
+# We cannot use mdynamic-no-pic when building shared host resources, or for PIE
+# tool executables, which also enables host-shared.
 
 ifeq (${host_shared},no)
 BOOTSTRAP_TOOL_CAN_USE_MDYNAMIC_NO_PIC := $(shell \
