@@ -1,3 +1,5 @@
+/* Copyright The GNU Toolchain Authors. */
+
 #include <unistd.h>
 #include <sys/mman.h>
 #include <stdint.h>
@@ -12,17 +14,6 @@ void *allocate_trampoline_page (void);
 
 void __builtin_nested_func_ptr_created (void *chain, void *func, void **dst);
 void __builtin_nested_func_ptr_deleted (void);
-
-struct tramp_ctrl_data;
-struct tramp_ctrl_data
-{
-  struct tramp_ctrl_data *prev;
-
-  int free_trampolines;
-
-  /* This will be pointing to an executable mmap'ed page.  */
-  union ix86_trampoline *trampolines;
-};
 
 static const uint8_t trampoline_insns[] = {
   /* movabs $<chain>,%r11  */
@@ -49,13 +40,23 @@ union ix86_trampoline {
   } fields;
 };
 
+struct tramp_ctrl_data
+{
+  struct tramp_ctrl_data *prev;
+
+  int free_trampolines;
+
+  /* This will be pointing to an executable mmap'ed page.  */
+  union ix86_trampoline *trampolines;
+};
+
 int
 get_trampolines_per_page (void)
 {
   return getpagesize() / sizeof(union ix86_trampoline);
 }
 
-static _Thread_local struct tramp_ctrl_data *tramp_ctrl_curr = NULL;
+static _Thread_local struct tramp_ctrl_data *tramp_ctrl_curr;// = NULL;
 
 void *
 allocate_trampoline_page (void)

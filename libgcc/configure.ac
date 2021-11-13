@@ -72,10 +72,13 @@ AC_ARG_ENABLE([off-stack-trampolines],
   [AS_HELP_STRING([--enable-off-stack-trampolines]
                   [Specify whether to support generating off-stack trampolines])],[
 case "$target" in
-  x86_64-*-linux* )
+  x86_64-*-linux* | x86_64-*-darwin1[[4-9]]* | x86_64-*-darwin2*)
     off_stack_trampolines=$enableval
     ;;
   aarch64*-*-linux* )
+    off_stack_trampolines=$enableval
+    ;;
+  aarch64*-*darwin* )
     off_stack_trampolines=$enableval
     ;;
   *)
@@ -85,6 +88,9 @@ for this platform])
     ;;
 esac],[
 case "$target" in
+  *-*-darwin2*)
+    off_stack_trampolines=yes
+    ;;
   *)
     off_stack_trampolines=no
     ;;
