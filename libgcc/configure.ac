@@ -75,6 +75,9 @@ case "$target" in
   x86_64-*-linux* )
     off_stack_trampolines=$enableval
     ;;
+  aarch64*-*-linux* )
+    off_stack_trampolines=$enableval
+    ;;
   *)
     AC_MSG_ERROR([Configure option --enable-off-stack-trampolines is not supported \
 for this platform])
