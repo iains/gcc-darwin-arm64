@@ -2796,7 +2796,7 @@ convert_tramp_reference_op (tree *tp, int *walk_subtrees, void *data)
       /* APB: We don't need to do the adjustment calls when using off-stack
 	 trampolines, any such adjustment will be done when the off-stack
 	 trampoline is created.  */
-      if (flag_off_stack_trampolines)
+      if (!descr && flag_off_stack_trampolines)
 	x = gsi_gimplify_val (info, x, &wi->gsi);
       else
 	{
