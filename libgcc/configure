@@ -2261,6 +2261,9 @@ fi
 if test "${enable_off_stack_trampolines+set}" = set; then :
   enableval=$enable_off_stack_trampolines;
 case "$target" in
+  x86_64-*-linux* )
+    off_stack_trampolines=$enableval
+    ;;
   *)
     as_fn_error $? "Configure option --enable-off-stack-trampolines is not supported \
 for this platform" "$LINENO" 5
