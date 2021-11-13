@@ -398,6 +398,10 @@ aarch64*-*-linux*)
 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
 	tmake_file="${tmake_file} ${cpu_type}/t-lse t-slibgcc-libgcc"
 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp t-crtfm"
+	if test x$off_stack_trampolines = xyes; then
+	    extra_parts="$extra_parts heap-trampoline.o"
+	    tmake_file="${tmake_file} ${cpu_type}/t-heap-trampoline"
+	fi
 	;;
 aarch64*-*-vxworks7*)
 	extra_parts="$extra_parts crtfastmath.o"
