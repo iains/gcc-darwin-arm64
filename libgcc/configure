@@ -2261,10 +2261,13 @@ fi
 if test "${enable_off_stack_trampolines+set}" = set; then :
   enableval=$enable_off_stack_trampolines;
 case "$target" in
-  x86_64-*-linux* )
+  x86_64-*-linux* | x86_64-*-darwin1[4-9]* | x86_64-*-darwin2*)
     off_stack_trampolines=$enableval
     ;;
   aarch64*-*-linux* )
+    off_stack_trampolines=$enableval
+    ;;
+  aarch64*-*darwin* )
     off_stack_trampolines=$enableval
     ;;
   *)
@@ -2276,6 +2279,9 @@ esac
 else
 
 case "$target" in
+  *-*-darwin2*)
+    off_stack_trampolines=yes
+    ;;
   *)
     off_stack_trampolines=no
     ;;

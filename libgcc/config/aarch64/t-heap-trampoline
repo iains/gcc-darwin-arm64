@@ -1,7 +1,5 @@
-# Machine description for AArch64 architecture.
-# Copyright (C) 2012-2021 Free Software Foundation, Inc.
-# Contributed by ARM Ltd.
-#
+# Copyright The GNU Toolchain Authors.
+
 # This file is part of GCC.
 #
 # GCC is free software; you can redistribute it and/or modify it
@@ -19,3 +17,4 @@
 # <http://www.gnu.org/licenses/>.
 
 LIB2ADD += $(srcdir)/config/aarch64/heap-trampoline.c
+HOST_LIBGCC2_CFLAGS += -mmacosx-version-min=11.0
