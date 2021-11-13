@@ -695,6 +695,7 @@ Objective-C and Objective-C++ Dialects}.
 @gccoptlist{-fcall-saved-@var{reg}  -fcall-used-@var{reg} @gol
 -ffixed-@var{reg}  -fexceptions @gol
 -fnon-call-exceptions  -fdelete-dead-exceptions  -funwind-tables @gol
+-foff-stack-trampolines @gol
 -fasynchronous-unwind-tables @gol
 -fno-gnu-unique @gol
 -finhibit-size-directive  -fcommon  -fno-ident @gol
@@ -18027,6 +18028,19 @@ instructions to throw exceptions, i.e.@: memory references or floating-point
 instructions.  It does not allow exceptions to be thrown from
 arbitrary signal handlers such as @code{SIGALRM}.  This enables
 @option{-fexceptions}.
+
+@item -foff-stack-trampolines
+@opindex foff-stack-trampolines
+Certain platforms (such as the Apple M1) do not permit an executable
+stack. Generate calls to @code{__builtin_nested_func_ptr_created} and
+@code{__builtin_nested_func_ptr_deleted} in order to allocate and
+deallocate trampoline space on the executable heap. Please note that
+these functions are implemented in libgcc, and will not be compiled in
+unless you provide @option{--enable-off-stack-trampolines} when
+building gcc.  @emph{PLEASE NOTE}: The trampolines are @emph{not}
+guaranteed to be correctly deallocated if you @code{setjmp},
+instantiate nested functions, and then @code{longjmp} back to a state
+prior to having allocated those nested functions.
 
 @item -fdelete-dead-exceptions
 @opindex fdelete-dead-exceptions
