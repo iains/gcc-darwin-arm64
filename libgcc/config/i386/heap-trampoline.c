@@ -1,9 +1,16 @@
+/* Copyright The GNU Toolchain Authors. */
+
 #include <unistd.h>
 #include <sys/mman.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 101400
+/* For pthread_jit_write_protect_np */
+#include <pthread.h>
+#endif
 
 void *allocate_trampoline_page (void);
 int get_trampolines_per_page (void);
@@ -12,17 +19,6 @@ void *allocate_trampoline_page (void);
 
 void __builtin_nested_func_ptr_created (void *chain, void *func, void **dst);
 void __builtin_nested_func_ptr_deleted (void);
-
-struct tramp_ctrl_data;
-struct tramp_ctrl_data
-{
-  struct tramp_ctrl_data *prev;
-
-  int free_trampolines;
-
-  /* This will be pointing to an executable mmap'ed page.  */
-  union ix86_trampoline *trampolines;
-};
 
 static const uint8_t trampoline_insns[] = {
   /* movabs $<chain>,%r11  */
@@ -49,6 +45,16 @@ union ix86_trampoline {
   } fields;
 };
 
+struct tramp_ctrl_data
+{
+  struct tramp_ctrl_data *prev;
+
+  int free_trampolines;
+
+  /* This will be pointing to an executable mmap'ed page.  */
+  union ix86_trampoline *trampolines;
+};
+
 int
 get_trampolines_per_page (void)
 {
@@ -62,8 +68,20 @@ allocate_trampoline_page (void)
 {
   void *page;
 
+#if defined(__gnu_linux__)
   page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
 	       MAP_ANON | MAP_PRIVATE, 0, 0);
+#elif __APPLE__
+# if  __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 101400
+  page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
+	       MAP_ANON | MAP_PRIVATE | MAP_JIT, 0, 0);
+# else
+  page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
+	       MAP_ANON | MAP_PRIVATE, 0, 0);
+# endif
+#else
+  page = MAP_FAILED;
+#endif
 
   return page;
 }
@@ -109,10 +127,21 @@ __builtin_nested_func_ptr_created (void *chain, void *func, void **dst)
     = &tramp_ctrl_curr->trampolines[get_trampolines_per_page ()
 				    - tramp_ctrl_curr->free_trampolines];
 
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 101400
+  /* Disable write protection for the MAP_JIT regions in this thread (see
+     https://developer.apple.com/documentation/apple-silicon/porting-just-in-time-compilers-to-apple-silicon) */
+  pthread_jit_write_protect_np (0);
+#endif
+
   memcpy (trampoline->insns, trampoline_insns,
 	  sizeof(trampoline_insns));
   trampoline->fields.func_ptr = func;
   trampoline->fields.chain_ptr = chain;
+
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 101400
+  /* Re-enable write protection.  */
+  pthread_jit_write_protect_np (1);
+#endif
 
   tramp_ctrl_curr->free_trampolines -= 1;
 
