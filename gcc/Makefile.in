@@ -270,11 +270,13 @@ COMPILER += $(CET_HOST_FLAGS)
 NO_PIE_CFLAGS = @NO_PIE_CFLAGS@
 NO_PIE_FLAG = @NO_PIE_FLAG@
 
+ifneq (@enable_pie_tools@,yes)
 # We don't want to compile the compilers with -fPIE, it make PCH fail.
 COMPILER += $(NO_PIE_CFLAGS)
 
 # Link with -no-pie since we compile the compiler with -fno-PIE.
 LINKER += $(NO_PIE_FLAG)
+endif
 
 # Like LINKER, but use a mutex for serializing front end links.
 ifeq (@DO_LINK_MUTEX@,true)
@@ -407,6 +409,7 @@ ifeq ($(enable_plugin),yes)
 endif
 
 enable_host_shared = @enable_host_shared@
+enable_default_pie = @enable_default_pie@
 
 enable_as_accelerator = @enable_as_accelerator@
 
