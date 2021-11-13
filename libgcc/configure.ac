@@ -68,6 +68,23 @@ AC_ARG_ENABLE(shared,
 ], [enable_shared=yes])
 AC_SUBST(enable_shared)
 
+AC_ARG_ENABLE([off-stack-trampolines],
+  [AS_HELP_STRING([--enable-off-stack-trampolines]
+                  [Specify whether to support generating off-stack trampolines])],[
+case "$target" in
+  *)
+    AC_MSG_ERROR([Configure option --enable-off-stack-trampolines is not supported \
+for this platform])
+    off_stack_trampolines=no
+    ;;
+esac],[
+case "$target" in
+  *)
+    off_stack_trampolines=no
+    ;;
+esac])
+AC_SUBST(off_stack_trampolines)
+
 AC_ARG_ENABLE(gcov,
 [  --disable-gcov          don't provide libgcov and related host tools],
 [], [enable_gcov=yes])
