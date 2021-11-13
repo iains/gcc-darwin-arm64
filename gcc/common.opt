@@ -2198,6 +2198,10 @@ foffload-abi=
 Common Joined RejectNegative Enum(offload_abi)
 -foffload-abi=[lp64|ilp32]	Set the ABI to use in an offload compiler.
 
+foff-stack-trampolines
+Common RejectNegative Var(flag_off_stack_trampolines) Init(OFF_STACK_TRAMPOLINES_INIT)
+Generate trampolines in executable memory rather than executable stack.
+
 Enum
 Name(offload_abi) Type(enum offload_abi) UnknownError(unknown offload ABI %qs)
 
@@ -2826,7 +2830,7 @@ Common Var(flag_tracer) Optimization
 Perform superblock formation via tail duplication.
 
 ftrampolines
-Common Var(flag_trampolines) Init(0)
+Common Var(flag_trampolines) Init(OFF_STACK_TRAMPOLINES_INIT)
 For targets that normally need trampolines for nested functions, always
 generate them instead of using descriptors.
 
