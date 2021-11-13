@@ -1124,6 +1124,17 @@ case ${target} in
   ;;
 esac
 
+# Figure out if we need to enable -foff-stack-trampolines by default
+case ${target} in
+*-*-darwin2*)
+  # Currently, we do this for macOS 11 and above.
+  tm_defines="$tm_defines OFF_STACK_TRAMPOLINES_INIT=1"
+  ;;
+*)
+  tm_defines="$tm_defines OFF_STACK_TRAMPOLINES_INIT=0"
+  ;;
+esac
+
 case ${target} in
 aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
 	tm_file="${tm_file} elfos.h newlib-stdint.h"
