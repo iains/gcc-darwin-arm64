@@ -20,8 +20,11 @@
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
+#include "options.h"
 #include "diagnostic-core.h"
 #include "config/host-darwin.h"
+#include <sys/syslimits.h>
+#include <sys/stat.h>
 
 /* For Darwin (macOS only) platforms, without ASLR (PIE) enabled on the
    binaries, the following VM addresses are expected to be available.
@@ -58,20 +61,37 @@
    pick up the same position when reading as we got at write-time.  */
 
 void *
-darwin_gt_pch_get_address (size_t sz, int fd ATTRIBUTE_UNUSED)
+darwin_gt_pch_get_address (size_t sz, int fd)
 {
   if (sz > SAFE_ALLOC_SIZE)
     {
-      error_at (input_location, "PCH memory request exceeds available space");
+      error ("PCH memory request exceeds the available space");
       return NULL;
     }
 
+  /* Now try with the constraint that we really want this address...  */
   void *addr = mmap ((void *)TRY_EMPTY_VM_SPACE, sz, PROT_READ | PROT_WRITE,
-		     MAP_PRIVATE, fd, 0);
+		     MAP_PRIVATE | MAP_FIXED, fd, 0);
 
-  /* If we failed the map, that means there is *no* free space.  */
-  if (addr == (void *) MAP_FAILED)
+  if (addr != (void *) MAP_FAILED)
+    munmap (addr, sz);
+
+  /* Guard against broken MAP_FIXED.  */
+  if (addr == (void *)TRY_EMPTY_VM_SPACE)
+    return addr;
+
+  warning (OPT_Winvalid_pch, "PCH memory [fixed at %p] is not available %m",
+	   (char *) TRY_EMPTY_VM_SPACE);
+
+  /* Now try without the constraint.  */
+  addr = mmap ((void *)TRY_EMPTY_VM_SPACE, sz, PROT_READ | PROT_WRITE,
+	       MAP_PRIVATE, fd, 0);
+
+  /* If we failed this time, that means there is *no* large enough free space.  */
+  if (addr == (void *) MAP_FAILED) {
+    error ("no memory is available for PCH : %m");
     return NULL;
+  }
 
   /* Unmap the area before returning.  */
   munmap (addr, sz);
@@ -80,16 +100,22 @@ darwin_gt_pch_get_address (size_t sz, int fd ATTRIBUTE_UNUSED)
   if (TRY_EMPTY_VM_SPACE && addr == (void *) TRY_EMPTY_VM_SPACE)
     return addr;
 
+  warning (OPT_Winvalid_pch, "PCH memory at %p is not available",
+	  (char *) TRY_EMPTY_VM_SPACE);
+
   /* Otherwise, we need to try again but put some buffer space first.  */
   size_t buffer_size = 32 * 1024 * 1024;
-  void *buffer = mmap (0, buffer_size, PROT_NONE,
-		       MAP_PRIVATE | MAP_ANON, -1, 0);
-  addr = mmap (0, sz, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+  void *buffer = mmap (0, buffer_size, PROT_NONE, MAP_PRIVATE | MAP_ANON, -1, 0);
+  addr = mmap ((void *)TRY_EMPTY_VM_SPACE, sz, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
   if (buffer != (void *) MAP_FAILED)
     munmap (buffer, buffer_size);
-  if (addr == (void *) MAP_FAILED)
-    return NULL;
 
+  if (addr == (void *) MAP_FAILED) {
+    error ("PCH memory not available %m");
+    return NULL;
+  }
+
+  warning (OPT_Winvalid_pch, "PCH memory at %p used instead", addr);
   munmap (addr, sz);
   return addr;
 }
@@ -109,25 +135,51 @@ darwin_gt_pch_use_address (void *addr, size_t sz, int fd, size_t off)
   if (sz == 0)
     return -1;
 
+  if (addr != (void *)TRY_EMPTY_VM_SPACE)
+    warning (OPT_Winvalid_pch, "PCH memory at %p is not the standard position", addr);
+
+  /* This is somewhat extra checking but, at least on Darwin13, we get sporadic fails
+     to map the file with an invalid complaint that it does not exist without this.  */
+  struct stat sbuf;
+  int res = fstat(fd, &sbuf);
+  if (res < 0)
+   {
+      error ("unable to access PCH file %m");
+      return -1;
+   }
+
+  char file_path[PATH_MAX*2];
+  if (fcntl(fd, F_GETPATH, file_path) == -1)
+    strcpy (file_path, "unknown file");
+
+  if ((sbuf.st_mode & S_IRUSR) != S_IRUSR)
+    {
+      error ("PCH file %s is not readable (mode: 0x%x)", file_path, sbuf.st_mode);
+      return -1;
+    }
+
   /* Try to map the file with MAP_PRIVATE.  */
-  mapped_addr = mmap ((char*)addr, sz, PROT_READ | PROT_WRITE,
-		      MAP_PRIVATE, fd, off);
+  mapped_addr = mmap ((char*)addr, sz, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, off);
 
   /* Hopefully, we succeed.  */
   if (mapped_addr == (char*)addr)
     return 1;
 
+  warning (OPT_Winvalid_pch, "PCH private mmap of %s standard position (%p) failed %m",
+	   file_path, addr);
+
   if (mapped_addr != (void *) MAP_FAILED)
     munmap (mapped_addr, sz);
 
   /* Try to make an anonymous private mmap at the desired location.  */
-  mapped_addr = mmap (addr, sz, PROT_READ | PROT_WRITE,
-	       MAP_PRIVATE | MAP_ANON, -1, 0);
+  mapped_addr = mmap (addr, sz, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 
   if (mapped_addr != addr)
     {
+      warning (OPT_Winvalid_pch, "PCH anon mmap at standard position (%p) failed %m",
+	       addr);
       if (mapped_addr != (void *) MAP_FAILED)
-	munmap (mapped_addr, sz);
+	    munmap (mapped_addr, sz);
       return -1;
     }
 
