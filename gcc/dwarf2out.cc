@@ -283,7 +283,7 @@ static GTY(()) dw_die_ref decltype_auto_die;
 
 /* Forward declarations for functions defined in this file.  */
 
-static void output_call_frame_info (int);
+static void output_call_frame_info (bool, bool);
 
 /* Personality decl of current unit.  Used only when assembler does not support
    personality CFI.  */
@@ -750,7 +750,7 @@ fde_needed_for_eh_p (dw_fde_ref fde)
    location of saved registers.  */
 
 static void
-output_call_frame_info (int for_eh)
+output_call_frame_info (bool for_eh, bool for_debug)
 {
   unsigned int i;
   dw_fde_ref fde;
@@ -758,6 +758,7 @@ output_call_frame_info (int for_eh)
   char l1[MAX_ARTIFICIAL_LABEL_BYTES], l2[MAX_ARTIFICIAL_LABEL_BYTES];
   char section_start_label[MAX_ARTIFICIAL_LABEL_BYTES];
   bool any_lsda_needed = false;
+  bool debug_only = for_debug && !for_eh;
   char augmentation[6];
   int augmentation_size;
   int fde_encoding = DW_EH_PE_absptr;
@@ -795,16 +796,22 @@ output_call_frame_info (int for_eh)
 	    targetm.asm_out.emit_unwind_label (asm_out_file, fde->decl, 1, 1);
 	}
 
-      if (!any_eh_needed)
+      if (!any_eh_needed && !for_debug)
 	return;
+
+      /* We might now have discovered that no EH was needed even though for_eh
+	 is set, but in this case we only want to emit a debug_frame.  */
+      debug_only = !any_eh_needed;
     }
 
   /* We're going to be generating comments, so turn on app.  */
   if (flag_debug_asm)
     app_enable ();
 
-  /* Switch to the proper frame section, first time.  */
-  switch_to_frame_table_section (for_eh, false);
+  /* Switch to the proper frame section, first time. we use the eh_frame when
+     emitting unwind only or unwind + debug, but the debug_frame when emitting
+     only debug.  */
+  switch_to_frame_table_section (!debug_only, false);
 
   ASM_GENERATE_INTERNAL_LABEL (section_start_label, FRAME_BEGIN_LABEL, for_eh);
   ASM_OUTPUT_LABEL (asm_out_file, section_start_label);
@@ -1271,12 +1278,9 @@ void
 dwarf2out_frame_finish (void)
 {
   /* Output call frame information.  */
-  if (targetm.debug_unwind_info () == UI_DWARF2)
-    output_call_frame_info (0);
-
-  /* Output another copy for the unwinder.  */
-  if (do_eh_frame)
-    output_call_frame_info (1);
+  if (targetm.debug_unwind_info () == UI_DWARF2 || do_eh_frame)
+    output_call_frame_info (do_eh_frame,
+			    targetm.debug_unwind_info () == UI_DWARF2);
 }
 
 static void var_location_switch_text_section (void);
