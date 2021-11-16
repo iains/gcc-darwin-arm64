@@ -283,7 +283,7 @@ static GTY(()) dw_die_ref decltype_auto_die;
 
 /* Forward declarations for functions defined in this file.  */
 
-static void output_call_frame_info (int);
+static void output_call_frame_info (bool, bool);
 
 /* Personality decl of current unit.  Used only when assembler does not support
    personality CFI.  */
@@ -750,7 +750,7 @@ fde_needed_for_eh_p (dw_fde_ref fde)
    location of saved registers.  */
 
 static void
-output_call_frame_info (int for_eh)
+output_call_frame_info (bool for_eh, bool for_debug)
 {
   unsigned int i;
   dw_fde_ref fde;
@@ -795,7 +795,7 @@ output_call_frame_info (int for_eh)
 	    targetm.asm_out.emit_unwind_label (asm_out_file, fde->decl, 1, 1);
 	}
 
-      if (!any_eh_needed)
+      if (!any_eh_needed && !for_debug)
 	return;
     }
 
@@ -1271,12 +1271,9 @@ void
 dwarf2out_frame_finish (void)
 {
   /* Output call frame information.  */
-  if (targetm.debug_unwind_info () == UI_DWARF2)
-    output_call_frame_info (0);
-
-  /* Output another copy for the unwinder.  */
-  if (do_eh_frame)
-    output_call_frame_info (1);
+  if (targetm.debug_unwind_info () == UI_DWARF2 || do_eh_frame)
+    output_call_frame_info (do_eh_frame,
+			    targetm.debug_unwind_info () == UI_DWARF2);
 }
 
 static void var_location_switch_text_section (void);
