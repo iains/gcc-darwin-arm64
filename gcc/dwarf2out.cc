@@ -758,6 +758,7 @@ output_call_frame_info (bool for_eh, bool for_debug)
   char l1[MAX_ARTIFICIAL_LABEL_BYTES], l2[MAX_ARTIFICIAL_LABEL_BYTES];
   char section_start_label[MAX_ARTIFICIAL_LABEL_BYTES];
   bool any_lsda_needed = false;
+  bool debug_only = for_debug && !for_eh;
   char augmentation[6];
   int augmentation_size;
   int fde_encoding = DW_EH_PE_absptr;
@@ -797,14 +798,20 @@ output_call_frame_info (bool for_eh, bool for_debug)
 
       if (!any_eh_needed && !for_debug)
 	return;
+
+      /* We might now have discovered that no EH was needed even though for_eh
+	 is set, but in this case we only want to emit a debug_frame.  */
+      debug_only = !any_eh_needed;
     }
 
   /* We're going to be generating comments, so turn on app.  */
   if (flag_debug_asm)
     app_enable ();
 
-  /* Switch to the proper frame section, first time.  */
-  switch_to_frame_table_section (for_eh, false);
+  /* Switch to the proper frame section, first time. we use the eh_frame when
+     emitting unwind only or unwind + debug, but the debug_frame when emitting
+     only debug.  */
+  switch_to_frame_table_section (!debug_only, false);
 
   ASM_GENERATE_INTERNAL_LABEL (section_start_label, FRAME_BEGIN_LABEL, for_eh);
   ASM_OUTPUT_LABEL (asm_out_file, section_start_label);
