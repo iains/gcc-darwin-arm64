@@ -4,7 +4,7 @@ SHLIB_SOVERSION = 1.1
 SHLIB_SO_MINVERSION = 1
 SHLIB_VERSTRING = -compatibility_version $(SHLIB_SO_MINVERSION) -current_version $(SHLIB_SOVERSION)
 SHLIB_EXT = .dylib
-SHLIB_LC = -lSystem
+SHLIB_LC = -lc
 
 # Shorthand expressions for the LINK below.
 SHLIB_INSTALL_NAME = @shlib_base_name@.$(SHLIB_SOVERSION)$(SHLIB_EXT)
@@ -29,12 +29,49 @@ SHLIB_MKMAP_OPTS = -v leading_underscore=1
 
 LGCC_FILES = libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)
 
+ifeq ($(BUILD_LIBGCCS1),YES)
+
+# We are going to build a libgcc_s.1.dylib so that distributions can
+# install it for compatibility with binaries linked against the old
+# libgcc_ext.10.x.dylib stubs.
+
+# For systems after 10.7 we can forward the correct unwinder symbols
+# from libSystem but, for older systems we have to forward an entire
+# library (since they cannot selectively forward symbols).  So build
+# the unwinder into a separate shared lib.
+
+ifneq ($(LIBEHSOBJS),)
+
+EHS_INSTNAME = libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)
+
+
+# multilib build for a shared EH lib.
+$(LIBEHSOBJS): libgcc_tm.h
+
+libgcc_ehs$(SHLIB_EXT): $(LIBEHSOBJS)
+	mkdir -p $(MULTIDIR)
+	$(CC) $(LIBGCC2_CFLAGS) $(LDFLAGS) -dynamiclib \
+	-nodefaultlibs -install_name $(slibdir)/$(EHS_INSTNAME) \
+	-o $(MULTIDIR)/libgcc_ehs$(SHLIB_EXT) $(SHLIB_VERSTRING) \
+	$(LIBEHSOBJS) $(SHLIB_LC)
+
+all: libgcc_ehs$(SHLIB_EXT)
+
+LGCC_FILES += libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)
+
+endif
+
+# Provide a gcc_s.1 for backwards compatibility.
+LGCC_FILES += libgcc_s.1.dylib
+
+endif
+
 INSTALL_FILES=$(LGCC_FILES)
 
 # we do our own thing
 SHLIB_INSTALL =
 
-# For the toplevel multilib, build a fat archive including all the multilibs.
+# For the toplevel multilib, build FAT dylibs including all the multilibs.
 ifeq ($(MULTIBUILDTOP),)
 
 ifeq ($(enable_shared),yes)
@@ -52,7 +89,62 @@ libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT): all-multi libgcc_s$(SHLIB_EXT)
 	  -create libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
 	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
 
-# Install the shared library.
+ifeq ($(BUILD_LIBGCCS1),YES)
+ifneq ($(LIBEHSOBJS),)
+
+libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT): all-multi libgcc_ehs$(SHLIB_EXT)
+	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
+	for mlib in $$MLIBS ; do \
+	  cp ../$${mlib}/libgcc/$${mlib}/libgcc_ehs$(SHLIB_EXT)  \
+	    ./libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} || exit 1 ; \
+	done
+	$(LIPO) -output libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT) \
+	  -create libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
+	rm libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
+
+
+libgcc_s.1.dylib: libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT) libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)
+	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
+	for mlib in $$MLIBS ; do \
+	  cp ../$${mlib}/libgcc/$${mlib}/libgcc_s$(SHLIB_EXT)  \
+	    ./libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} || exit 1 ; \
+	  cp ../$${mlib}/libgcc/$${mlib}/libgcc_ehs$(SHLIB_EXT)  \
+	    ./libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} || exit 1 ; \
+	  arch=`$(LIPO) -info libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} | sed -e 's/.*:\ //'` ; \
+	  $(CC) -arch $${arch} -nodefaultlibs -dynamiclib \
+	    -o libgcc_s.1$(SHLIB_EXT)_T_$${mlib} \
+	    -Wl,-reexport_library,libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
+	    -Wl,-reexport_library,libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
+	    -install_name $(slibdir)/libgcc_s.1.dylib \
+	    -compatibility_version 1 -current_version 1 ; \
+	done
+	$(LIPO) -output libgcc_s.1$(SHLIB_EXT) -create libgcc_s.1$(SHLIB_EXT)_T*
+	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
+	rm libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
+
+else
+
+libgcc_s.1.dylib: libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)
+	MLIBS=`$(CC) --print-multi-lib | sed -e 's/;.*$$//'` ; \
+	for mlib in $$MLIBS ; do \
+	  cp ../$${mlib}/libgcc/$${mlib}/libgcc_s$(SHLIB_EXT)  \
+	    ./libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} || exit 1 ; \
+	  arch=`$(LIPO) -info libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} | sed -e 's/.*:\ //'` ; \
+	  $(CC) -arch $${arch} -nodefaultlibs -dynamiclib \
+	    -o libgcc_s.1$(SHLIB_EXT)_T_$${mlib} \
+	    -Wl,-reexport_library,libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
+	    -lSystem \
+	    -Wl,-reexported_symbols_list,$(srcdir)/config/darwin-unwind.ver \
+	    -install_name $(slibdir)/libgcc_s.1.dylib \
+	    -compatibility_version 1 -current_version 1 ; \
+	done
+	$(LIPO) -output libgcc_s.1$(SHLIB_EXT) -create libgcc_s.1$(SHLIB_EXT)_T*
+	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
+
+endif
+endif
+
+# Install the shared libraries.
 
 install-darwin-libgcc-stubs :
 	$(mkinstalldirs) $(DESTDIR)$(slibdir)
@@ -62,10 +154,10 @@ install-darwin-libgcc-stubs :
 
 else
 
-# Do not install shared libraries for any other multilibs.  Unless we are
-# putting them in the gcc directory during a build, for compatibility with
-# the pre-top-level layout.  In that case we provide symlinks to the FAT lib
-# from the sub-directories.
+# Do not install shared libraries for multilibs.  Unless we are putting them
+# in the gcc directory during a build, for compatibility with the pre-top-
+# level layout.  In that case we provide symlinks to the FAT lib from the
+# multilib sub-directories.
 
 ifeq ($(enable_shared),yes)
 all: install-darwin-libgcc-links
