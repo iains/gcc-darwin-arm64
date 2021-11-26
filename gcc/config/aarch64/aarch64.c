@@ -3877,7 +3877,7 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 	    rtx sym, off;
 	    split_const (imm, &sym, &off);
 	    /* Negative offsets don't work, whether by intention is TBD.  */
-	    if (INTVAL (off) < 0)
+	    if (INTVAL (off) < 0 || INTVAL (off) > 8 * 1024 * 1024)
 	      {
 		emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, sym));
 		emit_insn (gen_add_losym (dest, tmp_reg, sym));
@@ -3885,7 +3885,7 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 		emit_insn (gen_adddi3 (dest, dest, off));
 		return;
 	      }
-	   /* else positive offset is OK.  */
+	   /* else small enough positive offset is OK.  */
 	  }
 	emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, imm));
 	emit_insn (gen_add_losym (dest, tmp_reg, imm));
