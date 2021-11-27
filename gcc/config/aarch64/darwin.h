@@ -65,13 +65,15 @@ along with GCC; see the file COPYING3.  If not see
 #define LIB_SPEC "%{!static:-lSystem} -lgcc"
 
 /* Force the default endianness and ABI flags onto the command line
-   in order to make the other specs easier to write.  */
+   in order to make the other specs easier to write.  Match clang in
+   silently ignoring mdynamic-no-pic */
 #undef DRIVER_SELF_SPECS
 #define DRIVER_SELF_SPECS \
 "%{mbig-endian:%eDarwin platforms do not support big-endian arm64}" \
 "%{!mlittle-endian:-mlittle-endian} " \
 "%{mabi=ilp32:%eSorry, support for Darwin ilp32 arm64 is not implemented} " \
 "%{!mabi=*:-mabi=lp64} " \
+" %<mdynamic-no-pic* " \
   MCPU_MTUNE_NATIVE_SPECS \
   SUBTARGET_DRIVER_SELF_SPECS
 
@@ -197,14 +199,21 @@ along with GCC; see the file COPYING3.  If not see
     SUBTARGET_C_COMMON_OVERRIDE_OPTIONS;			\
   } while (0)
 
+/* We do not have a definition for a tiny (or large) code model so
+   far.
+   Section anchors are (probably) not useful with ld64 atom model so
+   default them off - this can be overridden by the user at present.
+   mdynamic-no-pic is silently ignored by clang (and not applicable
+   to this port).  */
 #undef SUBTARGET_OVERRIDE_OPTIONS
 #define SUBTARGET_OVERRIDE_OPTIONS					\
   do {									\
     if (global_options.x_aarch64_cmodel_var == AARCH64_CMODEL_TINY)	\
-      error ("code model %qs is not supported on Darwin platforms",	\
+      sorry ("code model %qs is not supported on Darwin platforms",	\
 	     "tiny");							\
     if (!global_options_set.x_flag_section_anchors)			\
       flag_section_anchors = 0;						\
+    target_flags &= ~MASK_MACHO_DYNAMIC_NO_PIC;				\
   } while (0); 								\
   SUBSUBTARGET_OVERRIDE_OPTIONS
 
