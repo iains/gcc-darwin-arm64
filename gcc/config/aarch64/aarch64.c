@@ -11234,6 +11234,13 @@ output_macho_postfix_expr (FILE *file, rtx x, const char *postfix)
       output_addr_const (file, XEXP (x, 0));
       break;
 
+    case  UNSPEC:
+      if (XINT (x, 1) == UNSPEC_SALT_ADDR)
+	{
+	  output_macho_postfix_expr (file, XVECEXP (x, 0, 0), postfix);
+	  break;
+	}
+      /* FALLTHROUGH */
     default:
       if (targetm.asm_out.output_addr_const_extra (file, x))
 	break;
