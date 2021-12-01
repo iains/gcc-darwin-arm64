@@ -38,7 +38,7 @@ foreach test [lsort [glob -nocomplain $srcdir/$subdir/*.c]] {
     # unlikely to make any difference to PCH.  However, we do want to
     # add -O0 -g, since users who want PCH usually want debugging and quick
     # compiles.
-    dg-pch $subdir $test [concat [list {-O0 -g}] $torture_without_loops] ".h"
+    dg-pch $subdir $test [concat [list {-O0 -g  -Winvalid-pch}] $torture_without_loops] ".h"
 }
 
 set test "largefile.c"
@@ -53,7 +53,7 @@ puts $f "#include \"largefile.h\""
 close $f
 set f [open $testh w]
 close $f
-dg-pch $subdir $test [concat [list {-O0 -g}] $torture_without_loops] ".h"    
+dg-pch $subdir $test [concat [list {-O0 -g  -Winvalid-pch}] $torture_without_loops] ".h"    
 file delete $test
 file delete $testh
 
