@@ -1,4 +1,4 @@
-# Build a shared libgcc library with the darwin linker.
+# Build a shared libgcc library able to use embedded runpaths.
 
 SHLIB_SOVERSION = 1.1
 SHLIB_SO_MINVERSION = 1
@@ -17,11 +17,15 @@ SHLIB_SONAME = @shlib_base_name@$(SHLIB_EXT)
 # subdir.  The code under MULTIBUILDTOP combines these into a single FAT
 # library, that is what we eventually install.
 
+# Instead of using @shlib_slibdir@, use @rpath and add a search path to exes
+# and dylibs that depend on this.
+SHLIB_RPATH = @shlib_slibdir@
+
 SHLIB_LINK = $(CC) $(LIBGCC2_CFLAGS) $(LDFLAGS) -dynamiclib -nodefaultlibs \
-	-install_name @shlib_slibdir@/$(SHLIB_INSTALL_NAME) \
+	-install_name $(SHLIB_RPATH)/$(SHLIB_INSTALL_NAME) \
 	-single_module -o $(SHLIB_DIR)/$(SHLIB_SONAME) \
 	-Wl,-exported_symbols_list,$(SHLIB_MAP) \
-	$(SHLIB_VERSTRING) \
+	$(SHLIB_VERSTRING) -nodefaultrpath \
 	@multilib_flags@ @shlib_objs@ $(SHLIB_LC)
 
 SHLIB_MKMAP = $(srcdir)/mkmap-flat.awk

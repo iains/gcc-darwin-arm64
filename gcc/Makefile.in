@@ -1157,6 +1157,8 @@ LANG_MAKEFRAGS = @all_lang_makefrags@
 # Used by gcc/jit/Make-lang.in
 LD_VERSION_SCRIPT_OPTION = @ld_version_script_option@
 LD_SONAME_OPTION = @ld_soname_option@
+@ENABLE_DARWIN_AT_RPATH_TRUE@DARWIN_RPATH = @rpath
+@ENABLE_DARWIN_AT_RPATH_FALSE@DARWIN_RPATH = ${libdir}
 
 # Flags to pass to recursive makes.
 # CC is set by configure.
