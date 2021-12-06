@@ -20238,8 +20238,18 @@ aarch64_gimplify_va_arg_expr (tree valist, tree type, gimple_seq *pre_p,
 	  field_ptr_t = double_ptr_type_node;
 	  break;
 	case E_TFmode:
-	  field_t = long_double_type_node;
-	  field_ptr_t = long_double_ptr_type_node;
+	  if (TARGET_MACHO)
+	    {
+	      /* Darwin has __float128, and long double is the same as
+		 double.  */
+	      field_t = float128_type_node;
+	      field_ptr_t = aarch64_float128_ptr_type_node;
+	    }
+	  else
+	    {
+	      field_t = long_double_type_node;
+	      field_ptr_t = long_double_ptr_type_node;
+	    }
 	  break;
 	case E_SDmode:
 	  field_t = dfloat32_type_node;
@@ -21174,6 +21184,10 @@ aarch64_mangle_type (const_tree type)
       else
 	return "Dh";
     }
+
+  /* __float128 */
+  if (TYPE_MODE (type) == TFmode)
+    return "g";
 
   /* Mangle AArch64-specific internal types.  TYPE_NAME is non-NULL_TREE for
      builtin types.  */
@@ -23546,7 +23560,7 @@ aarch64_init_libfuncs (void)
 static machine_mode
 aarch64_c_mode_for_suffix (char suffix)
 {
-  if (suffix == 'q' && !TARGET_MACHO)
+  if (suffix == 'q')
     return TFmode;
 
   return VOIDmode;
@@ -26894,7 +26908,7 @@ aarch64_libgcc_floating_mode_supported_p (scalar_float_mode mode)
 }
 
 /* Implement TARGET_SCALAR_MODE_SUPPORTED_P - return TRUE
-   if MODE is HFmode, and punt to the generic implementation otherwise.  */
+   if MODE is HFmode, or TFmode on Mach-O, and punt to the generic implementation otherwise.  */
 
 static bool
 aarch64_scalar_mode_supported_p (scalar_mode mode)
@@ -26902,7 +26916,7 @@ aarch64_scalar_mode_supported_p (scalar_mode mode)
   if (DECIMAL_FLOAT_MODE_P (mode))
     return default_decimal_float_supported_p ();
 
-  return (mode == HFmode
+  return (mode == HFmode || (mode == TFmode && TARGET_MACHO)
 	  ? true
 	  : default_scalar_mode_supported_p (mode));
 }
