@@ -1300,6 +1300,11 @@ extern GTY(()) tree aarch64_fp16_ptr_type_node;
 extern GTY(()) tree aarch64_bf16_type_node;
 extern GTY(()) tree aarch64_bf16_ptr_type_node;
 
+/* This type is the user-visible __float128 (on Mach-O), and a pointer to
+    that type.  Defined in aarch64-builtins.c.  */
+extern GTY(()) tree aarch64_float128_type_node;
+extern GTY(()) tree aarch64_float128_ptr_type_node;
+
 /* The generic unwind code in libgcc does not initialize the frame pointer.
    So in order to unwind a function using a frame pointer, the very first
    function that is unwound must save the frame pointer.  That way the frame
