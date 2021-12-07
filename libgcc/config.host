@@ -245,7 +245,6 @@ case ${host} in
   else
     echo "enable_darwin_at_rpath is '$enable_darwin_at_rpath'" 1>&2
   fi
-  tmake_file="$tmake_file t-slibgcc-darwin"
   case ${host} in
     *-*-darwin2* | *-*-darwin1[89]*)
       tmake_file="t-darwin-min-8 $tmake_file"
@@ -263,7 +262,7 @@ case ${host} in
       echo "Warning: libgcc configured to support macOS 10.5" 1>&2
       ;;
   esac
-  extra_parts="crt3.o libd10-uwfef.a crttms.o crttme.o libemutls_w.a"
+  extra_parts="crt3.o crttms.o crttme.o libemutls_w.a"
   ;;
 *-*-dragonfly*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip"
@@ -737,11 +736,13 @@ hppa*-*-netbsd*)
 i[34567]86-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
 	tm_file="$tm_file i386/darwin-lib.h"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 x86_64-*-darwin*)
 	tmake_file="$tmake_file i386/t-crtpc t-crtfm i386/t-msabi"
 	tm_file="$tm_file i386/darwin-lib.h"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crtprec32.o crtprec64.o crtprec80.o crtfastmath.o"
 	;;
 i[34567]86-*-elfiamcu)
@@ -1193,10 +1194,12 @@ powerpc-*-darwin*)
 	  ;;
 	esac
 	tmake_file="$tmake_file rs6000/t-ppc64-fp rs6000/t-ibm-ldouble"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crt2.o crt3_2.o libef_ppc.a dw_ppc.o"
 	;;
 powerpc64-*-darwin*)
 	tmake_file="$tmake_file rs6000/t-darwin64 rs6000/t-ibm-ldouble"
+	extra_parts="$extra_parts libd10-uwfef.a "
 	extra_parts="$extra_parts crt2.o crt3_2.o libef_ppc.a dw_ppc.o"
 	;;
 powerpc*-*-freebsd*)
