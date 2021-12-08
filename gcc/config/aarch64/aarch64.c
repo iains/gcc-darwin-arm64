@@ -19257,7 +19257,7 @@ aarch64_gimplify_va_arg_expr (tree valist, tree type, gimple_seq *pre_p,
 	    {
 	      /* Darwin has __float128, and long double is the same as
 		 double.  */
-	      field_t = aarch64_float128_type_node;
+	      field_t = float128_type_node;
 	      field_ptr_t = aarch64_float128_ptr_type_node;
 	    }
 	  else

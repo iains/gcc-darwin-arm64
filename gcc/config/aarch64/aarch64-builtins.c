@@ -729,8 +729,7 @@ tree aarch64_fp16_ptr_type_node = NULL_TREE;
 tree aarch64_bf16_type_node = NULL_TREE;
 tree aarch64_bf16_ptr_type_node = NULL_TREE;
 
-/* Back-end node type for __float128 on Mach-O, where it is not long double.  */
-tree aarch64_float128_type_node = NULL_TREE;
+/* Pointer to __float128 on Mach-O, where the 128b float is not long double.  */
 tree aarch64_float128_ptr_type_node = NULL_TREE;
 
 /* Wrapper around add_builtin_function.  NAME is the name of the built-in
@@ -1460,21 +1459,28 @@ aarch64_init_float128_types (void)
 {
   tree ftype, fndecl;
 
-  aarch64_float128_type_node = make_node (REAL_TYPE);
-  TYPE_PRECISION (aarch64_float128_type_node) = 128;
-  SET_TYPE_MODE (aarch64_float128_type_node, TFmode);
-  layout_type (aarch64_float128_type_node);
+  /* Populate the float128 node if it is not already done so that the FEs
+     know it is available.  */
+  if (float128_type_node == NULL_TREE)
+    {
+      float128_type_node = make_node (REAL_TYPE);
+      TYPE_PRECISION (float128_type_node) = 128;
+      SET_TYPE_MODE (float128_type_node, TFmode);
+      layout_type (float128_type_node);
+    }
 
-  lang_hooks.types.register_builtin_type (aarch64_float128_type_node, "__float128");
-  aarch64_float128_ptr_type_node = build_pointer_type (aarch64_float128_type_node);
+  lang_hooks.types.register_builtin_type (float128_type_node, "__float128");
+  aarch64_float128_ptr_type_node = build_pointer_type (float128_type_node);
 
-  ftype = build_function_type_list (aarch64_float128_type_node, NULL_TREE);
+  ftype = build_function_type_list (float128_type_node, NULL_TREE);
 
-  fndecl = aarch64_general_add_builtin ("__builtin_huge_valq", ftype, AARCH64_BUILTIN_HUGE_VALQ);
+  fndecl = aarch64_general_add_builtin ("__builtin_huge_valq", ftype,
+					AARCH64_BUILTIN_HUGE_VALQ);
   TREE_READONLY (fndecl) = 1;
   aarch64_builtin_decls[AARCH64_BUILTIN_HUGE_VALQ] = fndecl;
 
-  fndecl = aarch64_general_add_builtin ("__builtin_infq", ftype, AARCH64_BUILTIN_INFQ);
+  fndecl = aarch64_general_add_builtin ("__builtin_infq", ftype,
+					AARCH64_BUILTIN_INFQ);
   TREE_READONLY (fndecl) = 1;
   aarch64_builtin_decls[AARCH64_BUILTIN_INFQ] = fndecl;
 }
