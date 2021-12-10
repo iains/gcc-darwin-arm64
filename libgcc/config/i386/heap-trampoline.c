@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 14000
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 101400
 /* For pthread_jit_write_protect_np */
 #include <pthread.h>
 #endif
@@ -72,7 +72,7 @@ allocate_trampoline_page (void)
   page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
 	       MAP_ANON | MAP_PRIVATE, 0, 0);
 #elif __APPLE__
-# if  __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 140000
+# if  __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 101400
   page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
 	       MAP_ANON | MAP_PRIVATE | MAP_JIT, 0, 0);
 # else
@@ -127,7 +127,7 @@ __builtin_nested_func_ptr_created (void *chain, void *func, void **dst)
     = &tramp_ctrl_curr->trampolines[get_trampolines_per_page ()
 				    - tramp_ctrl_curr->free_trampolines];
 
-#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 140000
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 101400
   /* Disable write protection for the MAP_JIT regions in this thread (see
      https://developer.apple.com/documentation/apple-silicon/porting-just-in-time-compilers-to-apple-silicon) */
   pthread_jit_write_protect_np (0);
@@ -138,7 +138,7 @@ __builtin_nested_func_ptr_created (void *chain, void *func, void **dst)
   trampoline->fields.func_ptr = func;
   trampoline->fields.chain_ptr = chain;
 
-#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 140000
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 101400
   /* Re-enable write protection.  */
   pthread_jit_write_protect_np (1);
 #endif
