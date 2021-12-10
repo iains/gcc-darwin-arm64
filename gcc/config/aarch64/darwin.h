@@ -54,6 +54,10 @@ along with GCC; see the file COPYING3.  If not see
 #undef LONG_DOUBLE_TYPE_SIZE
 #define LONG_DOUBLE_TYPE_SIZE	64
 
+/* Disable custom function descriptors on Darwin, it breaks ABI.  */
+#undef AARCH64_CUSTOM_FUNCTION_TEST
+#define AARCH64_CUSTOM_FUNCTION_TEST 0
+
 /* Non-PIE executables are forbidden by the aarch64-darwin security model;
    remove the option from link-lines since they just produce a warning from
    ld64 and are then ignored anyway.  */
