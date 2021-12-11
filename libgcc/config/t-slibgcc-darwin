@@ -6,7 +6,6 @@ SHLIB_VERSTRING = -compatibility_version $(SHLIB_SO_MINVERSION) \
 		  -current_version $(SHLIB_SOVERSION)
 SHLIB_EXT = .dylib
 SHLIB_LC = -lSystem
-SHLIB_INSTALL_DIR = $(slibdir)
 
 SHLIB_MKMAP = $(srcdir)/mkmap-flat.awk
 SHLIB_MKMAP_OPTS = -v leading_underscore=1
@@ -68,7 +67,7 @@ EHS_INSTNAME = libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)
 libgcc_ehs$(SHLIB_EXT): $(LIBEHSOBJS) $(extra-parts)
 	mkdir -p $(MULTIDIR)
 	$(CC) $(LIBGCC2_CFLAGS) $(LDFLAGS) -dynamiclib -nodefaultlibs \
-	-install_name $(SHLIB_INSTALL_DIR)/$(EHS_INSTNAME) \
+	-install_name $(SHLIB_RPATH)/$(EHS_INSTNAME) \
 	-o $(MULTIDIR)/libgcc_ehs$(SHLIB_EXT) $(SHLIB_VERSTRING) \
 	$(LIBEHSOBJS) $(SHLIB_LC)
 
@@ -130,8 +129,8 @@ libgcc_s.1.dylib: all-multi libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT) \
 	    -o libgcc_s.1$(SHLIB_EXT)_T_$${mlib} \
 	    -Wl,-reexport_library,libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
 	    -Wl,-reexport_library,libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
-	    -install_name $(SHLIB_INSTALL_DIR)/libgcc_s.1.dylib \
-	    -compatibility_version 1 -current_version 1 ; \
+	    -install_name $(SHLIB_RPATH)/libgcc_s.1.dylib \
+	    -compatibility_version 1 -current_version 1.1 ; \
 	done
 	$(LIPO) -output libgcc_s.1$(SHLIB_EXT) -create libgcc_s.1$(SHLIB_EXT)_T*
 	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
@@ -150,8 +149,8 @@ libgcc_s.1.dylib: all-multi libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)
 	    -Wl,-reexport_library,libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
 	    -lSystem \
 	    -Wl,-reexported_symbols_list,$(srcdir)/config/darwin-unwind.ver \
-	    -install_name $(SHLIB_INSTALL_DIR)/libgcc_s.1.dylib \
-	    -compatibility_version 1 -current_version 1 ; \
+	    -install_name $(SHLIB_RPATH)/libgcc_s.1.dylib \
+	    -compatibility_version 1 -current_version 1.1 ; \
 	done
 	$(LIPO) -output libgcc_s.1$(SHLIB_EXT) -create libgcc_s.1$(SHLIB_EXT)_T*
 	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
