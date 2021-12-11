@@ -308,3 +308,7 @@ along with GCC; see the file COPYING3.  If not see
 #define CLEAR_INSN_CACHE(beg, end)				\
   extern void sys_icache_invalidate(void *start, size_t len);	\
   sys_icache_invalidate ((beg), (size_t)((end)-(beg)))
+
+/* Disable custom function descriptors for Darwin.  */
+#undef X86_CUSTOM_FUNCTION_TEST
+#define X86_CUSTOM_FUNCTION_TEST 0

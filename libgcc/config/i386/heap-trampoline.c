@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 14000
+/* For pthread_jit_write_protect_np */
+#include <pthread.h>
+#endif
+
 void *allocate_trampoline_page (void);
 int get_trampolines_per_page (void);
 struct tramp_ctrl_data *allocate_tramp_ctrl (struct tramp_ctrl_data *parent);
@@ -56,15 +61,27 @@ get_trampolines_per_page (void)
   return getpagesize() / sizeof(union ix86_trampoline);
 }
 
-static _Thread_local struct tramp_ctrl_data *tramp_ctrl_curr;// = NULL;
+static _Thread_local struct tramp_ctrl_data *tramp_ctrl_curr = NULL;
 
 void *
 allocate_trampoline_page (void)
 {
   void *page;
 
+#if defined(__gnu_linux__)
   page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
 	       MAP_ANON | MAP_PRIVATE, 0, 0);
+#elif __APPLE__
+# if  __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 140000
+  page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
+	       MAP_ANON | MAP_PRIVATE | MAP_JIT, 0, 0);
+# else
+  page = mmap (0, getpagesize (), PROT_WRITE | PROT_EXEC,
+	       MAP_ANON | MAP_PRIVATE, 0, 0);
+# endif
+#else
+  page = MAP_FAILED;
+#endif
 
   return page;
 }
@@ -110,10 +127,21 @@ __builtin_nested_func_ptr_created (void *chain, void *func, void **dst)
     = &tramp_ctrl_curr->trampolines[get_trampolines_per_page ()
 				    - tramp_ctrl_curr->free_trampolines];
 
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 140000
+  /* Disable write protection for the MAP_JIT regions in this thread (see
+     https://developer.apple.com/documentation/apple-silicon/porting-just-in-time-compilers-to-apple-silicon) */
+  pthread_jit_write_protect_np (0);
+#endif
+
   memcpy (trampoline->insns, trampoline_insns,
 	  sizeof(trampoline_insns));
   trampoline->fields.func_ptr = func;
   trampoline->fields.chain_ptr = chain;
+
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ > 140000
+  /* Re-enable write protection.  */
+  pthread_jit_write_protect_np (1);
+#endif
 
   tramp_ctrl_curr->free_trampolines -= 1;
 
