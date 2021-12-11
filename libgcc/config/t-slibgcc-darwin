@@ -69,7 +69,7 @@ $(LIBEHSOBJS): libgcc_tm.h
 libgcc_ehs$(SHLIB_EXT): $(LIBEHSOBJS)
 	mkdir -p $(MULTIDIR)
 	$(CC) $(LIBGCC2_CFLAGS) $(LDFLAGS) -dynamiclib -nodefaultlibs \
-	-install_name $(SHLIB_INSTALL_DIR)/$(EHS_INSTNAME) \
+	-install_name $(SHLIB_RPATH)/$(EHS_INSTNAME) \
 	-o $(MULTIDIR)/libgcc_ehs$(SHLIB_EXT) $(SHLIB_VERSTRING) \
 	$(LIBEHSOBJS) $(SHLIB_LC)
 
@@ -130,8 +130,8 @@ libgcc_s.1.dylib: libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT) libgcc_ehs.$(SHLIB_SOV
 	    -o libgcc_s.1$(SHLIB_EXT)_T_$${mlib} \
 	    -Wl,-reexport_library,libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
 	    -Wl,-reexport_library,libgcc_ehs.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
-	    -install_name $(SHLIB_INSTALL_DIR)/libgcc_s.1.dylib \
-	    -compatibility_version 1 -current_version 1 ; \
+	    -install_name $(SHLIB_RPATH)/libgcc_s.1.dylib \
+	    -compatibility_version 1 -current_version 1.1 ; \
 	done
 	$(LIPO) -output libgcc_s.1$(SHLIB_EXT) -create libgcc_s.1$(SHLIB_EXT)_T*
 	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
@@ -150,8 +150,8 @@ libgcc_s.1.dylib: libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)
 	    -Wl,-reexport_library,libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T_$${mlib} \
 	    -lSystem \
 	    -Wl,-reexported_symbols_list,$(srcdir)/config/darwin-unwind.ver \
-	    -install_name $(SHLIB_INSTALL_DIR)/libgcc_s.1.dylib \
-	    -compatibility_version 1 -current_version 1 ; \
+	    -install_name $(SHLIB_RPATH)/libgcc_s.1.dylib \
+	    -compatibility_version 1 -current_version 1.1 ; \
 	done
 	$(LIPO) -output libgcc_s.1$(SHLIB_EXT) -create libgcc_s.1$(SHLIB_EXT)_T*
 	rm libgcc_s.$(SHLIB_SOVERSION)$(SHLIB_EXT)_T*
