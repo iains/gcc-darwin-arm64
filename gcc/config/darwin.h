@@ -393,8 +393,8 @@ extern GTY(()) int darwin_ms_struct;
     DARWIN_NOPIE_SPEC \
     DARWIN_RDYNAMIC \
     DARWIN_NOCOMPACT_UNWIND \
-    "%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpath:%(darwin_rpaths)}}}} " \
-    "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath "
+    "%{!r:%{!nostdlib:%{!rpath:%{!nodefaultrpaths:%(darwin_rpaths)}}}}" \
+    "}}}}}}} %<pie %<no-pie %<rdynamic %<X %<rpath %<nodefaultrpaths "
 
 /* Spec that controls whether the debug linker is run automatically for
    a link step.  This needs to be done if there is a source file on the
