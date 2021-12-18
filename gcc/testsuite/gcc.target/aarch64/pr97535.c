@@ -13,4 +13,4 @@ void setRaw(const void *raw)
 
 /* At any optimization level this should be a function call
    and not inlined.  */
-/* { dg-final { scan-assembler "bl\tmemcpy" } } */
+/* { dg-final { scan-assembler "bl\t_*memcpy" } } */
