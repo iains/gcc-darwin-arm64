@@ -26,11 +26,12 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 
 /* Rounding mask and modes */
 
-#define FPCR_RM_MASK  0xc00000
-#define FE_TONEAREST  0x000000
-#define FE_UPWARD     0x400000
-#define FE_DOWNWARD   0x800000
-#define FE_TOWARDZERO 0xc00000
+#define FPCR_RM_MASK  0x0c00000
+#define FE_TONEAREST  0x0000000
+#define FE_UPWARD     0x0400000
+#define FE_DOWNWARD   0x0800000
+#define FE_TOWARDZERO 0x0c00000
+#define FE_MAP_FZ     0x1000000
 
 /* Exceptions */
 
@@ -301,22 +302,30 @@ support_fpu_rounding_mode (int mode __attribute__((unused)))
 int
 support_fpu_underflow_control (int kind __attribute__((unused)))
 {
-  /* Unsupported */
-  return 0;
+  /* Not supported for binary128.  */
+  return (kind == 4 || kind == 8) ? 1 : 0;
 }
 
 
 int
 get_fpu_underflow_mode (void)
 {
-  /* Unsupported */
-  return 0;
+  unsigned int fpcr = __builtin_aarch64_get_fpcr();
+
+  /* Return 0 for abrupt underflow (flush to zero), 1 for gradual underflow.  */
+  return (fpcr & FE_MAP_FZ) ? 0 : 1;
 }
 
 
 void
 set_fpu_underflow_mode (int gradual __attribute__((unused)))
 {
-  /* Unsupported */
-}
+  unsigned int fpcr = __builtin_aarch64_get_fpcr();
 
+  if (gradual)
+    fpcr &= ~FE_MAP_FZ;
+  else
+    fpcr |= FE_MAP_FZ;
+
+  __builtin_aarch64_set_fpcr(fpcr);
+}
