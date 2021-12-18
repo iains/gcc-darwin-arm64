@@ -110,6 +110,11 @@ along with GCC; see the file COPYING3.  If not see
 #undef TARGET_ASM_FILE_END
 #define TARGET_ASM_FILE_END darwin_file_end
 
+/* Darwin binds locally for PIC code (the default) without which
+   we lose many in-lineing opportunities.  */
+#undef TARGET_BINDS_LOCAL_P
+#define TARGET_BINDS_LOCAL_P darwin_binds_local_p
+
 /* Define the syntax of pseudo-ops, labels and comments.  */
 
 #ifdef HAVE_GAS_MAX_SKIP_P2ALIGN
