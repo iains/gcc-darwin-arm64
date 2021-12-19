@@ -1,4 +1,5 @@
 /* { dg-do assemble { target { aarch64*-*-* } } } */
+/* { dg-require-effective-target arm_v8_2a_i8mm_neon_hw } */
 /* { dg-require-effective-target arm_v8_2a_i8mm_ok } */
 /* { dg-add-options arm_v8_2a_i8mm }  */
 /* { dg-additional-options "-save-temps" } */
