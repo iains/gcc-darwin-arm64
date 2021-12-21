@@ -10329,7 +10329,9 @@ aarch64_classify_address (struct aarch64_address_info *info,
 	  if (SYMBOL_REF_P (sym)
 	      && offset.is_constant (&const_offset)
 	      && (aarch64_classify_symbol (sym, const_offset)
-		  == SYMBOL_SMALL_ABSOLUTE))
+		    == SYMBOL_SMALL_ABSOLUTE
+		  || aarch64_classify_symbol (sym, const_offset)
+		      == SYMBOL_MO_SMALL_PCR))
 	    {
 	      /* The symbol and offset must be aligned to the access size.  */
 	      unsigned int align;
@@ -18732,16 +18734,22 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 
 	  return SYMBOL_TINY_ABSOLUTE;
 
-
 	case AARCH64_CMODEL_SMALL_SPIC:
 	case AARCH64_CMODEL_SMALL_PIC:
-#if TARGET_MACHO
-	  return (MACHO_SYMBOL_INDIRECTION_P (x)
-		  || !MACHO_SYMBOL_DEFINED_P (x))
-		  ? SYMBOL_MO_SMALL_GOT
-		  : SYMBOL_MO_SMALL_PCR;
-#endif
 	case AARCH64_CMODEL_SMALL:
+#if TARGET_MACHO
+	  if (TARGET_MACHO)
+	    {
+	      /* Constant pool addresses are always TU-local and PC-
+		 relative.  We indirect common, external and weak
+		 symbols (but weak only if not hidden).  */
+	      if (!CONSTANT_POOL_ADDRESS_P (x)
+		  && (MACHO_SYMBOL_MUST_INDIRECT_P (x)
+		      || !aarch64_symbol_binds_local_p (x)))
+		return SYMBOL_MO_SMALL_GOT;
+	    }
+	  else
+#endif
 	  if ((flag_pic || SYMBOL_REF_WEAK (x))
 	      && !aarch64_symbol_binds_local_p (x))
 	    return aarch64_cmodel == AARCH64_CMODEL_SMALL_SPIC
@@ -18753,7 +18761,8 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 		|| offset_within_block_p (x, offset)))
 	    return SYMBOL_FORCE_TO_MEM;
 
-	  return SYMBOL_SMALL_ABSOLUTE;
+	  return TARGET_MACHO ? SYMBOL_MO_SMALL_PCR
+			      : SYMBOL_SMALL_ABSOLUTE;
 
 	case AARCH64_CMODEL_LARGE:
 	  /* This is alright even in PIC code as the constant
