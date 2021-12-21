@@ -26605,15 +26605,27 @@ aarch64_sls_emit_shared_blr_thunks (FILE *out_file)
 	continue;
 
       const char *name = indirect_symbol_names[regnum];
-      switch_to_section (get_named_section (decl, NULL, 0));
+      /* If the target uses a unique section for this switch to it.  */
+      if (DECL_SECTION_NAME (decl))
+	switch_to_section (get_named_section (decl, NULL, 0));
+      else
+	switch_to_section (text_section);
       ASM_OUTPUT_ALIGN (out_file, 2);
-      targetm.asm_out.globalize_label (out_file, name);
-      /* Only emits if the compiler is configured for an assembler that can
-	 handle visibility directives.  */
-      targetm.asm_out.assemble_visibility (decl, VISIBILITY_HIDDEN);
+      if (!TARGET_MACHO)
+	targetm.asm_out.globalize_label (out_file, name);
 #ifdef ASM_OUTPUT_TYPE_DIRECTIVE
       ASM_OUTPUT_TYPE_DIRECTIVE (out_file, name, "function");
 #endif
+      if (TARGET_MACHO)
+	{
+	  if (DECL_WEAK (decl))
+	    ASM_WEAKEN_DECL (out_file, decl, name, 0);
+	  else
+	    targetm.asm_out.globalize_decl_name (out_file, decl);
+	}
+      /* Only emits if the compiler is configured for an assembler that can
+	 handle visibility directives.  */
+      targetm.asm_out.assemble_visibility (decl, VISIBILITY_HIDDEN);
       ASM_OUTPUT_LABEL (out_file, name);
       aarch64_sls_emit_function_stub (out_file, regnum);
       /* Use the most conservative target to ensure it can always be used by any
