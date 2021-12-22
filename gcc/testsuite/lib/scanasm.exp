@@ -798,14 +798,14 @@ proc parse_MACHO_function_bodies { filename result } {
 
     # Regexp for the start of a function definition (name in \1).
     set label {^(_[a-zA-Z_]\S+):$}
+    set start {^LFB[0-9]+}
 
     # Regexp for the end of a function definition.
     set terminator {^LFE[0-9]+}
 
     # Regexp for lines that aren't interesting.
     set fluff {^\s*(?:\.|//|@)}
-    set fluff2 {^LFB[0-9]+}
-    set fluff3 {^L[SEA]}
+    set fluff3 {^L[0-9ACESV]}
 
     set fd [open $filename r]
     set in_function 0
@@ -813,11 +813,17 @@ proc parse_MACHO_function_bodies { filename result } {
 	if { !$in_function && [regexp $label $line dummy function_name] } {
 	    set in_function 1
 	    set function_body ""
-	} elseif { $in_function } {
+	} elseif { $in_function == 1 } {
+	  if { [regexp $start $line] } {
+	    set in_function 2
+	  } else {
+	    set in_function 0
+	  }
+	} elseif { $in_function == 2 } {
 	    if { [regexp $terminator $line] } {
 		set up_result($function_name) $function_body
 		set in_function 0
-	    } elseif { ![regexp $fluff $line] && ![regexp $fluff2 $line] && ![regexp $fluff3 $line] } {
+	    } elseif { ![regexp $fluff $line]  && ![regexp $fluff3 $line] } {
 		append function_body $line "\n"
 	    }
 	}
