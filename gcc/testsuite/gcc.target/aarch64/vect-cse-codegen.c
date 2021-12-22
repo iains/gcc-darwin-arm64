@@ -1,29 +1,18 @@
 /* { dg-do compile  { target { lp64 } } } */
 /* { dg-additional-options "-O3 -march=armv8.2-a+crypto -fno-schedule-insns -fno-schedule-insns2 -mcmodel=small" } */
-/* { dg-final { check-function-bodies "**" "" "" { target { le && { ! *-*-darwin* } } } } } */
-/* { dg-final { check-function-bodies "*M" "" "" { target { le && *-*-darwin* } } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
 
 #include <arm_neon.h>
 
 /*
 **test1:
-**	adrp	x[0-9]+, .LC[0-9]+
-**	ldr	q[0-9]+, \[x[0-9]+, #:lo12:.LC[0-9]+\]
+**	adrp	x[0-9]+, (.LC[0-9]+|lC[0-9]+@PAGE)
+**	ldr	q[0-9]+, \[x[0-9]+, #(:lo12:.LC[0-9]+|lC[0-9]+@PAGEOFF)\]
 **	add	v[0-9]+.2d, v[0-9]+.2d, v[0-9]+.2d
 **	str	q[0-9]+, \[x[0-9]+\]
 **	fmov	x[0-9]+, d[0-9]+
 **	orr	x[0-9]+, x[0-9]+, x[0-9]+
 **	ret
-
-*Mtest1:
-*M	adrp	x[0-9]+, lC[0-9]+@GOTPAGE
-*M	add	x[0-9]+, x[0-9]+, lC[0-9]+@PAGEOFF;momd
-*M	ldr	q[0-9]+, \[x[0-9]+\]
-*M	add	v[0-9]+.2d, v[0-9]+.2d, v[0-9]+.2d
-*M	str	q[0-9]+, \[x[0-9]+\]
-*M	fmov	x[0-9]+, d[0-9]+
-*M	orr	x[0-9]+, x[0-9]+, x[0-9]+
-*M	ret
 */
 
 uint64_t
@@ -38,23 +27,14 @@ test1 (uint64_t a, uint64x2_t b, uint64x2_t* rt)
 
 /*
 **test2:
-**	adrp	x[0-9]+, .LC[0-1]+
-**	ldr	q[0-9]+, \[x[0-9]+, #:lo12:.LC[0-9]+\]
+**	adrp	x[0-9]+, (.LC[0-1]+|lC[0-1]+@PAGE)
+**	ldr	q[0-9]+, \[x[0-9]+, #(:lo12:.LC[0-9]+|lC[0-9]+@PAGEOFF)\]
 **	add	v[0-9]+.2d, v[0-9]+.2d, v[0-9]+.2d
 **	str	q[0-9]+, \[x[0-9]+\]
 **	fmov	x[0-9]+, d[0-9]+
 **	orr	x[0-9]+, x[0-9]+, x[0-9]+
 **	ret
 
-*Mtest2:
-*M	adrp	x[0-9]+, lC[0-9]+@GOTPAGE
-*M	add	x[0-9]+, x[0-9]+, lC[0-9]+@PAGEOFF;momd
-*M	ldr	q[0-9]+, \[x[0-9]+\]
-*M	add	v[0-9]+.2d, v[0-9]+.2d, v[0-9]+.2d
-*M	str	q[0-9]+, \[x[0-9]+\]
-*M	fmov	x[0-9]+, d[0-9]+
-*M	orr	x[0-9]+, x[0-9]+, x[0-9]+
-*M	ret
 */
 
 uint64_t
@@ -69,23 +49,13 @@ test2 (uint64_t a, uint64x2_t b, uint64x2_t* rt)
 
 /*
 **test3:
-**	adrp	x[0-9]+, .LC[0-9]+
-**	ldr	q[0-9]+, \[x[0-9]+, #:lo12:.LC[0-9]+\]
+**	adrp	x[0-9]+, (.LC[0-9]+|lC[0-9]+@PAGE)
+**	ldr	q[0-9]+, \[x[0-9]+, #(:lo12:.LC[0-9]+|lC[0-9]+@PAGEOFF)\]
 **	add	v[0-9]+.4s, v[0-9]+.4s, v[0-9]+.4s
 **	str	q[0-9]+, \[x1\]
 **	fmov	w[0-9]+, s[0-9]+
 **	orr	w[0-9]+, w[0-9]+, w[0-9]+
 **	ret
-
-*Mtest3:
-*M	adrp	x[0-9]+, lC[0-9]+@GOTPAGE
-*M	add	x[0-9]+, x[0-9]+, lC[0-9]+@PAGEOFF;momd
-*M	ldr	q[0-9]+, \[x[0-9]+\]
-*M	add	v[0-9]+.4s, v[0-9]+.4s, v[0-9]+.4s
-*M	str	q[0-9]+, \[x1\]
-*M	fmov	w[0-9]+, s[0-9]+
-*M	orr	w[0-9]+, w[0-9]+, w[0-9]+
-*M	ret
 */
 
 uint32_t
@@ -112,20 +82,6 @@ test3 (uint32_t a, uint32x4_t b, uint32x4_t* rt)
 **	trn2	v[0-9]+.8b, v[0-9]+.8b, v[0-9]+.8b
 **	umov	w[0-9]+, v[0-9]+.h\[3\]
 **	ret
-
-*Mtest4:
-*M	ushr	v[0-9]+.16b, v[0-9]+.16b, 7
-*M	mov	x[0-9]+, 16512
-*M	movk	x[0-9]+, 0x1020, lsl 16
-*M	movk	x[0-9]+, 0x408, lsl 32
-*M	movk	x[0-9]+, 0x102, lsl 48
-*M	fmov	d[0-9]+, x[0-9]+
-*M	pmull	v[0-9]+.1q, v[0-9]+.1d, v[0-9]+.1d
-*M	dup	v[0-9]+.2d, v[0-9]+.d\[0\]
-*M	pmull2	v[0-9]+.1q, v[0-9]+.2d, v[0-9]+.2d
-*M	trn2	v[0-9]+.8b, v[0-9]+.8b, v[0-9]+.8b
-*M	umov	w[0-9]+, v[0-9]+.h\[3\]
-*M	ret
 */
 
 uint64_t
