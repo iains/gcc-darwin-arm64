@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-Ofast" } */
+/* { dg-skip-if "no system variant_pcs support" *-*-darwin* } */
 
 __attribute__ ((__simd__ ("notinbranch")))
 __attribute__ ((__nothrow__ , __leaf__ , __const__))
@@ -12,5 +13,5 @@ void bar(double * f, int n)
 		f[i] = foo(f[i]);
 }
 
-/* { dg-final { scan-assembler-not {\.variant_pcs\tfoo} } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\t_ZGVnN2v_foo} 1 } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?foo} } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?_ZGVnN2v_foo} 1 } } */
