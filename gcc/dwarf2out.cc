@@ -11479,6 +11479,16 @@ output_comdat_type_unit (comdat_type_node *node,
   targetm.asm_out.named_section (secname,
                                  SECTION_DEBUG | SECTION_LINKONCE,
                                  comdat_key);
+#elif defined (OBJECT_FORMAT_MACHO)
+  size_t bufsize = 19 + DWARF_TYPE_SIGNATURE_SIZE * 2;
+  tmp = XALLOCAVEC (char, bufsize);
+  snprintf (tmp, bufsize, "__DWARF,");
+  size_t pos = 8;
+  for (i = 0; i < DWARF_TYPE_SIGNATURE_SIZE; pos += 2, i++)
+    snprintf (tmp + pos, bufsize - pos, "%02x", node->signature[i] & 0xff);
+  snprintf (tmp + pos, bufsize - pos, ",coalesced");
+  secname = tmp;
+  switch_to_section (get_section (secname, SECTION_DEBUG, NULL));
 #else
   tmp = XALLOCAVEC (char, 18 + DWARF_TYPE_SIGNATURE_SIZE * 2);
   sprintf (tmp, (dwarf_version >= 5
