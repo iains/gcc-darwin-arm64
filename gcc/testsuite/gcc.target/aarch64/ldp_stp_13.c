@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-require-effective-target arm_mabi_ilp32 } */
 /* { dg-options "-O2 -mabi=ilp32" } */
 
 long long
