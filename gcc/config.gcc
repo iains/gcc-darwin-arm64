@@ -1078,10 +1078,11 @@ case ${target} in
   ;;
 esac
 
-# Figure out if we need to enable -foff-stack-trampolines by default
+# Defaults that need fixing.
 case ${target} in
-aarch64*-*darwin2*)
+aarch64*-*-darwin2*)
   tm_defines="$tm_defines STACK_USE_CUMULATIVE_ARGS_INIT=1"
+  tm_defines="$tm_defines OFF_STACK_TRAMPOLINES_INIT=1"
   ;;
 *-*-darwin2*)
   # Currently, we do this for macOS 11 and above.
@@ -1131,7 +1132,7 @@ aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
 	done
 	TM_MULTILIB_CONFIG=`echo $TM_MULTILIB_CONFIG | sed 's/^,//'`
 	;;
-aarch64-*-darwin* | arm64-*-darwin*)
+aarch64-*-darwin* )
 	tm_file="${tm_file} aarch64/aarch64-errata.h"
 	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-darwin"
 	tm_defines="${tm_defines} TARGET_DEFAULT_ASYNC_UNWIND_TABLES=1"
