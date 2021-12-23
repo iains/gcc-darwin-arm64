@@ -6859,6 +6859,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 		}
 	      pcum->aapcs_reg = par;
 	    }
+	  pcum->darwinpcs_stack_bytes = 0;
 	  return;
 	}
       else
@@ -6944,8 +6945,9 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 	    }
 	  pcum->aapcs_reg = par;
 	}
-
+//fprintf(stderr, "arg %d reg %d\n", pcum->darwinpcs_n_args_processed, pcum->aapcs_nextncrn);
       pcum->aapcs_nextncrn = ncrn + nregs;
+      pcum->darwinpcs_stack_bytes = 0;
       return;
     }
 
@@ -6974,6 +6976,7 @@ on_stack:
 	  * unnamed parms in variadic functions
 	  * complex types smaller than 4 bytes
 	 each get their own slot.  */
+
       if (!arg.named
 	  || TREE_CODE (type) == COMPLEX_TYPE
 	  || (TREE_CODE (type) == RECORD_TYPE
@@ -6985,25 +6988,39 @@ on_stack:
 	  pcum->darwinpcs_sub_word_pos = 0;
 	  /* We skip the re-alignment for 16byte things, since we currently
 	     assume that the darwinpcs doesn't force such alignment.  */
+//fprintf(stderr, "arg %d, forced new slot stack: %d size: %d\n", pcum->darwinpcs_n_args_processed,
+//	pcum->aapcs_stack_size, pcum->aapcs_stack_words);
 	  return;
 	}
 
-      if (pcum->darwinpcs_sub_word_pos == 0)
-	pcum->aapcs_stack_words = size / UNITS_PER_WORD;
-
-      int new_pos
+      /* Updated sub-word offset aligned for the new object.
+	 We are looking for the case that the new object will fit after some
+	 existing object(s) in the same stack slot.  In that case, we do not
+	 need to add any more stack space for it.  */
+      int new_off
 	= ROUND_UP (pcum->darwinpcs_sub_word_pos, align / BITS_PER_UNIT);
-      if (new_pos >= UNITS_PER_WORD)
+
+      if (new_off >= UNITS_PER_WORD)
 	{
-	  /* We are not catering for the possible 16byte alignment bump.  */
-	  pcum->aapcs_stack_words += 1;
-	  new_pos = 0;
+	  /* That exceeds a stack slot, start a new one.  */
+	  pcum->darwinpcs_sub_word_offset = 0;
+	  pcum->darwinpcs_sub_word_pos = 0;
+	  new_off = 0;
 	}
-      pcum->darwinpcs_sub_word_offset = new_pos;
-      new_pos += pcum->darwinpcs_stack_bytes;
-      if (new_pos > UNITS_PER_WORD)
-	pcum->aapcs_stack_words += new_pos / UNITS_PER_WORD;
-      pcum->darwinpcs_sub_word_pos = new_pos % UNITS_PER_WORD;
+      /* This is the end of the new object.  */
+      int new_pos = new_off + pcum->darwinpcs_stack_bytes;
+
+      if (pcum->darwinpcs_sub_word_pos == 0)
+	/* New stack slot, just allocate one or more words, and note where
+	  the next arg will start.  */
+	pcum->aapcs_stack_words = size / UNITS_PER_WORD;
+      else if (new_pos <= UNITS_PER_WORD)
+	/* Old stack slot, object starts at new_off and goes to new_pos, we do
+	   not add any stack space.  */
+	pcum->darwinpcs_sub_word_offset = new_off;
+      pcum->darwinpcs_sub_word_pos = new_pos;
+//fprintf(stderr, "arg %d, stack words: %d off: %d size: %d\n", pcum->darwinpcs_n_args_processed, pcum->aapcs_stack_size,
+//	pcum->darwinpcs_sub_word_offset, pcum->darwinpcs_stack_bytes);
       return;
     }
 
@@ -7064,6 +7081,7 @@ aarch64_init_cumulative_args (CUMULATIVE_ARGS *pcum,
   pcum->darwinpcs_stack_bytes = 0;
   pcum->darwinpcs_sub_word_offset = 0;
   pcum->darwinpcs_sub_word_pos = 0;
+  pcum->darwinpcs_stack_size = 0;
   pcum->darwinpcs_n_named = n_named;
   pcum->darwinpcs_n_args_processed = 0;
   pcum->silent_p = silent_p;
@@ -7188,15 +7206,31 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
 
 static unsigned int
 aarch64_function_arg_boundary_ca (machine_mode mode, const_tree type,
-				  cumulative_args_t ca)
+				  cumulative_args_t ca ATTRIBUTE_UNUSED)
 {
+  unsigned int abi_break;
+  unsigned int alignment = aarch64_function_arg_alignment (mode, type,
+							   &abi_break);
+#if TARGET_MACHO
   CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
   bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
-
   if (named_p)
-    return aarch64_function_arg_boundary (mode, type);
+    ; /* Leave the alignment as natural.  */
   else
-    return MAX (aarch64_function_arg_boundary (mode, type), PARM_BOUNDARY);
+    alignment = MAX (alignment, PARM_BOUNDARY);
+  return MIN (alignment, STACK_BOUNDARY);
+#else
+  alignment = MIN (MAX (alignment, PARM_BOUNDARY), STACK_BOUNDARY);
+  if (abi_break & warn_psabi)
+    {
+      abi_break = MIN (MAX (abi_break, PARM_BOUNDARY), STACK_BOUNDARY);
+      if (alignment != abi_break)
+	inform (input_location, "parameter passing for argument of type "
+		"%qT changed in GCC 9.1", type);
+    }
+
+  return alignment;
+#endif
 }
 
 #if TARGET_MACHO
@@ -7211,21 +7245,30 @@ aarch64_function_arg_round_boundary (machine_mode, const_tree)
 }
 
 static unsigned int
-aarch64_function_arg_round_boundary_ca (machine_mode mode, const_tree type,
+aarch64_function_arg_round_boundary_ca (machine_mode /*mode*/,
+					const_tree /*type*/,
 					cumulative_args_t ca)
 {
   CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
   bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
   bool last_named_p = pcum->darwinpcs_n_args_processed + 1 == pcum->darwinpcs_n_named;
 
-  if (named_p)
+  if (last_named_p && pcum->darwinpcs_sub_word_pos > 0)
     {
-      if (last_named_p)
+      /* Round the last named arg to the start of the next stack slot.  */
+      if (pcum->darwinpcs_sub_word_pos <= 4)
 	return PARM_BOUNDARY;
-      else
-	return aarch64_function_arg_round_boundary (mode, type);
+      else if (pcum->darwinpcs_sub_word_pos <= 6)
+	return 4 * BITS_PER_UNIT;
+      else if (pcum->darwinpcs_sub_word_pos <= 7)
+	return 2 * BITS_PER_UNIT;
+      return BITS_PER_UNIT;
     }
+  else if (named_p)
+    /* Named args are naturally aligned, but with no rounding.  */
+    return BITS_PER_UNIT;
   else
+    /* un-named args are rounded to fill slots.  */
     return PARM_BOUNDARY;
 }
 
@@ -19398,7 +19441,7 @@ aarch64_setup_incoming_varargs (cumulative_args_t cum_v,
   int vr_saved = cfun->va_list_fpr_size;
 
   if (TARGET_MACHO)
-    return;
+    return default_setup_incoming_varargs (cum_v, arg, pretend_size, no_rtl);
 
   /* The caller has advanced CUM up to, but not beyond, the last named
      argument.  Advance a local copy of CUM past the last "real" named
