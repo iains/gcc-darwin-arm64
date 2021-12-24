@@ -101,4 +101,4 @@ neg2(unsigned a, unsigned b, unsigned c)
   return a ? -b : c;
 }
 
-/* { dg-final { check-function-bodies "**" "" "" { target { ! aarch64*-*-darwin* } } } } */
+/* { dg-final { check-function-bodies "**" "" "" } } */
