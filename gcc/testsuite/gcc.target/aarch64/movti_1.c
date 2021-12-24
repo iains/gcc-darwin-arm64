@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O" } */
-/* { dg-final { check-function-bodies "**" "" "" { target { lp64 && { ! aarch64*-*-darwin* } } } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
 
 /*
 ** zero_q:
