@@ -1,5 +1,4 @@
 /* { dg-do compile } */
-/* { dg-skip-if "No Float128" { arm64*-*-darwin* aarch64*-*-darwin* } { "" } { "" } } */
 /* { dg-options "-O" } */
 /* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
 
