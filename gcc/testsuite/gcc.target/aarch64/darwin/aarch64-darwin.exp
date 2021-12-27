@@ -20,9 +20,9 @@
 
 # GCC testsuite that uses the `dg.exp' driver.
 
-# Exit immediately if this isn't an AArch64 target or we are not testing
-# darwin.
-if {![istarget aarch64*-*-*] || ![istarget *-*-darwin*]  } then {
+# Exit immediately if this isn't aarch64-darwin.
+
+if { ![istarget aarch64*-*-darwin*] } then {
   return
 }
 
