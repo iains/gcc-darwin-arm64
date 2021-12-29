@@ -2,7 +2,7 @@
 /* we need this for __int128.  */
 /* { dg-options "-std=gnu99 " } */
 /* { dg-additional-options "-O -fno-schedule-insns -fno-schedule-insns2 " } */
-/* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target *-*-darwin* } } } */
 
 /* we should use x0, x1 and x2 - not skip x1.
 **foo:
