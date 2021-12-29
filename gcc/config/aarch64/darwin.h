@@ -209,6 +209,18 @@ along with GCC; see the file COPYING3.  If not see
 #undef TARGET_ASM_OUTPUT_IDENT
 #define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
 
+/* Darwin has experimental support for section anchors on aarch64*; it is
+   not enabled by default (the -fsection-anchors is required).  */
+
+#undef TARGET_ASM_OUTPUT_ANCHOR 
+#define TARGET_ASM_OUTPUT_ANCHOR darwin_asm_output_anchor
+
+#undef TARGET_USE_ANCHORS_FOR_SYMBOL_P
+#define TARGET_USE_ANCHORS_FOR_SYMBOL_P darwin_use_anchors_for_symbol_p
+
+#undef DARWIN_SECTION_ANCHORS
+#define DARWIN_SECTION_ANCHORS 1
+
 /* Pull in the stuff common to all Darwin-based platforms.  */
 #define C_COMMON_OVERRIDE_OPTIONS				\
   do {								\
