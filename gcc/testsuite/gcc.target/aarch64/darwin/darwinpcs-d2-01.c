@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-additional-options " -O -fno-schedule-insns -fno-schedule-insns2 " } */
-/* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target *-*-darwin* } } } */
 
 /* In each case we consume the parm registers with 8 ints, forcing
    the test values to be spilled to the stack.  */
@@ -32,9 +32,10 @@
 **	...
 */
 
-void c_s_packing (int a, int b, int c, int d, int e, int f, int g, int h,
-		   char i, short j, char k, short l,
-		   char m);
+__attribute__((__noinline__)) void
+c_s_packing (int a, int b, int c, int d, int e, int f, int g, int h,
+	     char i, short j, char k, short l,
+	     char m);
 
 void call_c_s_packing (void)
 {
@@ -67,9 +68,10 @@ void call_c_s_packing (void)
 **	...
 */
 
-void s_c_packing (int a, int b, int c, int d, int e, int f, int g, int h,
-		   short i, char j, short k, char l,
-		   char m);
+__attribute__((__noinline__)) void
+s_c_packing (int a, int b, int c, int d, int e, int f, int g, int h,
+	     short i, char j, short k, char l,
+	     char m);
 
 void call_s_c_packing (void)
 {
@@ -102,8 +104,9 @@ void call_s_c_packing (void)
 **	...
 */
 
-void csi_packing (int a, int b, int c, int d, int e, int f, int g, int h,
-		   char i, short j, int k, char l);
+__attribute__((__noinline__)) void
+csi_packing (int a, int b, int c, int d, int e, int f, int g, int h,
+	     char i, short j, int k, char l);
 
 void call_csi_packing (void)
 {
