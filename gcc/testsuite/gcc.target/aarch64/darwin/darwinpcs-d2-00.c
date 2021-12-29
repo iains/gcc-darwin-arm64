@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-additional-options " -O -fno-schedule-insns -fno-schedule-insns2 " } */
-/* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target *-*-darwin* } } } */
 
 /* In each case we consume the parm registers with 8 ints, forcing
    the test values to be spilled to the stack.  */
@@ -41,10 +41,11 @@
 **	...
 */
 
-void char_packing (int a, int b, int c, int d, int e, int f, int g, int h,
-		   char i, char j, char k, char l,
-		   char m, char n, char o, char p,
-		   char q);
+__attribute__((__noinline__)) void
+char_packing (int a, int b, int c, int d, int e, int f, int g, int h,
+	      char i, char j, char k, char l,
+	      char m, char n, char o, char p,
+	      char q);
 
 void call_char_packing (void)
 {
@@ -79,7 +80,8 @@ void call_char_packing (void)
 **	...
 */
 
-void short_packing (int a, int b, int c, int d, int e, int f, int g, int h,
+__attribute__((__noinline__)) void
+short_packing (int a, int b, int c, int d, int e, int f, int g, int h,
 		    short i, short j, short k, short l,
 		    short m);
 
@@ -112,8 +114,9 @@ void call_short_packing (void)
 **	...
 */
 
-void int_packing (int a, int b, int c, int d, int e, int f, int g, int h,
-		  int i, int j, int k);
+__attribute__((__noinline__)) void
+int_packing (int a, int b, int c, int d, int e, int f, int g, int h,
+	     int i, int j, int k);
 
 void call_int_packing (void)
 {
