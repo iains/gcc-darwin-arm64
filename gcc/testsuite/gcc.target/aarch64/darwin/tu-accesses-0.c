@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O -fcommon -mno-pc-relative-literal-loads" } */
-/* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target *-*-darwin* } } } */
 
 /* This checks that we perform the correct accesses for file-scope vars
    including GOT indirections.  */
