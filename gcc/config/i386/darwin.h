@@ -308,3 +308,10 @@ along with GCC; see the file COPYING3.  If not see
 #define CLEAR_INSN_CACHE(beg, end)				\
   extern void sys_icache_invalidate(void *start, size_t len);	\
   sys_icache_invalidate ((beg), (size_t)((end)-(beg)))
+
+/* Disable custom function descriptors for Darwin when we have off-stack
+   trampolines.  */
+#undef X86_CUSTOM_FUNCTION_TEST
+#define X86_CUSTOM_FUNCTION_TEST \
+  (!flag_off_stack_trampolines && !flag_trampolines) ? 1 : 0
+
