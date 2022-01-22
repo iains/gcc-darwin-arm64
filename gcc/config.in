@@ -224,6 +224,13 @@
 #endif
 
 
+/* Define if you build Position Independent Executables for the compilers and
+   other tools. */
+#ifndef USED_FOR_TARGET
+#undef ENABLE_PIE_TOOLS
+#endif
+
+
 /* Define to enable plugin support. */
 #ifndef USED_FOR_TARGET
 #undef ENABLE_PLUGIN
@@ -2205,6 +2212,12 @@
 /* Define if O_CLOEXEC supported by fcntl. */
 #ifndef USED_FOR_TARGET
 #undef HOST_HAS_O_CLOEXEC
+#endif
+
+
+/* Define which stat syscall is able to handle 64bit indodes. */
+#ifndef USED_FOR_TARGET
+#undef HOST_STAT_FOR_64BIT_INODES
 #endif
 
 
