@@ -654,6 +654,7 @@ build
 with_aix_soname
 enable_vtable_verify
 enable_gcov
+off_stack_trampolines
 enable_shared
 libgcc_topdir
 target_alias
@@ -701,6 +702,7 @@ with_target_subdir
 with_cross_host
 with_ld
 enable_shared
+enable_off_stack_trampolines
 enable_gcov
 enable_vtable_verify
 with_aix_soname
@@ -1342,6 +1344,9 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --disable-shared        don't provide a shared libgcc
+  --enable-off-stack-trampolines
+                  Specify whether to support generating off-stack trampolines
+
   --disable-gcov          don't provide libgcov and related host tools
   --enable-vtable-verify    Enable vtable verification feature
   --enable-version-specific-runtime-libs    Specify that runtime libraries should be installed in a compiler-specific directory
@@ -2248,6 +2253,39 @@ if test "${enable_shared+set}" = set; then :
 
 else
   enable_shared=yes
+fi
+
+
+
+# Check whether --enable-off-stack-trampolines was given.
+if test "${enable_off_stack_trampolines+set}" = set; then :
+  enableval=$enable_off_stack_trampolines;
+case "$target" in
+  x86_64-*-linux* | x86_64-*-darwin1[4-9]* | x86_64-*-darwin2*)
+    off_stack_trampolines=$enableval
+    ;;
+  aarch64*-*-linux* )
+    off_stack_trampolines=$enableval
+    ;;
+  aarch64*-*darwin* )
+    off_stack_trampolines=$enableval
+    ;;
+  *)
+    as_fn_error $? "Configure option --enable-off-stack-trampolines is not supported \
+for this platform" "$LINENO" 5
+    off_stack_trampolines=no
+    ;;
+esac
+else
+
+case "$target" in
+  *-*-darwin2*)
+    off_stack_trampolines=yes
+    ;;
+  *)
+    off_stack_trampolines=no
+    ;;
+esac
 fi
 
 
