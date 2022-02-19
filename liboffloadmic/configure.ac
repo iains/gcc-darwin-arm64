@@ -118,9 +118,12 @@ esac
 
 AC_LIBTOOL_DLOPEN
 AM_PROG_LIBTOOL
+AM_CONDITIONAL([ENABLE_DARWIN_AT_RPATH], [test x$enable_darwin_at_rpath = xyes])
+
 # Forbid libtool to hardcode RPATH, because we want to be able to specify
 # library search directory using LD_LIBRARY_PATH
 hardcode_into_libs=no
+
 AC_SUBST(toolexecdir)
 AC_SUBST(toolexeclibdir)
 
