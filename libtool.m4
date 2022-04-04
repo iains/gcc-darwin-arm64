@@ -1048,7 +1048,7 @@ m4_defun([_LT_DARWIN_LINKER_FEATURES],
   # configuring can override the defaults for any system version that supports
   # them - they are, however, forced off for system versions without support.
   AC_ARG_ENABLE([darwin-at-rpath],
-    AS_HELP_STRING([--enable-darwin-at-path],
+    AS_HELP_STRING([--enable-darwin-at-rpath],
       [install libraries with @rpath/library-name, requires rpaths to be added to executables]),
   [if test "x$enable_darwin_at_rpath" = "xyes"; then
     # This is not supported before macOS 10.5 / Darwin9.
