@@ -62,11 +62,3 @@ AC_DEFUN([_AM_SUBST_NOTMAKE])
 # Public sister of _AM_SUBST_NOTMAKE.
 AC_DEFUN([AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE($@)])
 
-m4_include([../config/acx.m4])
-m4_include([../config/cet.m4])
-m4_include([../config/enable.m4])
-m4_include([../config/no-executables.m4])
-m4_include([../config/override.m4])
-m4_include([../config/picflag.m4])
-m4_include([../config/warnings.m4])
-m4_include([acinclude.m4])
