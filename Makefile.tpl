@@ -115,6 +115,9 @@ GCC_SHLIB_SUBDIR = @GCC_SHLIB_SUBDIR@
 # If the build should make suitable code for shared host resources.
 host_shared = @host_shared@
 
+# If we should build compilers and supporting tools as PIE.
+enable_pie_tools = @enable_pie_tools@
+
 # Build programs are put under this directory.
 BUILD_SUBDIR = @build_subdir@
 # This is set by the configure script to the arguments to use when configuring
