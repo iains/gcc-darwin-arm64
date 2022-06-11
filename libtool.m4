@@ -1068,7 +1068,7 @@ m4_defun([_LT_DARWIN_LINKER_FEATURES],
     # We cannot build and test reliably on macOS 10.11+ (Darwin15+) without use
     # of rpaths, since runpaths set via DYLD_LIBRARY_PATH are elided by key
     # system executables (e.g. /bin/sh).  Force rpaths on for these systems.
-      UNSET,darwin1[[56789]]*|UNSET,darwin2*|10.1[[123456789]][[,.]]*|1[[12]].*[[,.]]* )
+      UNSET,darwin1[[56789]]*|UNSET,darwin2*|10.1[[123456789]][[,.]]*|1[[123456789]].*[[,.]]* )
       echo "@rpath library names are needed on macOS versions later than 10.11 (rpaths enabled)" 1>&AS_MESSAGE_LOG_FD
       enable_darwin_at_rpath=yes
       ;;
