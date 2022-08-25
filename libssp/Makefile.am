@@ -50,7 +50,7 @@ libssp_la_SOURCES = \
 libssp_la_LIBADD = 
 libssp_la_DEPENDENCIES = $(version_dep) $(libssp_la_LIBADD)
 if ENABLE_DARWIN_AT_RPATH
-libssp_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths
+libssp_darwin_rpath = -Wc,-nodefaultrpaths
 libssp_darwin_rpath += -Wl,-rpath,@loader_path
 endif
 libssp_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` \

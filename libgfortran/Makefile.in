@@ -91,7 +91,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_1 = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_1 = -Wc,-nodefaultrpaths \
 @ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 @LIBGFOR_MINIMAL_TRUE@am__append_2 = -DLIBGFOR_MINIMAL
 @LIBGFOR_MINIMAL_FALSE@am__append_3 = \

@@ -185,7 +185,6 @@ case "${host}" in
     # obsolete.
     extra_ldflags_libobjc='$(lt_host_flags)'
     if test "x$enable_darwin_at_rpath" = "xyes"; then
-      extra_ldflags_libobjc="${extra_ldflags_libobjc} -Wc,-nodefaultexport"
       extra_ldflags_libobjc="${extra_ldflags_libobjc} -Wc,-nodefaultrpaths"
       extra_ldflags_libobjc="${extra_ldflags_libobjc} -Wl,-rpath,@loader_path"
     fi

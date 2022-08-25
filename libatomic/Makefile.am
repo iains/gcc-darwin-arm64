@@ -66,7 +66,7 @@ libatomic_version_dep =
 endif
 libatomic_version_info = -version-info $(libtool_VERSION)
 if ENABLE_DARWIN_AT_RPATH
-libatomic_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths
+libatomic_darwin_rpath = -Wc,-nodefaultrpaths
 libatomic_darwin_rpath += -Wl,-rpath,@loader_path
 endif
 

@@ -481,7 +481,8 @@ libitm_version_info = -version-info $(libtool_VERSION)
 # want or need libstdc++.
 libitm_la_DEPENDENCIES = $(libitm_version_dep)
 libitm_la_LINK = $(LINK) $(libitm_la_LDFLAGS)
-@ENABLE_DARWIN_AT_RPATH_TRUE@libitm_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@libitm_darwin_rpath =  \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wc,-nodefaultrpaths \
 @ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 libitm_la_LDFLAGS = $(libitm_version_info) $(libitm_version_script) \
   $(libitm_darwin_rpath)

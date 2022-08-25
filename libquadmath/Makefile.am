@@ -38,7 +38,7 @@ toolexeclib_LTLIBRARIES = libquadmath.la
 libquadmath_la_LIBADD = 
 
 if ENABLE_DARWIN_AT_RPATH
-libquadmath_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths
+libquadmath_darwin_rpath = -Wc,-nodefaultrpaths
 libquadmath_darwin_rpath += -Wl,-rpath,@loader_path
 endif
 libquadmath_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` \

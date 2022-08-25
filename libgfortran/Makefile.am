@@ -39,7 +39,7 @@ version_dep =
 endif
 extra_darwin_ldflags_libgfortran = @extra_ldflags_libgfortran@
 if ENABLE_DARWIN_AT_RPATH
-extra_darwin_ldflags_libgfortran += -Wc,-nodefaultexport,-nodefaultrpaths 
+extra_darwin_ldflags_libgfortran += -Wc,-nodefaultrpaths 
 extra_darwin_ldflags_libgfortran += -Wl,-rpath,@loader_path
 endif
 

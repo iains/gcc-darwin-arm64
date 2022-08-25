@@ -140,7 +140,7 @@ libstdc___la_DEPENDENCIES = \
 	$(top_builddir)/src/c++20/libc++20convenience.la
 
 if ENABLE_DARWIN_AT_RPATH
-libstdc___darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths
+libstdc___darwin_rpath = -Wc,-nodefaultrpaths
 libstdc___darwin_rpath += -Wl,-rpath,@loader_path
 endif
 
