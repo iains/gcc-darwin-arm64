@@ -90,9 +90,12 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 @DARWIN_DYNAMIC_LOOKUP_TRUE@am__append_1 = -Wl,-undefined,dynamic_lookup
-@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_2 = -nodefaultrpaths -Wl,-rpath,@loader_path
-@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_3 = -nodefaultrpaths -Wl,-rpath,@loader_path
-@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_4 = -nodefaultrpaths -Wl,-rpath,@loader_path
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_2 = -Wc,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_3 = -Wc,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_4 = -Wc,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../config/acx.m4 \
