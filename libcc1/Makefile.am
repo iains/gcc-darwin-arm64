@@ -56,7 +56,8 @@ marshall_cxx_source = marshall-cp.hh
 
 libcc1plugin_la_LDFLAGS = -module -export-symbols $(srcdir)/libcc1plugin.sym
 if ENABLE_DARWIN_AT_RPATH
-libcc1plugin_la_LDFLAGS += -nodefaultrpaths -Wl,-rpath,@loader_path
+libcc1plugin_la_LDFLAGS += -Wc,-nodefaultrpaths
+libcc1plugin_la_LDFLAGS += -Wl,-rpath,@loader_path
 endif
 libcc1plugin_la_SOURCES = libcc1plugin.cc context.cc context.hh \
 	$(shared_source) $(marshall_c_source)
@@ -69,7 +70,8 @@ libcc1plugin_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 
 libcp1plugin_la_LDFLAGS = -module -export-symbols $(srcdir)/libcp1plugin.sym
 if ENABLE_DARWIN_AT_RPATH
-libcp1plugin_la_LDFLAGS += -nodefaultrpaths -Wl,-rpath,@loader_path
+libcp1plugin_la_LDFLAGS += -Wc,-nodefaultrpaths
+libcp1plugin_la_LDFLAGS += -Wl,-rpath,@loader_path
 endif
 libcp1plugin_la_SOURCES = libcp1plugin.cc context.cc context.hh \
 	$(shared_source) $(marshall_cxx_source)
@@ -83,7 +85,8 @@ libcp1plugin_la_LINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) \
 LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS))
 libcc1_la_LDFLAGS = -module -export-symbols $(srcdir)/libcc1.sym
 if ENABLE_DARWIN_AT_RPATH
-libcc1_la_LDFLAGS += -nodefaultrpaths -Wl,-rpath,@loader_path
+libcc1_la_LDFLAGS += -Wc,-nodefaultrpaths
+libcc1_la_LDFLAGS += -Wl,-rpath,@loader_path
 endif
 libcc1_la_SOURCES = findcomp.cc libcc1.cc libcp1.cc \
 		compiler.cc compiler.hh names.cc names.hh $(shared_source) \
