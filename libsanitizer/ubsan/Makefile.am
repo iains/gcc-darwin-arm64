@@ -37,7 +37,8 @@ libubsan_la_LIBADD += $(top_builddir)/libbacktrace/libsanitizer_libbacktrace.la
 endif
 libubsan_la_LIBADD += $(LIBSTDCXX_RAW_CXX_LDFLAGS)
 if ENABLE_DARWIN_AT_RPATH
-libubsan_darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+libubsan_darwin_rpath = -Wc,-nodefaultrpaths
+libubsan_darwin_rpath += -Wl,-rpath,@loader_path
 endif
 libubsan_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` \
 	$(link_libubsan) $(libubsan_darwin_rpath)
