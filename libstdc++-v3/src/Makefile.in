@@ -553,7 +553,8 @@ libstdc___la_DEPENDENCIES = \
 	$(top_builddir)/src/c++17/libc++17convenience.la \
 	$(top_builddir)/src/c++20/libc++20convenience.la
 
-@ENABLE_DARWIN_AT_RPATH_TRUE@libstdc___darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+@ENABLE_DARWIN_AT_RPATH_TRUE@libstdc___darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 libstdc___la_LDFLAGS = \
 	-version-info $(libtool_VERSION) ${version_arg} -lm $(libstdc___darwin_rpath)
 

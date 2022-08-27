@@ -403,7 +403,8 @@ noinst_LTLIBRARIES = libatomic_convenience.la
 @LIBAT_BUILD_VERSIONED_SHLIB_GNU_TRUE@@LIBAT_BUILD_VERSIONED_SHLIB_TRUE@libatomic_version_dep = $(top_srcdir)/libatomic.map
 @LIBAT_BUILD_VERSIONED_SHLIB_SUN_TRUE@@LIBAT_BUILD_VERSIONED_SHLIB_TRUE@libatomic_version_dep = libatomic.map-sun
 libatomic_version_info = -version-info $(libtool_VERSION)
-@ENABLE_DARWIN_AT_RPATH_TRUE@libatomic_darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+@ENABLE_DARWIN_AT_RPATH_TRUE@libatomic_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 libatomic_la_LDFLAGS = $(libatomic_version_info) $(libatomic_version_script) \
 	$(lt_host_flags) $(libatomic_darwin_rpath) 
 

@@ -400,7 +400,8 @@ libubsan_la_SOURCES = $(ubsan_files)
 libubsan_la_LIBADD =  \
 	$(top_builddir)/sanitizer_common/libsanitizer_common.la \
 	$(am__append_1) $(am__append_2) $(LIBSTDCXX_RAW_CXX_LDFLAGS)
-@ENABLE_DARWIN_AT_RPATH_TRUE@libubsan_darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+@ENABLE_DARWIN_AT_RPATH_TRUE@libubsan_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 libubsan_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` \
 	$(link_libubsan) $(libubsan_darwin_rpath)
 

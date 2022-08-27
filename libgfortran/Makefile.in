@@ -91,9 +91,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_1 = -nodefaultrpaths \
-@ENABLE_DARWIN_AT_RPATH_TRUE@	-nodefaultexport \
-@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path/
+@ENABLE_DARWIN_AT_RPATH_TRUE@am__append_1 = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 @LIBGFOR_MINIMAL_TRUE@am__append_2 = -DLIBGFOR_MINIMAL
 @LIBGFOR_MINIMAL_FALSE@am__append_3 = \
 @LIBGFOR_MINIMAL_FALSE@io/close.c \
@@ -697,8 +696,7 @@ dvidir = @dvidir@
 enable_shared = @enable_shared@
 enable_static = @enable_static@
 exec_prefix = @exec_prefix@
-extra_ldflags_libgfortran = @extra_ldflags_libgfortran@ \
-	$(am__append_1)
+extra_ldflags_libgfortran = @extra_ldflags_libgfortran@
 get_gcc_base_ver = @get_gcc_base_ver@
 host = @host@
 host_alias = @host_alias@
@@ -753,6 +751,8 @@ gcc_version := $(shell @get_gcc_base_ver@ $(top_srcdir)/../gcc/BASE-VER)
 @LIBGFOR_USE_SYMVER_FALSE@version_dep = 
 @LIBGFOR_USE_SYMVER_GNU_TRUE@@LIBGFOR_USE_SYMVER_TRUE@version_dep = gfortran.ver
 @LIBGFOR_USE_SYMVER_SUN_TRUE@@LIBGFOR_USE_SYMVER_TRUE@version_dep = gfortran.ver-sun gfortran.ver
+extra_darwin_ldflags_libgfortran = @extra_ldflags_libgfortran@ \
+	$(am__append_1)
 gfor_c_HEADERS = ISO_Fortran_binding.h
 gfor_cdir = $(libdir)/gcc/$(target_alias)/$(gcc_version)/include
 LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS)) \
@@ -764,7 +764,7 @@ libgfortran_la_LINK = $(LINK) $(libgfortran_la_LDFLAGS)
 libgfortran_la_LDFLAGS = -version-info `grep -v '^\#' $(srcdir)/libtool-version` \
 	$(LTLDFLAGS) $(LIBQUADLIB) ../libbacktrace/libbacktrace.la \
 	$(HWCAP_LDFLAGS) \
-	$(LIBM) $(extra_ldflags_libgfortran) \
+	$(LIBM) $(extra_darwin_ldflags_libgfortran) \
 	$(version_arg) -Wc,-shared-libgcc
 
 libgfortran_la_DEPENDENCIES = $(version_dep) libgfortran.spec $(LIBQUADLIB_DEP)

@@ -56,7 +56,8 @@ endif
 
 libgomp_version_info = -version-info $(libtool_VERSION)
 if ENABLE_DARWIN_AT_RPATH
-libgomp_darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+libgomp_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths
+libgomp_darwin_rpath += -Wl,-rpath,@loader_path
 endif
 libgomp_la_LDFLAGS = $(libgomp_version_info) $(libgomp_version_script) \
         $(lt_host_flags) $(libgomp_darwin_rpath)

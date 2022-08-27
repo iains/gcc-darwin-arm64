@@ -534,7 +534,8 @@ nodist_toolexeclib_HEADERS = libgomp.spec
 @LIBGOMP_BUILD_VERSIONED_SHLIB_GNU_TRUE@@LIBGOMP_BUILD_VERSIONED_SHLIB_TRUE@libgomp_version_dep = libgomp.ver
 @LIBGOMP_BUILD_VERSIONED_SHLIB_SUN_TRUE@@LIBGOMP_BUILD_VERSIONED_SHLIB_TRUE@libgomp_version_dep = libgomp.ver-sun
 libgomp_version_info = -version-info $(libtool_VERSION)
-@ENABLE_DARWIN_AT_RPATH_TRUE@libgomp_darwin_rpath = -nodefaultrpaths -Wl,-rpath,@loader_path/
+@ENABLE_DARWIN_AT_RPATH_TRUE@libgomp_darwin_rpath = -Wc,-nodefaultexport,-nodefaultrpaths \
+@ENABLE_DARWIN_AT_RPATH_TRUE@	-Wl,-rpath,@loader_path
 libgomp_la_LDFLAGS = $(libgomp_version_info) $(libgomp_version_script) \
         $(lt_host_flags) $(libgomp_darwin_rpath)
 
