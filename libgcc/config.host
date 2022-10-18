@@ -272,7 +272,10 @@ case ${host} in
       echo "Warning: libgcc configured to support macOS 10.5" 1>&2
       ;;
   esac
-  extra_parts="crt3.o crttms.o crttme.o libemutls_w.a"
+  extra_parts="crt3.o crttms.o crttme.o"
+  if test x$enable_shared = xyes; then
+    extra_parts="$extra_parts libemutls_w.a"
+  fi
   ;;
 *-*-dragonfly*)
   tmake_file="$tmake_file t-crtstuff-pic t-libgcc-pic t-eh-dw2-dip"
