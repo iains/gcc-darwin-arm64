@@ -415,8 +415,8 @@ aarch64*-*-elf | aarch64*-*-rtems*)
 aarch64*-*-darwin*)
 	extra_parts="$extra_parts crtfastmath.o libheapt_w.a"
 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
-	tmake_file="${tmake_file} ${cpu_type}/t-lse "
-	tmake_file="${tmake_file} t-crtfm"
+	tmake_file="${tmake_file} ${cpu_type}/t-lse"
+	tmake_file="${tmake_file} t-crtfm t-dfprules"
 	tmake_file="${tmake_file} ${cpu_type}/t-heap-trampoline"
 	# No soft float for now because our long double is DF not TF.
 	md_unwind_header=aarch64/aarch64-unwind.h
