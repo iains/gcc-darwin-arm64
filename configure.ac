@@ -773,6 +773,8 @@ esac
 
 # Disable libffi for some systems.
 case "${target}" in
+  aarch64*-*-darwin2*)
+    ;;
   powerpc-*-darwin*)
     ;;
   i[[3456789]]86-*-darwin*)
