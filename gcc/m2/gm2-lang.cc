@@ -609,7 +609,7 @@ add_one_import_path (const char *libname)
   strcat (lib, "m2");
   strcat (lib, dir_sep);
   strcat (lib, libname);
-  M2Options_SetSearchPath (lib);
+  M2Options_SetSearchPath (lib, TRUE);
 }
 
 /* For each comma-separated standard library name in LIBLIST, add the
@@ -668,13 +668,13 @@ gm2_langhook_post_options (const char **pfilename)
      flibs= option. */
 
   for (auto *s : iquote)
-    M2Options_SetSearchPath (s);
+    M2Options_SetSearchPath (s, FALSE);
   iquote.clear();
   for (auto *s : Ipaths)
-    M2Options_SetSearchPath (s);
+    M2Options_SetSearchPath (s, FALSE);
   Ipaths.clear();
   for (auto *s : isystem)
-    M2Options_SetSearchPath (s);
+    M2Options_SetSearchPath (s, TRUE);
   isystem.clear();
   /* FIXME: this is not a good way to suppress the addition of the import
      paths.  */

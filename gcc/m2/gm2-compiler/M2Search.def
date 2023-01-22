@@ -32,6 +32,10 @@ DEFINITION MODULE M2Search ;
 
 FROM DynamicStrings IMPORT String ;
 
+EXPORT QUALIFIED FindResult ;
+
+TYPE
+  FindResult = (notFound, inUser, inSystem) ;
 
 (*
    FindSourceFile - attempts to locate the source file FileName.
@@ -46,7 +50,7 @@ FROM DynamicStrings IMPORT String ;
 *)
 
 PROCEDURE FindSourceFile (FileName: String;
-                          VAR FullPath: String) : BOOLEAN ;
+                          VAR FullPath: String) : FindResult ;
 
 
 (*
@@ -56,7 +60,7 @@ PROCEDURE FindSourceFile (FileName: String;
                        then FALSE is returned and FullPath is set to NIL.
 *)
 
-PROCEDURE FindSourceDefFile (Stem: String; VAR FullPath: String) : BOOLEAN ;
+PROCEDURE FindSourceDefFile (Stem: String; VAR FullPath: String) : FindResult ;
 
 
 (*
@@ -66,7 +70,7 @@ PROCEDURE FindSourceDefFile (Stem: String; VAR FullPath: String) : BOOLEAN ;
                        then FALSE is returned and FullPath is set to NIL.
 *)
 
-PROCEDURE FindSourceModFile (Stem: String; VAR FullPath: String) : BOOLEAN ;
+PROCEDURE FindSourceModFile (Stem: String; VAR FullPath: String) : FindResult ;
 
 
 (*

@@ -266,7 +266,7 @@ VAR
    filename: String ;
 BEGIN
    filename := CalculateFileName (name, Mark (extension)) ;
-   IF FindSourceFile (filename, location)
+   IF FindSourceFile (filename, location) # notFound
    THEN
       RETURN location
    ELSE
@@ -465,7 +465,7 @@ BEGIN
          s := RemoveLinkOnly (s) ;
          t := Dup (s) ;
          t := CalculateFileName (s, Mark (GenObjectSuffix ())) ;
-         IF FindSourceFile (t, u)
+         IF FindSourceFile (t, u) # notFound
          THEN
             IF KillString (WriteS (fo, Mark (Sprintf2 (Mark (InitString ('%-20s : %s\n')), t, u)))) = NIL
             THEN
@@ -475,7 +475,7 @@ BEGIN
             t := KillString (t) ;
             (* try finding .a archive *)
             t := CalculateFileName (s, Mark (GenArchiveSuffix ())) ;
-            IF FindSourceFile (t, u)
+            IF FindSourceFile (t, u) # notFound
             THEN
                IF KillString (WriteS (fo, Mark (Sprintf2 (Mark (InitString ('%-20s : %s\n')), t, u)))) = NIL
                THEN

@@ -25,9 +25,11 @@ IMPLEMENTATION MODULE M2Options ;
 IMPORT CmdArgs ;
 FROM SArgs IMPORT GetArg, Narg ;
 FROM M2Search IMPORT SetDefExtension, SetModExtension ;
-FROM DynamicStringPath IMPORT Cons, GetUserPath, SetUserPath, Cons ;
+FROM DynamicStringPath IMPORT Cons, GetUserPath, SetUserPath,
+                                    GetSystemPath, SetSystemPath ;
 FROM M2Printf IMPORT printf0, printf1, fprintf1 ;
 FROM FIO IMPORT StdErr ;
+FROM SFIO IMPORT Exists ;
 FROM libc IMPORT exit ;
 FROM Debug IMPORT Halt ;
 FROM m2linemap IMPORT location_t ;
@@ -896,16 +898,30 @@ END SetDumpSystemExports ;
    SetSearchPath -
 *)
 
-PROCEDURE SetSearchPath (arg: ADDRESS) ;
+PROCEDURE SetSearchPath (arg: ADDRESS; isSystem: BOOLEAN) ;
 VAR
    s: String ;
 BEGIN
    s := InitStringCharStar(arg) ;
-   IF Debugging
+   IF NOT Exists (s)
    THEN
-      fprintf1 (StdErr, "M2Search.SetSearchPath setting search path to: %s\n", s)
+      IF Verbose
+      THEN
+         fprintf1 (StdErr, "ignoring nonexistent directory '%s'\n", s)
+      END ;
+      s := KillString (s) ;
+      RETURN
    END ;
-   SetUserPath (Cons (GetUserPath (), s)) ;
+   IF Verbose
+   THEN
+      fprintf1 (StdErr, "Setting search path to: %s\n", s)
+   END ;
+   IF isSystem
+   THEN
+      SetSystemPath (Cons (GetSystemPath (), s)) ;
+   ELSE
+      SetUserPath (Cons (GetUserPath (), s)) ;
+   END ;
    s := KillString (s)
 END SetSearchPath ;
 

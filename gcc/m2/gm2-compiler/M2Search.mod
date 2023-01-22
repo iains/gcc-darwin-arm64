@@ -121,14 +121,19 @@ END DSdbExit ;
 *)
 
 PROCEDURE FindSourceFile (FileName: String;
-                          VAR FullPath: String) : BOOLEAN ;
+                          VAR FullPath: String) : FindResult ;
 BEGIN
    FullPath := FindFileName (FileName, GetUserPath ()) ;
-   IF FullPath = NIL
+   IF FullPath # NIL
    THEN
-      FullPath := FindFileName (FileName, GetSystemPath ())
+      RETURN inUser
    END ;
-   RETURN FullPath # NIL
+   FullPath := FindFileName (FileName, GetSystemPath ()) ;
+   IF FullPath # NIL
+   THEN
+      RETURN inSystem
+   END ;
+   RETURN notFound
 END FindSourceFile ;
 
 
@@ -139,16 +144,18 @@ END FindSourceFile ;
                        then FALSE is returned and FullPath is set to NIL.
 *)
 
-PROCEDURE FindSourceDefFile (Stem: String; VAR FullPath: String) : BOOLEAN ;
+PROCEDURE FindSourceDefFile (Stem: String; VAR FullPath: String) : FindResult ;
 VAR
    f: String ;
+   res: FindResult ;
 BEGIN
    IF Def # NIL
    THEN
       f := CalculateFileName (Stem, Def) ;
-      IF FindSourceFile (f, FullPath)
+      res := FindSourceFile (f, FullPath) ;
+      IF res # notFound
       THEN
-         RETURN TRUE
+         RETURN res
       END ;
       f := KillString (f)
    END ;
@@ -165,16 +172,18 @@ END FindSourceDefFile ;
                        then FALSE is returned and FullPath is set to NIL.
 *)
 
-PROCEDURE FindSourceModFile (Stem: String; VAR FullPath: String) : BOOLEAN ;
+PROCEDURE FindSourceModFile (Stem: String; VAR FullPath: String) : FindResult ;
 VAR
    f: String ;
+   res: FindResult ;
 BEGIN
-   IF Mod#NIL
+   IF Mod # NIL
    THEN
       f := CalculateFileName (Stem, Mod) ;
-      IF FindSourceFile (f, FullPath)
+      res := FindSourceFile (f, FullPath) ;
+      IF res # notFound
       THEN
-         RETURN TRUE
+         RETURN res
       END ;
       f := KillString (f)
    END ;

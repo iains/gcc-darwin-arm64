@@ -475,7 +475,7 @@ PROCEDURE SetUnboundedByReference (value: BOOLEAN) : BOOLEAN ;
    SetSearchPath -
 *)
 
-PROCEDURE SetSearchPath (arg: ADDRESS) ;
+PROCEDURE SetSearchPath (arg: ADDRESS; isSystem: BOOLEAN) ;
 
 
 (*

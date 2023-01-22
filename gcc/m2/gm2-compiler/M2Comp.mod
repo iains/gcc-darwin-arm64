@@ -22,14 +22,14 @@ along with GNU Modula-2; see the file COPYING3.  If not see
 IMPLEMENTATION MODULE M2Comp ;
 
 
-FROM M2Options IMPORT PPonly, Statistics, Quiet, WholeProgram,
-                      ExtendedOpaque, GenModuleList ;
+FROM M2Options IMPORT PPonly, Statistics, Quiet, Verbose,
+                      WholeProgram, ExtendedOpaque, GenModuleList ;
 
 FROM M2Pass IMPORT SetPassToPass0, SetPassToPass1, SetPassToPass2, SetPassToPassC, SetPassToPass3,
                    SetPassToNoPass, SetPassToPassHidden ;
 
 FROM M2Reserved IMPORT toktype ;
-FROM M2Search IMPORT FindSourceDefFile, FindSourceModFile ;
+FROM M2Search IMPORT FindResult, FindSourceDefFile, FindSourceModFile ;
 FROM M2Code IMPORT Code ;
 FROM M2LexBuf IMPORT OpenSource, CloseSource, ResetForNewPass, currenttoken, GetToken, ReInitialize, currentstring, GetTokenNo ;
 FROM M2FileName IMPORT CalculateFileName ;
@@ -66,7 +66,6 @@ FROM NameKey IMPORT Name, GetKey, KeyToCharStar, makekey ;
 FROM M2Printf IMPORT fprintf1 ;
 FROM M2Quiet IMPORT qprintf0, qprintf1, qprintf2 ;
 FROM DynamicStrings IMPORT String, InitString, KillString, InitStringCharStar, Dup, Mark, string ;
-FROM M2Options IMPORT Verbose ;
 
 CONST
    Debugging = FALSE ;
@@ -260,7 +259,7 @@ BEGIN
       SymName := InitStringCharStar(KeyToCharStar(GetSymName(Sym))) ;
       IF IsDefImp(Sym)
       THEN
-         IF FindSourceDefFile(SymName, FileName)
+         IF FindSourceDefFile(SymName, FileName) # notFound
          THEN
             ModuleType := Definition ;
             IF OpenSource(AssociateDefinition(PreprocessModule(FileName, FALSE), Sym))
@@ -302,7 +301,7 @@ BEGIN
          THEN
             FileName := Dup (PPSource)
          ELSE
-            IF FindSourceModFile (SymName, FileName)
+            IF FindSourceModFile (SymName, FileName) # notFound
             THEN
                FileName := PreprocessModule (FileName, FALSE)
             END
@@ -343,7 +342,7 @@ BEGIN
          THEN
             (* The implementation is only useful if -fgen-module-list= is
                used and we do not insist upon it.  *)
-            IF FindSourceModFile (SymName, FileName)
+            IF FindSourceModFile (SymName, FileName) # notFound
             THEN
                qprintf2 ('   Module %-20s : %s (linking)\n', SymName, FileName) ;
                IF OpenSource (AssociateModule (PreprocessModule (FileName, FALSE), Sym))
