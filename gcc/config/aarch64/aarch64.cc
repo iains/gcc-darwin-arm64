@@ -7647,7 +7647,8 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
     {
       /* Set suitable defaults for queries.  */
       pcum->darwinpcs_arg_boundary
-	= aarch64_function_arg_alignment (mode, type, &abi_break);
+	= aarch64_function_arg_alignment (mode, type, &abi_break,
+					  &abi_break_packed);
       pcum->darwinpcs_arg_padding = BITS_PER_UNIT;
     }
 
@@ -7936,7 +7937,7 @@ gcc_checking_assert (arg.named == pcum->named_p);
 	  pcum->aapcs_stack_words = size / UNITS_PER_WORD;
 	  pcum->darwinpcs_sub_word_offset = 0;
 	  pcum->darwinpcs_sub_word_pos = 0;
-	  pcum->darwinpcs_arg_boundary = MAX (align, PARM_BOUNDARY);
+	  pcum->darwinpcs_arg_boundary = MAX (alignment, PARM_BOUNDARY);
 	  if (!pcum->named_p)
 	    pcum->darwinpcs_arg_padding = PARM_BOUNDARY;
 	  return;
@@ -7968,7 +7969,7 @@ gcc_checking_assert (arg.named == pcum->named_p);
 	   not add any stack space.  */
 	pcum->darwinpcs_sub_word_offset = new_off;
       pcum->darwinpcs_sub_word_pos = new_pos;
-      pcum->darwinpcs_arg_boundary = align;
+      pcum->darwinpcs_arg_boundary = alignment ;
       if (pcum->last_named_p && new_pos > 0)
 	{
 	  /* Round the last named arg to the start of the next stack slot.  */
