@@ -33,6 +33,14 @@ CONST
 
 
 (*
+   GetLibexec - return
+   STANDARD_LIBEXEC_PREFIX / DEFAULT_TARGET_MACHINE / DEFAULT_TARGET_VERSION.
+*)
+
+PROCEDURE GetLibexec () : ADDRESS ;
+
+
+(*
    FullPathCPP - return a string to the full path of the C preprocessor cpp.
                  It checks the -B option (if provided) otherwise it uses
                  the STANDARD_LIBEXEC_PREFIX.

@@ -24,7 +24,8 @@ IMPLEMENTATION MODULE M2Search ;
 
 FROM M2FileName IMPORT CalculateFileName ;
 FROM Assertion IMPORT Assert ;
-FROM DynamicStringPath IMPORT GetUserPath, GetSystemPath, FindFileName ;
+FROM DynamicStringPath IMPORT GetUserPath, GetSystemPath, GetExePath,
+                              FindFileName ;
 
 FROM DynamicStrings IMPORT InitString, InitStringChar,
                            KillString, ConCat, ConCatChar, Index, Slice,
@@ -136,6 +137,22 @@ BEGIN
    RETURN notFound
 END FindSourceFile ;
 
+
+(*
+   FindExecutable - attempts to locate the executable named ExeName in the
+   Executables path.
+*)
+
+PROCEDURE FindExecutable (ExeName: String;
+                          VAR FullPath: String) : FindResult ;
+BEGIN
+   FullPath := FindFileName (ExeName, GetExePath ()) ;
+   IF FullPath # NIL
+   THEN
+      RETURN inExecutables
+   END ;
+   RETURN notFound
+END FindExecutable ;
 
 (*
    FindSourceDefFile - attempts to find the definition module for

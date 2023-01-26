@@ -45,6 +45,11 @@ PROCEDURE GetUserPath () : PathList ;
 
 PROCEDURE GetSystemPath () : PathList ;
 
+(*
+   GetExePath - returns the current Executables Path.
+*)
+
+PROCEDURE GetExePath () : PathList ;
 
 (*
    SetUserPath - assigns UserPath to pl.
@@ -59,6 +64,11 @@ PROCEDURE SetUserPath (pl: PathList) ;
 
 PROCEDURE SetSystemPath (pl: PathList) ;
 
+(*
+   SetExePath - assigns Executables Path to pl.
+*)
+
+PROCEDURE SetExePath (pl: PathList) ;
 
 (*
    InitPathList - creates a new empty path list.

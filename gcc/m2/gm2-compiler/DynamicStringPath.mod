@@ -48,7 +48,8 @@ TYPE
 VAR
    FreeList,
    DefaultUserPath,
-   DefaultSystemPath: PathList ;
+   DefaultSystemPath,
+   DefaultExePath: PathList ;
 
 
 (*
@@ -69,6 +70,15 @@ PROCEDURE GetSystemPath () : PathList ;
 BEGIN
    RETURN DefaultSystemPath
 END GetSystemPath ;
+
+(*
+   GetExePath - returns the current Executables Path.
+*)
+
+PROCEDURE GetExePath () : PathList ;
+BEGIN
+   RETURN DefaultExePath
+END GetExePath ;
 
 
 (*
@@ -92,6 +102,16 @@ BEGIN
    DumpPath ('DefaultSystemPath', DefaultSystemPath)
 END SetSystemPath ;
 
+
+(*
+   SetExePath - assigns Executables Path to pl.
+*)
+
+PROCEDURE SetExePath (pl: PathList) ;
+BEGIN
+   DefaultExePath := pl ;
+   DumpPath ('DefaultExePath', DefaultExePath)
+END SetExePath ;
 
 (*
    KillPathList - places list pl onto the freelist.
@@ -261,5 +281,6 @@ END DumpPath ;
 BEGIN
    DefaultSystemPath := NIL ;
    DefaultUserPath := NIL ;
+   DefaultExePath := NIL ;
    FreeList := NIL
 END DynamicStringPath.

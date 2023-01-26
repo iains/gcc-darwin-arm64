@@ -54,22 +54,50 @@ along with GNU Modula-2; see the file COPYING3.  If not see
 /* gen_gm2_libexec returns a string containing libexec /
    DEFAULT_TARGET_MACHINE string / DEFAULT_TARGET_MACHINE.  */
 
-static char *
-gen_gm2_libexec (const char *libexec)
+char *
+m2configure_GetLibexec ()
 {
-  int l = strlen (libexec) + 1 + strlen (DEFAULT_TARGET_MACHINE) + 1
-          + strlen (DEFAULT_TARGET_VERSION) + 1;
+  const char *libexec = STANDARD_LIBEXEC_PREFIX;
+  size_t liblen = strlen (libexec);
+  size_t targlen = strlen (DEFAULT_TARGET_MACHINE);
+  size_t verlen = strlen (DEFAULT_TARGET_VERSION);
+  size_t l = liblen + 3 + targlen + 1 + verlen + 1;
   char *s = (char *)xmalloc (l);
   char dir_sep[2];
 
   dir_sep[0] = DIR_SEPARATOR;
   dir_sep[1] = (char)0;
 
-  strcpy (s, libexec);
-  strcat (s, dir_sep);
-  strcat (s, DEFAULT_TARGET_MACHINE);
-  strcat (s, dir_sep);
-  strcat (s, DEFAULT_TARGET_VERSION);
+  /* FIXME: this should be generalised to use some target-independent test
+     for absolute paths.  */
+  if (liblen > 0)
+    {
+      if (libexec[0] == DIR_SEPARATOR)
+	strcpy (s, libexec);
+      else
+	{
+	  strcpy (s, ".");
+	  strcat (s, dir_sep);
+	  strcat (s, libexec);
+	}
+      if (libexec[liblen-1] != DIR_SEPARATOR)
+	strcat (s, dir_sep);
+    }
+  else
+    {
+      strcpy (s, "." );
+      strcat (s, dir_sep);
+    }
+  if (targlen > 0)
+    {
+      strcat (s, DEFAULT_TARGET_MACHINE);
+      strcat (s, dir_sep);
+    }
+  if (verlen > 0)
+    {
+      strcat (s, DEFAULT_TARGET_VERSION);
+      strcat (s, dir_sep);
+    }
   return s;
 }
 
@@ -80,10 +108,7 @@ m2configure_FullPathCPP (void)
 {
   if (M2Options_GetCpp ())
     {
-      char *path = (char *) M2Options_GetB ();
-
-      if (path == NULL)
-	path = gen_gm2_libexec (STANDARD_LIBEXEC_PREFIX);
+      char *path = m2configure_GetLibexec ();
 
       if (strcmp (path, "") == 0)
 	return xstrdup (CPPPROGRAM);

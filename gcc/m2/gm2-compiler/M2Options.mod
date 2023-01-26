@@ -24,20 +24,22 @@ IMPLEMENTATION MODULE M2Options ;
 
 IMPORT CmdArgs ;
 FROM SArgs IMPORT GetArg, Narg ;
-FROM M2Search IMPORT SetDefExtension, SetModExtension ;
+FROM M2Search IMPORT SetDefExtension, SetModExtension,
+                     FindExecutable, FindResult ;
 FROM DynamicStringPath IMPORT Cons, GetUserPath, SetUserPath,
-                                    GetSystemPath, SetSystemPath ;
+                                    GetSystemPath, SetSystemPath,
+                                    GetExePath, SetExePath ;
 FROM M2Printf IMPORT printf0, printf1, fprintf1 ;
 FROM FIO IMPORT StdErr ;
 FROM SFIO IMPORT Exists ;
 FROM libc IMPORT exit ;
 FROM Debug IMPORT Halt ;
 FROM m2linemap IMPORT location_t ;
-FROM m2configure IMPORT FullPathCPP ;
+FROM m2configure IMPORT FullPathCPP, GetLibexec ;
 
 FROM DynamicStrings IMPORT String, Length, InitString, Mark, Slice, EqualArray,
                            InitStringCharStar, ConCatChar, ConCat, KillString,
-                           Dup, string,
+                           Dup, string, RIndex,
                            PushAllocation, PopAllocationExemption,
                            InitStringDB, InitStringCharStarDB,
                            InitStringCharDB, MultDB, DupDB, SliceDB ;
@@ -55,7 +57,7 @@ CONST
    Debugging = FALSE ;
 
 VAR
-   Barg,
+   ProgName,
    MDarg,
    MMDarg,
    MQarg,
@@ -119,25 +121,40 @@ END DSdbExit ;
 
 
 (*
-   SetB - assigns Barg to arg.
+   SetProgName - saves the program invocation path from arg to ProgName.
 *)
 
-PROCEDURE SetB (arg: ADDRESS) ;
+PROCEDURE SetProgName (arg: ADDRESS) ;
 BEGIN
-   Barg := KillString (Barg) ;
-   Barg := InitStringCharStar (arg)
-END SetB ;
+   ProgName := KillString (ProgName) ;
+   ProgName := InitStringCharStar (arg) ;
+   IF Verbose
+   THEN
+      fprintf1 (StdErr, "installed as '%s'\n", ProgName)
+   END
+END SetProgName ;
 
 
 (*
-   GetB - returns Barg value as a C string or NIL if it was never set.
+   SetB - adds the path 'arg' (if present) to Executables path.
 *)
 
-PROCEDURE GetB () : ADDRESS ;
+PROCEDURE SetB (arg: ADDRESS) ;
+VAR
+   s : String ;
 BEGIN
-   RETURN string (Barg)
-END GetB ;
-
+   s := InitStringCharStar (arg) ;
+   IF NOT Exists (s)
+   THEN
+      IF Verbose
+      THEN
+         fprintf1 (StdErr, "ignoring nonexistent directory '%s'\n", s)
+      END ;
+      s := KillString (s) ;
+      RETURN
+   END ;
+   SetExePath (Cons(GetExePath (), s))
+END SetB ;
 
 (*
    SetMD - assigns MDarg to the filename from arg.
@@ -235,10 +252,35 @@ END GetObj ;
 PROCEDURE CppCommandLine () : String ;
 VAR
    s: String ;
+   end: INTEGER ;
 BEGIN
+   s := NIL ;
+   (* We only do this if pre-processing. *)
    IF CPreProcessor
    THEN
-      s := InitStringCharStar (FullPathCPP ()) ;
+      (* look for the cc1 executable in the executables path.  *)
+      IF FindExecutable (InitString ('cc1'), s) = notFound
+      THEN
+         (* If that fails, try looking in the same path as the FE. *)
+         IF ProgName # NIL
+         THEN
+            end := RIndex (ProgName, '/', 0) ;
+            IF (end # -1) AND (end # 0)
+            THEN
+               s := Slice(ProgName, 0, end+1) ;
+               s := ConCat (s, Mark (InitString ('cc1'))) ;
+               IF NOT Exists (s)
+               THEN
+                  s := KillString (s)
+               END ;
+            END ;
+         END ;
+      END ;
+      IF s = NIL
+      THEN
+         (* If all else fails, look in the configured path. *)
+         s := InitStringCharStar (FullPathCPP ()) ;
+      END ;
       s := ConCat (ConCatChar (s, ' '), CppArgs) ;
       IF CC1Quiet
       THEN
@@ -1393,7 +1435,7 @@ BEGIN
    GenModuleList                := FALSE ;
    GenModuleListFilename        := NIL ;
    SharedFlag                   := FALSE ;
-   Barg                         := NIL ;
+   ProgName                     := NIL ;
    MDarg                        := NIL ;
    MMDarg                       := NIL ;
    MQarg                        := NIL ;

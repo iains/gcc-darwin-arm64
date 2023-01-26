@@ -35,7 +35,7 @@ FROM DynamicStrings IMPORT String ;
 EXPORT QUALIFIED FindResult ;
 
 TYPE
-  FindResult = (notFound, inUser, inSystem) ;
+  FindResult = (notFound, inUser, inSystem, inExecutables) ;
 
 (*
    FindSourceFile - attempts to locate the source file FileName.
@@ -72,6 +72,13 @@ PROCEDURE FindSourceDefFile (Stem: String; VAR FullPath: String) : FindResult ;
 
 PROCEDURE FindSourceModFile (Stem: String; VAR FullPath: String) : FindResult ;
 
+(*
+   FindExecutable - attempts to locate the executable named ExeName in the
+                    Executables path.
+*)
+
+PROCEDURE FindExecutable (ExeName: String;
+                          VAR FullPath: String) : FindResult ;
 
 (*
    SetDefExtension - sets the default extension for definition modules to, ext.

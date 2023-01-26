@@ -175,13 +175,18 @@ gm2_langhook_init_options (unsigned int decoded_options_count,
   bool in_cpp_args = false;
   bool building_cpp_command = false;
 
-  for (i = 1; i < decoded_options_count; i++)
+  for (i = 0; i < decoded_options_count; i++)
     {
+      const char *arg = decoded_options[i].arg;
       enum opt_code code = (enum opt_code)decoded_options[i].opt_index;
       const struct cl_option *option = &cl_options[code];
       const char *opt = (const char *)option->opt_text;
-      const char *arg = decoded_options[i].arg;
       HOST_WIDE_INT value = decoded_options[i].value;
+      if (i == 0)
+	{
+	  M2Options_SetProgName (arg);
+	  continue;
+	}
       switch (code)
 	{
 	case OPT_fcpp:

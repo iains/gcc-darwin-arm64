@@ -93,8 +93,8 @@ EXPORT QUALIFIED SetReturnCheck, SetNilCheck, SetCaseCheck,
                  SetScaffoldMain, ScaffoldMain,
                  SetRuntimeModuleOverride, GetRuntimeModuleOverride,
                  SetGenModuleList, GetGenModuleFilename, SharedFlag,
-                 SetB, GetB, SetMD, GetMD, SetMMD, GetMMD, SetObj, GetObj,
-                 GetMQ, SetMQ ;
+                 SetProgName, SetB, SetObj, GetObj,
+                 SetMD, GetMD, SetMMD, GetMMD, GetMQ, SetMQ ;
 
 
 VAR
@@ -211,10 +211,10 @@ PROCEDURE Getc () : BOOLEAN ;
 PROCEDURE SetB (arg: ADDRESS) ;
 
 (*
-   GetB - returns argument to the -B option as a string or NIL if it were never set.
+   SetProgName - assigns ProgName to arg.
 *)
 
-PROCEDURE GetB () : ADDRESS ;
+PROCEDURE SetProgName (arg: ADDRESS) ;
 
 (*
    SetMD - assigns MD file to arg.
