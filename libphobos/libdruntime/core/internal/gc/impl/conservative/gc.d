@@ -99,7 +99,7 @@ private
 
         version (COLLECT_FORK)
             version (OSX)
-                pid_t __fork() nothrow;
+                pid_t fork() nothrow;
     }
 
     enum
@@ -2949,11 +2949,8 @@ struct Gcx
         {
             fflush(null); // avoid duplicated FILE* output
         }
-        version (OSX)
-        {
-            auto pid = __fork(); // avoids calling handlers (from libc source code)
-        }
-        else version (linux)
+
+        version (linux)
         {
             // clone() fits better as we don't want to do anything but scanning in the child process.
             // no fork-handlers are called, so we can avoid deadlocks due to malloc locks. Probably related:
