@@ -581,6 +581,11 @@ finish_aggregate_mode (tree type)
 {
   for (tree field = TYPE_FIELDS (type); field; field = DECL_CHAIN (field))
     {
+      /* Fields of type `typeof(*null)' have no size, so let them force the
+	 record type mode to be computed as BLKmode.  */
+      if (TYPE_MAIN_VARIANT (TREE_TYPE (field)) == noreturn_type_node)
+	break;
+
       if (DECL_SIZE (field) == NULL_TREE)
        return;
     }
