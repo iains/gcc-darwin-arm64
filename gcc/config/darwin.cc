@@ -114,6 +114,19 @@ static bool ld_needs_eh_markers = false;
 /* Emit a section-start symbol for mod init and term sections.  */
 static bool ld_init_term_start_labels = false;
 
+/* The source and version of dsymutil in use.  */
+#ifndef DSYMUTIL_VERSION
+# warning Darwin toolchain without a defined dsymutil.
+# define DSYMUTIL_VERSION DET_UNKNOWN,0,0,0
+#endif
+
+struct {
+  darwin_external_toolchain kind; /* cctools, llvm, clang etc.  */
+  int major; /* version number.  */
+  int minor;
+  int tiny;
+} dsymutil_version = {DSYMUTIL_VERSION};
+
 /* Section names.  */
 section * darwin_sections[NUM_DARWIN_SECTIONS];
 
@@ -3321,8 +3334,17 @@ darwin_override_options (void)
      workaround for tool bugs.  */
   if (!OPTION_SET_P (dwarf_strict))
     dwarf_strict = 1;
+
   if (!OPTION_SET_P (dwarf_version))
-    dwarf_version = 2;
+    {
+      /* External toolchains based on LLVM or clang 7 have support for
+	 dwarf-4.  */
+      if ((dsymutil_version.kind == LLVM && dsymutil_version.major >= 7)
+	  || (dsymutil_version.kind == CLANG && dsymutil_version.major >= 7))
+	dwarf_version = 4;
+      else
+	dwarf_version = 2;  /* Older cannot safely exceed dwarf-2.  */
+    }
 
   if (OPTION_SET_P (dwarf_split_debug_info))
     {
