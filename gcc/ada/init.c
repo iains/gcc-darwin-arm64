@@ -2564,7 +2564,10 @@ __gnat_map_signal (int sig, siginfo_t *si, void *mcontext ATTRIBUTE_UNUSED)
       /* Reset the use of alt stack, so that the alt stack will be used
 	 for the next signal delivery.
 	 The stack can't be used in case of stack checking.  */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
       syscall (SYS_sigreturn, NULL, UC_RESET_ALT_STACK);
+#pragma GCC diagnostic pop
       break;
 
     case SIGFPE:
