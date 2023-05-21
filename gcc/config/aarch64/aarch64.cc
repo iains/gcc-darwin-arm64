@@ -7691,8 +7691,8 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
     {
       /* Set suitable defaults for queries.  */
       pcum->darwinpcs_arg_boundary
-	= aarch64_function_arg_alignment (mode, type, &abi_break,
-					  &abi_break_packed);
+	= aarch64_function_arg_alignment (mode, type, &abi_break_gcc_9,
+					  &abi_break_gcc_13, &abi_break_gcc_14);
       pcum->darwinpcs_arg_padding = BITS_PER_UNIT;
     }
 
@@ -8236,11 +8236,12 @@ aarch64_function_arg_boundary_ca (machine_mode mode ATTRIBUTE_UNUSED,
 				  const_tree type ATTRIBUTE_UNUSED,
 				  cumulative_args_t ca ATTRIBUTE_UNUSED)
 {
-  unsigned int abi_break;
-  unsigned int abi_break_packed;
-  unsigned int alignment = aarch64_function_arg_alignment (mode, type,
-							   &abi_break,
-							   &abi_break_packed);
+  unsigned int abi_break_gcc_9;
+  unsigned int abi_break_gcc_13;
+  unsigned int abi_break_gcc_14;
+  unsigned int alignment
+    = aarch64_function_arg_alignment (mode, type, &abi_break_gcc_9,
+				      &abi_break_gcc_13, &abi_break_gcc_14);
   /* We rely on aarch64_layout_arg and aarch64_gimplify_va_arg_expr
      to emit warnings about ABI incompatibility.  */
 #if TARGET_MACHO
