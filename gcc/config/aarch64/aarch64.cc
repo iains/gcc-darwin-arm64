@@ -13693,7 +13693,11 @@ aarch64_select_rtx_section (machine_mode mode,
   if (aarch64_can_use_per_function_literal_pools_p ())
     return function_section (current_function_decl);
 
+#ifdef TARGET_MACHO
+  return machopic_select_rtx_section (mode, x, align);
+#else
   return default_elf_select_rtx_section (mode, x, align);
+#endif
 }
 
 /* Implement ASM_OUTPUT_POOL_EPILOGUE.  */
