@@ -663,6 +663,6 @@ public:
 class StoppableVisitor : public Visitor
 {
 public:
-    bool stop;
+    d_bool stop;
     StoppableVisitor() : stop(false) {}
 };
