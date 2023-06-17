@@ -1891,17 +1891,16 @@ AC_ARG_ENABLE(linker-plugin-flags,
   extra_linker_plugin_flags=)
 AC_SUBST(extra_linker_plugin_flags)
 
-# Enable --enable-host-pie.
-# Checked early to determine whether jit is an 'all' language
+# Enable --enable-host-pie, for Darwin20+ this is required.
 AC_ARG_ENABLE(host-pie,
 [AS_HELP_STRING([--enable-host-pie],
 		[build position independent host executables])],
 [host_pie=$enableval
  case $host in
-   x86_64-*-darwin* | aarch64-*-darwin*)
+   *-*-darwin2*)
      if test x$host_pie != xyes ; then
        # PIC is the default, and actually cannot be switched off.
-       echo configure.ac: warning: PIC code is required for the configured target, host-shared setting ignored. 1>&2
+       echo configure.ac: warning: PIE code is required for the configured target, host-pie setting ignored. 1>&2
        host_pie=yes
      fi ;;
   *) ;;
