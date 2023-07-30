@@ -235,18 +235,17 @@ gcc_gxx_libcxx_include_dir=
 AC_ARG_WITH(gxx-libcxx-include-dir,
 [AS_HELP_STRING([--with-gxx-libcxx-include-dir=DIR],
                 [specifies directory to find libc++ header files])],
-[case "${withval}" in
-yes)	AC_MSG_ERROR(bad value ${withval} given for libc++ include directory) ;;
-*)	gcc_gxx_libcxx_include_dir=$with_gxx_libcxx_include_dir ;;
-esac])
+[gcc_gxx_libcxx_include_dir=$with_gxx_libcxx_include_dir])
 
 # --with-gxx-libcxx-include-dir controls the enabling of the -stdlib option.
 # if --with-gxx-libcxx-include-dir is 'no' we disable the stdlib option.
+# if --with-gxx-libcxx-include-dir is 'yes' we enable the stdlib option and use
+# the default path within the installation.
 # if --with-gxx-libcxx-include-dir is unset we enable the stdlib option
-# based on the platform (to be available on platform versions where it is the
+# based on the platform (to be available on platform versions where it is the
 # default for the system tools). We also use a default path within the compiler
-# install tree.
-# Otherwise, we use the path provided and enable the stdlib option.
+# install tree.
+# Otherwise, we use the path provided and enable the stdlib option.
 # If both --with-sysroot and --with-gxx-libcxx-include-dir are passed, we
 # check to see if the latter starts with the former and, upon success, compute
 # gcc_gxx_libcxx_include_dir as relative to the sysroot.
@@ -254,16 +253,20 @@ gcc_gxx_libcxx_include_dir_add_sysroot=0
 gcc_enable_stdlib_opt=0
 if test x${gcc_gxx_libcxx_include_dir} != x; then
   if test x${gcc_gxx_libcxx_include_dir} = xno; then
-    # set defaults for the dir, but the option is disabled anyway.
+    # set defaults for the dir, but the option is disabled anyway.
     gcc_gxx_libcxx_include_dir=
+  elif test x${gcc_gxx_libcxx_include_dir} = xyes; then
+    # set defaults for the dir, and enable.
+    gcc_gxx_libcxx_include_dir=
+    gcc_enable_stdlib_opt=1
   else
     gcc_enable_stdlib_opt=1
   fi
 else
   case $target in
     *-darwin1[[1-9]]* | *-darwin2*)
-       # Default this on for Darwin versions which default to libcxx,
-       # and embed the path in the compiler install so that we get a
+       # Default this on for Darwin versions which default to libcxx,
+       # and embed the path in the compiler install so that we get a
        # self-contained toolchain.
        gcc_enable_stdlib_opt=1
        ;;
