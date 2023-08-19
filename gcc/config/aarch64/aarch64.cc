@@ -21651,8 +21651,10 @@ aarch64_mangle_type (const_tree type)
 	return "Dh";
     }
 
-  /* __float128 */
-  if (TYPE_MODE (type) == TFmode)
+  /* __float128 is mangled as "g" on darwin.  _Float128 is not mangled here,
+     but handled in common code (as "DF128_").  */
+  if (TARGET_MACHO && TYPE_MODE (type) == TFmode
+      && TYPE_MAIN_VARIANT (type) == float128t_type_node)
     return "g";
 
   /* Mangle AArch64-specific internal types.  TYPE_NAME is non-NULL_TREE for
