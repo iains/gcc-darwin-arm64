@@ -1,0 +1,5 @@
+# Ensure we have a suitable minimum OS version.
+
+HOST_LIBGCC2_CFLAGS += -mmacosx-version-min=11.0
+
+LIB2_SIDITI_CONV_FUNCS = yes

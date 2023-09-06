@@ -69,12 +69,12 @@
    not make use of most AdvSIMD instructions.
 */
 
-variant_pcs (__arm_sc_memmove)
-ENTRY_ALIAS (__arm_sc_memmove)
+variant_pcs (ASMNAME (__arm_sc_memmove))
+ENTRY_ALIAS (ASMNAME (__arm_sc_memmove))
 
-variant_pcs (__arm_sc_memcpy)
+variant_pcs (ASMNAME (__arm_sc_memcpy))
 
-ENTRY (__arm_sc_memcpy)
+ENTRY (ASMNAME (__arm_sc_memcpy))
 	add	srcend, src, count
 	add	dstend, dstin, count
 	cmp	count, 128
@@ -255,4 +255,4 @@ L(copy64_from_start):
 	stp	B_l, B_h, [dstin, 16]
 	stp	C_l, C_h, [dstin]
 	ret
-END (__arm_sc_memcpy)
+END (ASMNAME (__arm_sc_memcpy))

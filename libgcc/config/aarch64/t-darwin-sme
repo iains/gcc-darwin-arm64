@@ -1,0 +1,16 @@
+# The SME runtime entry points are .private_extern on Mach-O, so they cannot be
+# exported from the shared libgcc.  Collect them into a convenience library
+# that the driver adds to the link instead: being an archive, no member is
+# pulled in unless it is referenced, and the reference is then resolved within
+# the image, so no stub can be interposed on a call that must preserve ZA.
+# Use the non-shared objects: those carry the .private_extern marking (the
+# visibility fragment is generated from the shared ones, so it does not apply
+# to them), and this library is only ever linked statically.
+SME_RT_OBJS = __aarch64_have_sme.o __arm_get_current_vg.o __arm_sme_state.o \
+	      __arm_tpidr2_restore.o __arm_tpidr2_save.o __arm_za_disable.o \
+	      __arm_sc_memchr_scalar.o __arm_sc_memcpy_scalar.o \
+	      __arm_sc_memset_scalar.o
+
+libsme_rt.a: $(SME_RT_OBJS)
+	$(AR_CREATE_FOR_TARGET) $@ $(SME_RT_OBJS)
+	$(RANLIB_FOR_TARGET) $@

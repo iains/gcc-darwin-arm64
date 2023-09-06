@@ -52,9 +52,9 @@
    __arm_sc_mem* functions must be able to run in streaming mode and can thus
    not make use of most AdvSIMD instructions. */
 
-variant_pcs (__arm_sc_memchr)
+variant_pcs (ASMNAME (__arm_sc_memchr))
 
-ENTRY (__arm_sc_memchr)
+ENTRY (ASMNAME (__arm_sc_memchr))
 	cbz	count_in, L(no_match)
 
 	/* Replicate the needle byte across the rest of the word.  */
@@ -125,4 +125,4 @@ L(loop):
 	cmp	src_end, result
 	csel	result, result, xzr, hi
 	ret
-END (__arm_sc_memchr)
+END (ASMNAME (__arm_sc_memchr))
