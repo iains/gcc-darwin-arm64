@@ -215,7 +215,7 @@ along with GCC; see the file COPYING3.  If not see
 #define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
 
 /* Darwin has experimental support for section anchors on aarch64*; it is
-   not enabled by default (the -fsection-anchors is required).  */
+   not enabled by default (the -fsection-anchors is required), see below.  */
 
 #undef TARGET_ASM_OUTPUT_ANCHOR
 #define TARGET_ASM_OUTPUT_ANCHOR darwin_asm_output_anchor
@@ -279,3 +279,8 @@ along with GCC; see the file COPYING3.  If not see
 #define SYMBOL_FLAG_SUBT_DEP (SYMBOL_FLAG_MACH_DEP)
 
 #undef ASM_OUTPUT_DEF_FROM_DECLS
+
+#undef CLEAR_INSN_CACHE
+#define CLEAR_INSN_CACHE(beg, end)				\
+  extern void sys_icache_invalidate(void *start, size_t len);	\
+  sys_icache_invalidate ((beg), (size_t)((end)-(beg)))
