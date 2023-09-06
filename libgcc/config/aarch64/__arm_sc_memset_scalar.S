@@ -39,8 +39,8 @@
 /* __arm_sc_mem* functions must be able to run in streaming mode and can thus
    not make use of most AdvSIMD instructions.  */
 
-variant_pcs (__arm_sc_memset)
-ENTRY (__arm_sc_memset)
+variant_pcs (ASMNAME (__arm_sc_memset))
+ENTRY (ASMNAME (__arm_sc_memset))
 	/* Replicate the fill byte across the last half of the word.  */
 	and	valw, valw, 255
 	orr	valw, valw, valw, lsl 8
@@ -175,4 +175,4 @@ L(no_zva_loop):
 	stp	val, val, [dstend, -32]
 	stp	val, val, [dstend, -16]
 	ret
-END (__arm_sc_memset)
+END (ASMNAME (__arm_sc_memset))
