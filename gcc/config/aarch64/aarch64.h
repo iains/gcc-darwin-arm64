@@ -136,6 +136,12 @@
 /* Heap alignment (same as BIGGEST_ALIGNMENT and STACK_BOUNDARY).  */
 #define MALLOC_ABI_ALIGNMENT  128
 
+/* We will and with this value to test if a custom function descriptor needs
+   a static chain.  The function boundary must the adjusted so that the bit
+   this represents is no longer part of the address.  0 Disables the custom
+   function descriptors.  */
+#define AARCH64_CUSTOM_FUNCTION_TEST 4
+
 /* Defined by the ABI */
 #define WCHAR_TYPE "unsigned int"
 #define WCHAR_TYPE_SIZE			32
