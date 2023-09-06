@@ -170,6 +170,12 @@ along with GCC; see the file COPYING3.  If not see
 #undef STATIC_CHAIN_REGNUM
 #define STATIC_CHAIN_REGNUM	R17_REGNUM
 
+/* Heap trampoline support in a CRT.  */
+#undef DARWIN_HEAP_T_LIB
+#define DARWIN_HEAP_T_LIB " -lheapt_w "
+#undef DARWIN_SME_RT_LIB
+#define DARWIN_SME_RT_LIB " -lsme_rt "
+
 #define SUBTARGET_ENCODE_SECTION_INFO  darwin_encode_section_info
 
 #undef ASM_MAYBE_OUTPUT_ENCODED_ADDR_RTX
@@ -230,7 +236,7 @@ along with GCC; see the file COPYING3.  If not see
 #define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
 
 /* Darwin has experimental support for section anchors on aarch64*; it is
-   not enabled by default (the -fsection-anchors is required).  */
+   not enabled by default (the -fsection-anchors is required), see below.  */
 
 #undef TARGET_ASM_OUTPUT_ANCHOR
 #define TARGET_ASM_OUTPUT_ANCHOR darwin_asm_output_anchor
@@ -294,3 +300,8 @@ along with GCC; see the file COPYING3.  If not see
 #define SYMBOL_FLAG_SUBT_DEP (SYMBOL_FLAG_MACH_DEP)
 
 #undef ASM_OUTPUT_DEF_FROM_DECLS
+
+#undef CLEAR_INSN_CACHE
+#define CLEAR_INSN_CACHE(beg, end)				\
+  extern void sys_icache_invalidate(void *start, size_t len);	\
+  sys_icache_invalidate ((beg), (size_t)((end)-(beg)))

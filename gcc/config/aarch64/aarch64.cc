@@ -14699,10 +14699,10 @@ aarch64_frame_pointer_required ()
   if (!TARGET_MACHO)
     return aarch64_need_old_pstate_sm ();
 
-  /* We could do with some more general test.  */
-  gcc_checking_assert (!aarch64_need_old_pstate_sm ());
+  /* We could do with some more general test.
+  gcc_checking_assert (!aarch64_need_old_pstate_sm ());*/
 
-  if (crtl->calls_eh_return)
+  if (crtl->calls_eh_return || aarch64_need_old_pstate_sm ())
     return true;
 
   /* Not used in leaf functions (unless forced).  */
@@ -35688,7 +35688,7 @@ aarch64_libgcc_floating_mode_supported_p
 
 /* The architecture reserves bits 0 and 1 so use bit 2 for descriptors.  */
 #undef TARGET_CUSTOM_FUNCTION_DESCRIPTORS
-#define TARGET_CUSTOM_FUNCTION_DESCRIPTORS 4
+#define TARGET_CUSTOM_FUNCTION_DESCRIPTORS AARCH64_CUSTOM_FUNCTION_TEST
 
 #undef TARGET_HARD_REGNO_NREGS
 #define TARGET_HARD_REGNO_NREGS aarch64_hard_regno_nregs
