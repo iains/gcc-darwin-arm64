@@ -589,8 +589,8 @@ extern GTY(()) int darwin_ms_struct;
 #define DARWIN_WEAK_CRTS \
 "%{static-libgcc|static:						  \
     %{%:version-compare(>= 10.6 mmacosx-version-min= -lemutls_w):	  \
-      " DARWIN_HEAP_T_LIB "} ;						  \
-   : -lemutls_w	" DARWIN_HEAP_T_LIB "					  \
+      " DARWIN_HEAP_T_LIB DARWIN_SME_RT_LIB "} ;			  \
+   : -lemutls_w	" DARWIN_HEAP_T_LIB DARWIN_SME_RT_LIB "			  \
   }"
 
 /* We specify crt0.o as -lcrt0.o so that ld will search the library path.  */

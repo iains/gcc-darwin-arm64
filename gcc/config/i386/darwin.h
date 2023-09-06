@@ -123,6 +123,7 @@ along with GCC; see the file COPYING3.  If not see
 
 #undef DARWIN_HEAP_T_LIB
 #define DARWIN_HEAP_T_LIB " -lheapt_w "
+#define DARWIN_SME_RT_LIB " "
 
 #undef SUBTARGET_EXTRA_SPECS
 #define SUBTARGET_EXTRA_SPECS                                   \
