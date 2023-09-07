@@ -1,4 +1,4 @@
-# FIXME: decide what we need here, or delete this file.
+# Ensure we have a suitable minimum OS version.
 
 HOST_LIBGCC2_CFLAGS += -mmacosx-version-min=11.0
 
