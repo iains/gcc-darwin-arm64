@@ -312,6 +312,16 @@ aarch64_cpu_cpp_builtins (cpp_reader *pfile)
 {
   aarch64_define_unconditional_macros (pfile);
   aarch64_update_cpp_builtins (pfile);
+
+  if (TARGET_MACHO)
+    {
+      builtin_define ("__builtin_copysignq=__builtin_copysignf128");
+      builtin_define ("__builtin_fabsq=__builtin_fabsf128");
+      builtin_define ("__builtin_huge_valq=__builtin_huge_valf128");
+      builtin_define ("__builtin_infq=__builtin_inff128");
+      builtin_define ("__builtin_nanq=__builtin_nanf128");
+      builtin_define ("__builtin_nansq=__builtin_nansf128");
+    }
 }
 
 /* Hook to validate the current #pragma GCC target and set the state, and
