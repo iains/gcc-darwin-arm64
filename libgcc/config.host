@@ -417,8 +417,8 @@ aarch64*-*-darwin*)
 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
 	tmake_file="${tmake_file} ${cpu_type}/t-lse"
 	tmake_file="${tmake_file} t-crtfm t-dfprules"
+	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp"
 	tmake_file="${tmake_file} ${cpu_type}/t-heap-trampoline"
-	# No soft float for now because our long double is DF not TF.
 	md_unwind_header=aarch64/aarch64-unwind.h
 	;;
 aarch64*-*-freebsd*)
