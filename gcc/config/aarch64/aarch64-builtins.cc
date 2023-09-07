@@ -1874,6 +1874,26 @@ aarch64_init_bf16_types (void)
   aarch64_bf16_ptr_type_node = build_pointer_type (bfloat16_type_node);
 }
 
+/* Initialize the backend REAL_TYPE type supporting __float128 on Mach-O,
+   as well as the related built-ins.  */
+static void
+aarch64_init_float128_types (void)
+{
+  /* The __float128 type.  The node has already been created as
+     _Float128, so for C we only need to register the __float128 name for
+     it.  For C++, we create a distinct type which will mangle differently
+     (g) vs. _Float128 (DF128_) and behave backwards compatibly.  */
+  if (float128t_type_node == NULL_TREE)
+    {
+      float128t_type_node = make_node (REAL_TYPE);
+      TYPE_PRECISION (float128t_type_node)
+	= TYPE_PRECISION (float128_type_node);
+      SET_TYPE_MODE (float128t_type_node, TYPE_MODE (float128_type_node));
+      layout_type (float128t_type_node);
+    }
+  lang_hooks.types.register_builtin_type (float128t_type_node, "__float128");
+}
+
 /* Pointer authentication builtins that will become NOP on legacy platform.
    Currently, these builtins are for internal use only (libgcc EH unwinder).  */
 
@@ -2489,6 +2509,8 @@ aarch64_general_init_builtins (void)
   aarch64_init_fp16_types ();
 
   aarch64_init_bf16_types ();
+  if (TARGET_MACHO)
+    aarch64_init_float128_types ();
 
   {
     aarch64_target_switcher switcher (AARCH64_FL_SIMD);

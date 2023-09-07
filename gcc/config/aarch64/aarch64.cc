@@ -24802,6 +24802,11 @@ aarch64_mangle_type (const_tree type)
   if (TYPE_MAIN_VARIANT (type) == aarch64_mfp8_type_node)
     return "u6__mfp8";
 
+  /* __float128 is mangled as "g" on Darwin.  _Float128 is not mangled here,
+     but handled in common code (as "DF128_").  */
+  if (TARGET_MACHO && TYPE_MAIN_VARIANT (type) == float128t_type_node)
+    return "g";
+
   /* Mangle AArch64-specific internal types.  TYPE_NAME is non-NULL_TREE for
      builtin types.  */
   if (TYPE_NAME (type) != NULL)
