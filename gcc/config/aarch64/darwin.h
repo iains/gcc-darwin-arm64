@@ -184,9 +184,10 @@ along with GCC; see the file COPYING3.  If not see
     {									\
       if ((SIZE) == 4 && ((ENCODING) & 0x70) == DW_EH_PE_pcrel)		\
 	{								\
-	  fputs (ASM_LONG, FILE);					\
+	  static unsigned got_pcr_count = 0;				\
+	  fprintf (FILE, "L_got_pcr%d:\n" ASM_LONG, got_pcr_count);	\
 	  assemble_name (FILE, XSTR (ADDR, 0));				\
-	  fputs ("@GOT-.", FILE);					\
+	  fprintf (FILE, "@GOT-L_got_pcr%d", got_pcr_count++);		\
 	  goto DONE;							\
 	}								\
     }									\
