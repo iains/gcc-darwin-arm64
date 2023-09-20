@@ -61,10 +61,6 @@ along with GCC; see the file COPYING3.  If not see
 #define DARWIN_NOPIE_SPEC \
 " %<no-pie %<fno-pie %<fno-PIE "
 
-/* Hack alert - we want the exported cas etc.  */
-#undef LIB_SPEC
-#define LIB_SPEC "%{!static:-lSystem} -lgcc"
-
 /* Force the default endianness and ABI flags onto the command line
    in order to make the other specs easier to write.  Match clang in
    silently ignoring mdynamic-no-pic */
