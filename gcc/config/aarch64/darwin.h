@@ -86,7 +86,7 @@ along with GCC; see the file COPYING3.  If not see
 "%{!mkernel:%{!static:-fPIC}} " DARWIN_CC1_SPEC
 
 #undef ASM_SPEC
-#define ASM_SPEC "-arch %(darwin_arch) "\
+#define ASM_SPEC "-arch %(darwin_arch) %{march*} %{mtune*} "\
   ASM_OPTIONS " %{static} " ASM_MMACOSX_VERSION_MIN_SPEC
 
 #undef ENDFILE_SPEC
