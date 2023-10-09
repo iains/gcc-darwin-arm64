@@ -79,8 +79,11 @@ check_l_neg_rev (long double x, long double y)
   return __builtin_copysignl (-1.0, y) * x;
 }
 
-/* { dg-final { scan-assembler-times {eor\tv[0-9]+\.16b, v[0-9]+\.16b, v[0-9]+\.16b} 8 } } */
-/* { dg-final { scan-assembler-times {and\tv[0-9]+\.16b, v[0-9]+\.16b, v[0-9]+\.16b} 8 } } */
+/* Darwin's long double is the same as double. */
+/* { dg-final { scan-assembler-times {eor\tv[0-9]+\.16b, v[0-9]+\.16b, v[0-9]+\.16b}  8 { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {and\tv[0-9]+\.16b, v[0-9]+\.16b, v[0-9]+\.16b}  8 { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {eor\tv[0-9]+\.16b, v[0-9]+\.16b, v[0-9]+\.16b} 12 { target *-*-darwin* } } } */
+/* { dg-final { scan-assembler-times {and\tv[0-9]+\.16b, v[0-9]+\.16b, v[0-9]+\.16b} 12 { target *-*-darwin* } } } */
 /* { dg-final { scan-assembler-not "copysign" } } */
 /* { dg-final { scan-assembler-not "fmov" } } */
 /* { dg-final { scan-assembler-not "\[ \t\]?orr\[ \t\]?" } } */
