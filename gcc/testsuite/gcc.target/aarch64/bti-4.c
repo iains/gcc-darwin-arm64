@@ -56,5 +56,7 @@ retbr_trampolines2 (void *a, int b)
   return 0;
 }
 
-/* Trampoline should have BTI C. */
-/* { dg-final { scan-assembler "\.LTRAMP0:\n\thint\t34" } } */
+/* Trampoline should have BTI C.
+   but Darwin trampolines are constructed on demand by a builtin and do not
+   appear in the generated code for this TU.  */
+/* { dg-final { scan-assembler "\.LTRAMP0:\n\thint\t34" { target { ! *-*-darwin* } } } } */
