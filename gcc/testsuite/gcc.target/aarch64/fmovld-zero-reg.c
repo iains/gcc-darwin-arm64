@@ -1,7 +1,13 @@
 /* { dg-do compile } */
 /* { dg-options "-O2" } */
 
-void bar (long double);
+#if __APPLE__
+#define F128TYPE __float128
+#else
+#define F128TYPE long double
+#endif
+
+void bar (F128TYPE);
 void
 foo (void)
 {
