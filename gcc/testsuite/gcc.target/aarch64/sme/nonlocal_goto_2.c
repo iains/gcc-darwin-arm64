@@ -3,22 +3,50 @@
 
 void run(void (*)());
 
+/* Darwin uses heap trampolines: taking the address of a nested function calls
+   __gcc_nested_func_ptr_created, and a matching __gcc_nested_func_ptr_deleted
+   tears it down, where the stack-trampoline implementation instead builds the
+   trampoline inline and flushes the cache.  The two are different enough to be
+   worth a body of their own rather than interleaved variants.
+   The asymmetry is a platform constraint, not a preference: Darwin enforces a
+   no-executable-stack policy, so a stack trampoline cannot work on aarch64 at
+   all, and warns at link time on x86 from macOS 11.  -ftrampoline-impl= is
+   generic and heap trampolines are available on ELF too, but they are not the
+   default there, so the *E body is left describing that default.  */
 /*
 ** foo:
-**	...
-**	smstop	sm
-**	bl	[^\n]*[cC]ache[^\n]*
-**	smstart	sm
-**	add	x0, .*
-**	smstop	sm
-**	bl	run
-**	smstart	sm
-**	mov	w0, 1
-**	...
-**	ret
-**	smstart	sm
-**	mov	w0, 0
-**	...
+*E	...
+*E	smstop	sm
+*E	bl	[^\n]*[cC]ache[^\n]*
+*E	smstart	sm
+*E	add	x0, .*
+*E	smstop	sm
+*E	bl	run
+*E	smstart	sm
+*E	mov	w0, 1
+*E	...
+*E	ret
+*E	smstart	sm
+*E	mov	w0, 0
+*E	...
+*M	...
+*M	smstop	sm
+*M	bl	_?__gcc_nested_func_ptr_created
+*M	smstart	sm
+*M	ldr	x0, .*
+*M	smstop	sm
+*M	bl	_?run
+*M	smstart	sm
+*M	mov	w0, 1
+*M	...
+*M	smstop	sm
+*M	bl	_?__gcc_nested_func_ptr_deleted
+*M	smstart	sm
+*M	...
+*M	ret
+*M	smstart	sm
+*M	str	wzr, .*
+*M	...
 */
 int
 foo (int *ptr) __arm_streaming
