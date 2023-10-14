@@ -239,7 +239,7 @@ void consume (float32x4_t, float32x4_t, float32x4_t, float32x4_t);
 **	dup	v1\.4s, v1\.s\[0\]
 **	dup	v0\.4s, v0\.s\[0\]
 ** )
-**	b	consume
+**	b	_?consume
 */
 void
 produce_1 (float32_t a, float32_t b, float32_t c, float32_t d)
@@ -267,7 +267,7 @@ produce_1 (float32_t a, float32_t b, float32_t c, float32_t d)
 **	dup	v1\.4s, v1\.s\[0\]
 **	dup	v0\.4s, v0\.s\[0\]
 ** )
-**	b	consume
+**	b	_?consume
 */
 void
 produce_2 (float32_t a, float32_t b, float32_t c, float32_t d)
