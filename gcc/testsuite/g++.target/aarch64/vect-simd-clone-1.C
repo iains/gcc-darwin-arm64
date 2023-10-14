@@ -37,7 +37,7 @@
 	for #pragma GCC target("+simd): _ZGVnN4vv_fn */
 
 #pragma GCC target ("+sve")
-/* { dg-final { scan-assembler {\s+_ZGVsMxv__Z3fn0i\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxv__Z3fn0i\n} } } */
 extern int __attribute__ ((simd, const)) fn0 (int);
 void test_fn0 (int *a, int *b, int n)
 {
@@ -45,7 +45,7 @@ void test_fn0 (int *a, int *b, int n)
     a[i] += fn0 (b[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv__Z3fn1si\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv__Z3fn1si\n} } } */
 extern int __attribute__ ((simd, const)) fn1 (short, int);
 void test_fn1 (int *a, int *b, short *c, int n)
 {
@@ -53,7 +53,7 @@ void test_fn1 (int *a, int *b, short *c, int n)
     a[i] = fn1 (c[i], b[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv__Z3fn2si\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv__Z3fn2si\n} } } */
 extern short __attribute__ ((simd, const)) fn2 (short, int);
 void test_fn2 (short *a, int *b, short *c, int n)
 {
@@ -61,7 +61,7 @@ void test_fn2 (short *a, int *b, short *c, int n)
     a[i] = fn2 (c[i], b[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv__Z3fn3ic\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv__Z3fn3ic\n} } } */
 extern char __attribute__ ((simd, const)) fn3 (int, char);
 void test_fn3 (int *a, int *b, char *c, int n)
 {
@@ -69,7 +69,7 @@ void test_fn3 (int *a, int *b, char *c, int n)
     a[i] = (int) (fn3 (b[i], c[i]) + c[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv__Z3fn4is\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv__Z3fn4is\n} } } */
 extern short __attribute__ ((simd, const)) fn4 (int, short);
 void test_fn4 (int *a, int *b, short *c, int n)
 {
@@ -79,7 +79,7 @@ void test_fn4 (int *a, int *b, short *c, int n)
 
 #pragma GCC reset_options
 #pragma GCC target ("+simd")
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv__Z3fn4is\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv__Z3fn4is\n} } } */
 extern short __attribute__ ((simd, const)) fn4 (int, short);
 void test_fn5 (int *a, int *b, short *c, int n)
 {
