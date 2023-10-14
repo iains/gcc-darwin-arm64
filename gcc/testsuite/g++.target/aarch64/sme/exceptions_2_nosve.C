@@ -24,19 +24,19 @@ void n_caller1()
       sc_callee_ne();
     }
 }
-// { dg-final { scan-assembler {_Z9n_caller1v:(?:(?!smstart|smstop).)*\tret} } }
+// { dg-final { scan-assembler {_?_Z9n_caller1v:(?:(?!smstart|smstop).)*\tret} } }
 
 /*
 ** _Z9n_caller2v:
 **	...
-**	bl	__arm_get_current_vg
+**	bl	_?__arm_get_current_vg
 **	str	x0, [^\n]+
 **	...
-**	bl	__cxa_begin_catch
+**	bl	_?__cxa_begin_catch
 **	smstart	sm
-**	bl	_Z11s_callee_nev
+**	bl	_?_Z11s_callee_nev
 **	smstop	sm
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	...
 */
 void n_caller2()
@@ -55,7 +55,7 @@ void n_caller2()
 /*
 ** _Z9s_caller1v:
 **	...
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	smstart	sm
 **	...
 */
@@ -100,12 +100,12 @@ int s_caller2() __arm_streaming
 /*
 ** _Z10sc_caller1v:
 **	...
-**	bl	__arm_get_current_vg
+**	bl	_?__arm_get_current_vg
 **	str	x0, [^\n]+
 **	mrs	(x[0-9]+), svcr
 **	str	\1, ([^\n]+)
 **	...
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	ldr	(x[0-9]+), \2
 **	tbz	\3, 0, [^\n]+
 **	smstart	sm
@@ -127,14 +127,14 @@ int sc_caller1() __arm_streaming_compatible
 /*
 ** _Z10ls_caller1v:
 **	...
-**	bl	__arm_get_current_vg
+**	bl	_?__arm_get_current_vg
 **	str	x0, [^\n]+
 **	...
-**	bl	__cxa_begin_catch
+**	bl	_?__cxa_begin_catch
 **	smstart	sm
-**	bl	_Z12sc_callee_nev
+**	bl	_?_Z12sc_callee_nev
 **	smstop	sm
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	...
 */
 __arm_locally_streaming void ls_caller1()
