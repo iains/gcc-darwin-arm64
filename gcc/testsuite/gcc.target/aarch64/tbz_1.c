@@ -1,5 +1,6 @@
 /* { dg-do compile } */
-/* { dg-additional-options "-O2 -std=c99  -fno-unwind-tables -fno-asynchronous-unwind-tables" } */
+/* { dg-additional-options "-O2 -std=c99 " } */
+/* { dg-additional-options " -fno-unwind-tables -fno-asynchronous-unwind-tables" { target { ! *-*-darwin* } } } */
 /* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
 
 #include <stdbool.h>
@@ -8,9 +9,9 @@ void h(void);
 
 /*
 ** g1:
-** 	tbnz	w[0-9]+, #?0, .L([0-9]+)
+** 	tbnz	w[0-9]+, #?0, .?L([0-9]+)
 ** 	ret
-**	...
+** 	...
 */
 void g1(bool x)
 {
@@ -20,9 +21,9 @@ void g1(bool x)
 
 /*
 ** g2:
-** 	tbz	w[0-9]+, #?0, .L([0-9]+)
-** 	b	h
-**	...
+** 	tbz	w[0-9]+, #?0, .?L([0-9]+)
+** 	b	_?h
+** 	...
 */
 void g2(bool x)
 {
@@ -32,8 +33,8 @@ void g2(bool x)
 
 /*
 ** g3_ge:
-** 	tbnz	w[0-9]+, #?31, .L[0-9]+
-** 	b	h
+** 	tbnz	w[0-9]+, #?31, .?L[0-9]+
+** 	b	_?h
 **	...
 */
 void g3_ge(int x)
@@ -45,8 +46,8 @@ void g3_ge(int x)
 /*
 ** g3_gt:
 ** 	cmp	w[0-9]+, 0
-** 	ble	.L[0-9]+
-** 	b	h
+** 	ble	.?L[0-9]+
+** 	b	_?h
 **	...
 */
 void g3_gt(int x)
@@ -57,8 +58,8 @@ void g3_gt(int x)
 
 /*
 ** g3_lt:
-** 	tbz	w[0-9]+, #?31, .L[0-9]+
-** 	b	h
+** 	tbz	w[0-9]+, #?31, .?L[0-9]+
+** 	b	_?h
 **	...
 */
 void g3_lt(int x)
@@ -70,8 +71,8 @@ void g3_lt(int x)
 /*
 ** g3_le:
 ** 	cmp	w[0-9]+, 0
-** 	bgt	.L[0-9]+
-** 	b	h
+** 	bgt	.?L[0-9]+
+** 	b	_?h
 **	...
 */
 void g3_le(int x)
@@ -84,8 +85,8 @@ void g3_le(int x)
 ** g5:
 ** 	mov	w[0-9]+, 65279
 ** 	tst	w[0-9]+, w[0-9]+
-** 	beq	.L[0-9]+
-** 	b	h
+** 	beq	.?L[0-9]+
+** 	b	_?h
 **	...
 */ 
 void g5(int x)
