@@ -23,5 +23,5 @@ int test (void)
   return 0;
 }
 
-/* { dg-final { scan-ipa-dump "hooray\[^\\n\]*inline copy in test" "inline" { xfail { { sparc*-*-* && ilp32 } || visium-*-* } } } } */
+/* { dg-final { scan-ipa-dump "_?hooray\[^\\n\]*inline copy in test" "inline" { xfail { { sparc*-*-* && ilp32 } || visium-*-* } } } } */
 /* Missing back-end support for attribute __optimize__ on SPARC and Visium.  */

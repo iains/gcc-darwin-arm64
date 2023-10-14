@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-std=gnu99 " } */
-/* { dg-additional-options "-O -fno-schedule-insns -fno-schedule-insns2 " } */
+/* { dg-additional-options "-O -fno-schedule-insns -fno-schedule-insns2 -fno-reorder-blocks" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 /* { dg-skip-if "" { *-*-mingw* } } */
 
@@ -20,7 +20,7 @@ aarchpcs_overflow (int, int, int, int, int, int, int, int, Empty);
 **	mov	w2, 2
 **	mov	w1, 1
 **	mov	w0, 0
-**	bl	aarchpcs_overflow 
+**	bl	_?aarchpcs_overflow
 **	...
 */
 
@@ -62,7 +62,7 @@ preserve_none_overflow (int, int, int, int, int, int, int, int, int, int, int, i
 **	mov	w21, 1
 **	mov	w20, 0
 **	...
-**	bl	preserve_none_overflow 
+**	bl	_?preserve_none_overflow
 **	...
 */
 
