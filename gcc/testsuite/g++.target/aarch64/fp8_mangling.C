@@ -18,8 +18,8 @@ bar (__mfp8 x)
 {
   return foo (x);
 }
-/* { dg-final { scan-assembler-times "\n_Z3fooh:\n" 1 } } */
-/* { dg-final { scan-assembler-times "\n_Z3foou6__mfp8:\n" 1 } } */
+/* { dg-final { scan-assembler-times "\n_?_Z3fooh:\n" 1 } } */
+/* { dg-final { scan-assembler-times "\n_?_Z3foou6__mfp8:\n" 1 } } */
 
 constexpr __mfp8 cfp8{};
 
