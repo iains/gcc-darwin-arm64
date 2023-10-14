@@ -2,6 +2,7 @@
 /* { dg-do run } */
 /* { dg-require-effective-target lp64 } */
 /* { dg-options "-fexceptions -O2" } */
+/* { dg-skip-if "asm incompatible with mach-o" { *-*-darwin* } } */
 
 #include <unwind.h>
 #include <stdlib.h>
