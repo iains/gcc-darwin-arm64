@@ -1,5 +1,6 @@
 /* { dg-do compile } */
-/* { dg-additional-options "-O2 -std=c99  -fno-unwind-tables -fno-asynchronous-unwind-tables" } */
+/* { dg-additional-options "-O2 -std=c99 " } */
+/* { dg-additional-options " -fno-unwind-tables -fno-asynchronous-unwind-tables" { target { ! *-*-darwin* } } } */
 /* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
 
 #include <stdbool.h>
