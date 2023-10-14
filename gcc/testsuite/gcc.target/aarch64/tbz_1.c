@@ -1,5 +1,6 @@
 /* { dg-do compile } */
-/* { dg-additional-options "-O2 -std=c99  -fno-unwind-tables -fno-asynchronous-unwind-tables" } */
+/* { dg-additional-options "-O2 -std=c99 " } */
+/* { dg-additional-options " -fno-unwind-tables -fno-asynchronous-unwind-tables" { target { ! *-*-darwin* } } } */
 /* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
 
 #include <stdbool.h>
@@ -10,7 +11,7 @@ void h(void);
 ** g1:
 ** 	tbnz	[wx][0-9]+, #?0, .L([0-9]+)
 ** 	ret
-**	...
+** 	...
 */
 void g1(bool x)
 {
@@ -87,7 +88,7 @@ void g3_le(int x)
 ** 	beq	.L[0-9]+
 ** 	b	h
 **	...
-*/ 
+*/
 void g5(int x)
 {
   if (__builtin_expect (x & 0xfeff, 1))
