@@ -1,5 +1,6 @@
 /* { dg-do assemble } */
 /* { dg-options "-O2 -march=armv8-a+nocrc -mcpu=generic -save-temps" } */
+/* { dg-xfail-if "Issue 119" { *-*-darwin* } } */
 
 #include "arm_acle.h"
 
