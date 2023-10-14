@@ -1,4 +1,5 @@
 /* { dg-do run } */
+/* { dg-skip-if "incompatible asm" { *-*-darwin* } } */
 /* { dg-require-effective-target fstack_protector } */
 /* { dg-options "-fstack-protector-all -O2" } */
 
