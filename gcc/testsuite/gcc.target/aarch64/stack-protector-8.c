@@ -1,4 +1,5 @@
 /* { dg-options " -O -fstack-protector-strong -mstack-protector-guard=sysreg -mstack-protector-guard-reg=tpidr2_el0 -mstack-protector-guard-offset=16" } */
+/* { dg-skip-if "incompatible stack layout" { *-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
 void g(void *);
