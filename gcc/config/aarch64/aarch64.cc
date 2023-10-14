@@ -28662,7 +28662,17 @@ aarch64_pars_overlap_p (rtx par1, rtx par2)
 static bool
 aarch64_darwin_frame_pointer_required ()
 {
-  return !leaf_function_p ();
+  if (crtl->calls_eh_return)
+    return true;
+
+  /* Not used in leaf functions (unless forced).  */
+  if (flag_omit_leaf_frame_pointer && leaf_function_p ())
+    return false;
+
+  /* NOTE: We are allowing the user to force omission of the frame
+     pointer, (despite that it is not ABI-compliant).  */
+
+  return flag_omit_frame_pointer != 1;
 }
 #endif
 
