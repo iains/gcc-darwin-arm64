@@ -1,5 +1,6 @@
 /* { dg-do "compile" } */
 /* { dg-options "-O1" } */
+/* { dg-skip-if "unimplemented patchable function entry" *-*-darwin* } */
 
 /* Test the placement of the .LPFE0 label.  */
 
