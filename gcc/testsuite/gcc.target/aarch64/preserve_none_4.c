@@ -40,7 +40,7 @@ int no_arg_stack_use_callee
 **	mov	w22, 2
 **	mov	w21, 1
 **	mov	w20, 0
-**	bl	no_arg_stack_use_callee
+**	bl	_?no_arg_stack_use_callee
 **	add	w0, w0, 1
 ** ...
 */
@@ -87,7 +87,7 @@ int arg_stack_use_callee
 **	mov	w20, 0
 **	str	w0, \[sp\]
 **	mov	w0, 9
-**	bl	arg_stack_use_callee
+**	bl	_?arg_stack_use_callee
 **	add	w0, w0, 1
 ** ...
 */
