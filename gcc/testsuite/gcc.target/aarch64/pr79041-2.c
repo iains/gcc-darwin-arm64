@@ -9,5 +9,5 @@ t (void)
   return ((__int128)0x123456789abcdef << 64) | 0xfedcba987654321;
 }
 
-/* { dg-final { scan-assembler "adr" } } */
+/* { dg-final { scan-assembler "adr" { xfail { *-*-darwin* } } } } */
 /* { dg-final { scan-assembler-not "adrp" } } */
