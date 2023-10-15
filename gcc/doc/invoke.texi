@@ -23967,7 +23967,7 @@ Permissible names are: @samp{arm7tdmi}, @samp{arm7tdmi-s}, @samp{arm710t},
 @samp{neoverse-n1}, @samp{neoverse-n2}, @samp{neoverse-v1}, @samp{xscale},
 @samp{iwmmxt}, @samp{iwmmxt2}, @samp{ep9312}, @samp{fa526}, @samp{fa626},
 @samp{fa606te}, @samp{fa626te}, @samp{fmp626}, @samp{fa726te}, @samp{star-mc1},
-@samp{xgene1}.
+@samp{xgene1}, @samp{apple-m1}, @samp{apple-m2}, @samp{apple-m3}.
 
 Additionally, this option can specify that GCC should tune the performance
 of the code for a big.LITTLE system.  Permissible names are:
