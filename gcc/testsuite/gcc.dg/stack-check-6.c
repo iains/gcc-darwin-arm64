@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -fstack-clash-protection -fdump-rtl-pro_and_epilogue -fno-optimize-sibling-calls --param stack-clash-protection-probe-interval=12 --param stack-clash-protection-guard-size=12" } */
+/* { dg-additional-options "-fomit-frame-pointer" { target aarch64-*-darwin* } } */
 /* { dg-require-effective-target supports_stack_clash_protection } */
 /* { dg-skip-if "" { *-*-* } { "-fstack-protector*" } { "" } } */
 
