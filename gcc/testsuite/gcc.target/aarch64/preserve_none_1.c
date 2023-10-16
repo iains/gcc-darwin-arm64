@@ -1,6 +1,7 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -fno-schedule-insns2" } */
-/* { dg-final { check-function-bodies "**" "" "" } } */
+/* { dg-final { check-function-bodies {"**" "*E"} "" "" { target { ! *-*-darwin* } } } } */
+/* { dg-final { check-function-bodies {"**" "*M"} "" "" { target *-*-darwin* } } } */
 /* { dg-skip-if "" { *-*-mingw* } } */
 
 void normal_callee();
@@ -50,9 +51,11 @@ int preserve_none_caller2(int x) [[gnu::preserve_none]]
 ** preserve_none_caller3:
 **	stp	x29, x30, \[sp, #?-32\]!
 **	mov	x29, sp
-**	str	w20, \[sp, #?[0-9]+\]
+*E	str	w20, \[sp, #?[0-9]+\]
+*M	str	w20, \[x29, #?[0-9]+\]
 **	bl	preserve_none_callee
-**	ldr	w0, \[sp, #?[0-9]+\]
+*E	ldr	w0, \[sp, #?[0-9]+\]
+*M	ldr	w0, \[x29, #?[0-9]+\]
 **	ldp	x29, x30, \[sp\], #?32
 **	ret
 */
