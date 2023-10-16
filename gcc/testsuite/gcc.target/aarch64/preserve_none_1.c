@@ -50,9 +50,9 @@ int preserve_none_caller2(int x) [[gnu::preserve_none]]
 ** preserve_none_caller3:
 **	stp	x29, x30, \[sp, #?-32\]!
 **	mov	x29, sp
-**	str	w20, \[sp, #?[0-9]+\]
+**	str	w20, \[(sp|x29), #?[0-9]+\]
 **	bl	preserve_none_callee
-**	ldr	w0, \[sp, #?[0-9]+\]
+**	ldr	w0, \[(sp|x29), #?[0-9]+\]
 **	ldp	x29, x30, \[sp\], #?32
 **	ret
 */
