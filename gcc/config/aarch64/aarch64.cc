@@ -19406,7 +19406,7 @@ initialize_aarch64_code_model (struct gcc_options *opts)
       if (TARGET_MACHO)
 	/* We need to implement fPIC here (arm64_32 also accepts the large
 	   model).  */
-	;
+	sorry ("code model %qs not supported yet", "large");
       else if (opts->x_flag_pic)
 	sorry ("code model %qs with %<-f%s%>", "large",
 	       opts->x_flag_pic > 1 ? "PIC" : "pic");
