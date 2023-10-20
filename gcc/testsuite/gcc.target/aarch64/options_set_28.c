@@ -6,4 +6,5 @@ int main ()
   return 0;
 }
 
-/* { dg-final { scan-assembler-times {\.arch armv9\.3\-a\+crc\+nopredres\+nomops\n} 1 } } */
+/* { dg-final { scan-assembler-times {\.arch armv9\.3\-a\+crc\+nopredres\+nomops\n} 1 { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\.arch armv9\.3\-a\+nopredres\+nomops\n} 1 { target *-*-darwin* } } } */
