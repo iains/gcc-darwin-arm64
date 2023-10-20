@@ -24932,7 +24932,8 @@ aarch64_float_const_representable_p (rtx x)
     return false;
 
   if (GET_MODE (x) == VOIDmode
-      || (GET_MODE (x) == HFmode && !TARGET_FP_F16INST))
+      || (GET_MODE (x) == HFmode && !TARGET_FP_F16INST)
+      || (GET_MODE (x) == BFmode))
     return false;
 
   r = *CONST_DOUBLE_REAL_VALUE (x);
