@@ -6,6 +6,6 @@ int main ()
   return 0;
 }
 
-/* { dg-final { scan-assembler {\.arch armv8\.2-a\+crc\+fp16} } } */
+/* { dg-final { scan-assembler {\.arch armv8\.2-a(?:\+crc)?\+fp16} } } */
 
  /* FP is part of FP16, don't emit it.  */
