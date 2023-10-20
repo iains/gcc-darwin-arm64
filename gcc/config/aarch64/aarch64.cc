@@ -23943,6 +23943,9 @@ aarch64_start_file (void)
 		aarch64_last_printed_arch_string.c_str ());
 
    default_file_start ();
+#if TARGET_MACHO
+  darwin_file_start ();
+#endif
 }
 
 /* Emit load exclusive.  */
