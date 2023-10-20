@@ -6,5 +6,6 @@ int main()
   return 0;
 }
 
-/* { dg-final { scan-assembler {\.arch armv9\.4-a\+crc\+lse128} } } */
+/* { dg-final { scan-assembler {\.arch armv9\.4-a\+crc\+lse128} { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler {\.arch armv9\.4-a\+lse128} { target *-*-darwin* } } } */
 /* Test a normal looking procinfo.  */
