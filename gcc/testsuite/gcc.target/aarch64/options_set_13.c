@@ -6,6 +6,7 @@ int main ()
   return 0;
 }
 
-/* { dg-final { scan-assembler {\.arch armv8\.2-a\+crc\+fp16\n} } } */
+/* { dg-final { scan-assembler {\.arch armv8\.2-a\+crc\+fp16\n} { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler {\.arch armv8\.2-a\+fp16} { target *-*-darwin* } } } */
 
  /* FP is part of FP16, don't emit it.  */
