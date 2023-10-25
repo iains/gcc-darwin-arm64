@@ -2,6 +2,7 @@
 /* { dg-options "-O2 -mcmodel=large -mpc-relative-literal-loads -fno-pie" } */
 /* { dg-require-effective-target lp64 } */
 /* { dg-skip-if "-mcmodel=large, no support for -fpic" { aarch64-*-* }  { "-fpic" } { "" } } */
+/* { dg-xfail-if "issue #100" { *-*-darwin* } } */
 
 __int128
 t (void)
