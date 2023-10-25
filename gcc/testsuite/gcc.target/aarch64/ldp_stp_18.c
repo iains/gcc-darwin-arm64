@@ -1,4 +1,5 @@
 /* { dg-options "-O2 -fno-tree-loop-distribute-patterns" } */
+/* { dg-additional-options "-mtune=generic -fomit-frame-pointer" { target *-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
 
 #include "ldp_stp_14.h"
