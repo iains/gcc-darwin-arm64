@@ -1,6 +1,7 @@
 /* This is a copy of pr71727.c with scanning reversed.  */
 /* { dg-do compile } */
 /* { dg-options "-mstrict-align -O3 -mno-strict-align" } */
+/* { dg-additional-options "-mtune=generic -fomit-frame-pointer" { target *-*-darwin* } } */
 
 struct test_struct_s
 {
