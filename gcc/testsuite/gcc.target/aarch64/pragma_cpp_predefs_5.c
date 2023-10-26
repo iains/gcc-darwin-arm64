@@ -1,4 +1,5 @@
 /* { dg-do assemble { target { { aarch64_asm_sve-sm4_ok && aarch64_asm_sve-sha3_ok } && { aarch64_asm_sve-aes_ok && aarch64_asm_sve-bitperm_ok } } } } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-do compile { target { ! { { aarch64_asm_sve-sm4_ok && aarch64_asm_sve-sha3_ok } && { aarch64_asm_sve-aes_ok && aarch64_asm_sve-bitperm_ok } } } } } */
 /* { dg-options "-O2" } */
 
