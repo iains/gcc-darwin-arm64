@@ -12,4 +12,6 @@ v2df f (v2df c1, v2df c2)
    return (a1 * c1) + (a2 * c2);
 }
 
-/* { dg-final { scan-assembler-times "adrp" 1 } } */
+/* { dg-final { scan-assembler-times "adrp" 1 { target { ! *-*-darwin* } } } } */
+/* Darwin addresses each literal-pool entry separately; see the anchor note.  */
+/* { dg-final { scan-assembler-times "adrp" 2 { target *-*-darwin* } } } */
