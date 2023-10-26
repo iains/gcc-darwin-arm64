@@ -8,6 +8,8 @@
 #elif defined(__aarch64__)
 # if defined __vxworks
 #  define CHAIN "x9"
+# elif defined(__APPLE__)
+#  define CHAIN  "x16"
 # else
 #  define CHAIN  "x18"
 # endif
