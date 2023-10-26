@@ -24,6 +24,11 @@ if {![istarget aarch64*-*-*] } {
     return
 }
 
+# Darwin assembler sve2 support is incomplete in places
+if { [istarget *-*-darwin*] && ![info exists env(DARWIN_TEST_SVE2)] } then {
+  return
+}
+
 # Load support procs.
 load_lib gcc-dg.exp
 
