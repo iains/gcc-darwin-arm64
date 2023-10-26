@@ -12,4 +12,4 @@ void foo(float16_t ap[20000], mfloat8x16_t b, mfloat8x16_t c)
       vst1q_f16(ap + 8*i, a);
     }
 }
-/* { dg-final { scan-assembler "msr\tfpmr.*\n\.L2" } } */
+/* { dg-final { scan-assembler "msr\tfpmr.*\n\\.?L2" } } */
