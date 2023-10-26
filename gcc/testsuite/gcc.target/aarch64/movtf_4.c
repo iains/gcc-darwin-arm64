@@ -1,4 +1,5 @@
 /* { dg-do assemble } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-require-effective-target large_long_double } */
 /* { dg-options "-O -mtune=neoverse-v1 --save-temps" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */

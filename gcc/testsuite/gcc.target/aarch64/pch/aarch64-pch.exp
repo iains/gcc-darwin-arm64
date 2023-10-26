@@ -26,6 +26,12 @@ if {![istarget aarch64*-*-*] } then {
   return
 }
 
+# Darwin doesn't have SVE we need to do some work to disentangle what is
+# meaningfully testable.
+if { [istarget *-*-darwin*] && ![info exists env(DARWIN_TEST_PCH_SVE)]} then {
+  return
+}
+
 # Load support procs.
 load_lib gcc-dg.exp
 load_lib dg-pch.exp

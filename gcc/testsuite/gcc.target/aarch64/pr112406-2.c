@@ -1,4 +1,5 @@
 /* { dg-do compile { target { aarch64*-*-* } } } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-march=armv8-a+sve -Ofast" } */
 
 double MADPictureC1;
