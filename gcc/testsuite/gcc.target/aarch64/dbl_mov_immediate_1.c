@@ -41,8 +41,10 @@ double d4(void)
 
 /* { dg-final { scan-assembler-times "movi\td\[0-9\]+, #?0"                 1 } } */
 
-/* { dg-final { scan-assembler-times "adrp\tx\[0-9\]+, \.LC\[0-9\]"         2 } } */
-/* { dg-final { scan-assembler-times "ldr\td\[0-9\]+, \\\[x\[0-9\], #:lo12:\.LC\[0-9\]\\\]" 2 } } */
+/* { dg-final { scan-assembler-times "adrp\tx\[0-9\]+, \.LC\[0-9\]"         2  { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times "ldr\td\[0-9\]+, \\\[x\[0-9\], #:lo12:\.LC\[0-9\]\\\]" 2  { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times "adrp\tx\[0-9\]+, lC\[0-9\]@PAGE" 2  { target *-*-darwin* } } } */
+/* { dg-final { scan-assembler-times "ldr\td\[0-9\]+, \\\[x\[0-9\], #lC\[0-9\]@PAGEOFF\\\]" 2  { target *-*-darwin* } } } */
 
 /* { dg-final { scan-assembler-times "fmov\td\[0-9\]+, 1\\\.5e\\\+0"        1 } } */
 
