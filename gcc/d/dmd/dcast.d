@@ -1329,7 +1329,9 @@ MATCH implicitConvTo(Expression e, Type t)
                             else if (!v.type.isZeroInit(e.loc))
                                 return false;
                         }
-                        return cd.baseClass ? convertible(e, cd.baseClass, mod) : true;
+                        if (cd.baseClass)
+                          return convertible(e, cd.baseClass, mod);
+                        return true;
                     }
                 }
 

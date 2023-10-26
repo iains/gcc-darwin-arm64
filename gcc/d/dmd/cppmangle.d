@@ -2360,7 +2360,9 @@ private bool isNamespaceEqual (CPPNamespaceDeclaration a, CPPNamespaceDeclaratio
         return false;
     if (a.ident != b.ident)
         return false;
-    return a.cppnamespace is null ? true : isNamespaceEqual(a.cppnamespace, b.cppnamespace);
+    if (a.cppnamespace is null)
+      return true;
+    return isNamespaceEqual(a.cppnamespace, b.cppnamespace);
 }
 
 /**

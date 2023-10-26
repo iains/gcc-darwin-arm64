@@ -682,7 +682,9 @@ extern (C++) final class TupleDeclaration : Declaration
     override bool needThis()
     {
         //printf("TupleDeclaration::needThis(%s)\n", toChars());
-        return isexp ? foreachVar((s) { return s.needThis(); }) != 0 : false;
+        if (isexp)
+          return foreachVar((s) { return s.needThis(); }) != 0;
+        return false;
     }
 
     /***********************************************************

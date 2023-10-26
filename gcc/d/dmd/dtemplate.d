@@ -153,7 +153,9 @@ extern (C++) bool isError(const RootObject o)
     assert(s);
     if (s.errors)
         return true;
-    return s.parent ? isError(s.parent) : false;
+    if (s.parent)
+      return isError(s.parent);
+    return false;
 }
 
 /**************************************

@@ -635,12 +635,16 @@ extern (C++) final class ScopeStatement : Statement
     override bool hasBreak() const pure nothrow
     {
         //printf("ScopeStatement::hasBreak() %s\n", toChars());
-        return statement ? statement.hasBreak() : false;
+        if (statement)
+          return statement.hasBreak();
+        return false;
     }
 
     override bool hasContinue() const pure nothrow
     {
-        return statement ? statement.hasContinue() : false;
+        if (statement)
+          return statement.hasContinue();
+        return false;
     }
 
     override void accept(Visitor v)

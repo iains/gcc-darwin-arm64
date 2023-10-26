@@ -544,7 +544,7 @@ struct IntRange
     IntRange opBinary(string op : "&")(IntRange rhs) const
     {
         // unsigned or identical sign bits
-        if ((imin.negative ^ imax.negative) != 1 && (rhs.imin.negative ^ rhs.imax.negative) != 1)
+        if (!(imin.negative ^ imax.negative) && !(rhs.imin.negative ^ rhs.imax.negative))
         {
             return IntRange(minAnd(this, rhs), maxAnd(this, rhs));
         }
@@ -553,10 +553,14 @@ struct IntRange
         IntRange r = IntRange(rhs);
 
         // both intervals span [-1,0]
-        if ((imin.negative ^ imax.negative) == 1 && (rhs.imin.negative ^ rhs.imax.negative) == 1)
+        if ((imin.negative ^ imax.negative) && (rhs.imin.negative ^ rhs.imax.negative) )
         {
             // cannot be larger than either l.max or r.max, set the other one to -1
-            SignExtendedNumber max = l.imax.value > r.imax.value ? l.imax : r.imax;
+            SignExtendedNumber max;
+            if (l.imax.value > r.imax.value)
+              max = l.imax;
+            else
+              max = r.imax;
 
             // only negative numbers for minimum
             l.imax.value = -1;
@@ -569,7 +573,7 @@ struct IntRange
         else
         {
             // only one interval spans [-1,0]
-            if ((l.imin.negative ^ l.imax.negative) == 1)
+            if ((l.imin.negative ^ l.imax.negative))
             {
                 swap(l, r); // r spans [-1,0]
             }
@@ -592,7 +596,7 @@ struct IntRange
     IntRange opBinary(string op : "|")(IntRange rhs) const
     {
         // unsigned or identical sign bits:
-        if ((imin.negative ^ imax.negative) == 0 && (rhs.imin.negative ^ rhs.imax.negative) == 0)
+        if (!(imin.negative ^ imax.negative) && !(rhs.imin.negative ^ rhs.imax.negative))
         {
             return IntRange(minOr(this, rhs), maxOr(this, rhs));
         }
@@ -601,7 +605,7 @@ struct IntRange
         IntRange r = IntRange(rhs);
 
         // both intervals span [-1,0]
-        if ((imin.negative ^ imax.negative) == 1 && (rhs.imin.negative ^ rhs.imax.negative) == 1)
+        if ((imin.negative ^ imax.negative) && (rhs.imin.negative ^ rhs.imax.negative))
         {
             // cannot be smaller than either l.min or r.min, set the other one to 0
             SignExtendedNumber min = l.imin.value < r.imin.value ? l.imin : r.imin;
@@ -617,7 +621,7 @@ struct IntRange
         else
         {
             // only one interval spans [-1,0]
-            if ((imin.negative ^ imax.negative) == 1)
+            if ((imin.negative ^ imax.negative))
             {
                 swap(l, r); // r spans [-1,0]
             }
