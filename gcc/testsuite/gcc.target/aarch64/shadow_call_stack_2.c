@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-fsanitize=shadow-call-stack -ffixed-x18 -fexceptions" } */
-/* { dg-skip-if "conflicts with x18" { aarch64-*-vxworks* } } */
+/* { dg-skip-if "conflicts with x18" { aarch64-*-vxworks* aarch64*-*-darwin* } } */
 
 int i;
 
