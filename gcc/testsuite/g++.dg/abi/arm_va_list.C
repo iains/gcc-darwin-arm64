@@ -8,8 +8,10 @@
 // #include <stdarg.h>
 typedef __builtin_va_list va_list;
 
-// { dg-final { scan-assembler "\n_Z1fPSt9__va_list:" } }
+// { dg-final { scan-assembler "\n_Z1fPSt9__va_list:" { target { ! *-*-darwin* } } } }
+// { dg-final { scan-assembler "\n__Z1fPPc:" { target *-*-darwin* } } }
 void f(va_list*) {}
 
-// { dg-final { scan-assembler "\n_Z1gSt9__va_listS_:" } }
+// { dg-final { scan-assembler "\n_Z1gSt9__va_listS_:" { target { ! *-*-darwin* } } } }
+// { dg-final { scan-assembler "\n__Z1gPcS_:" { target *-*-darwin* } } }
 void g(va_list, va_list) {}
