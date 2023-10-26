@@ -1,3 +1,4 @@
+/* { dg-skip-if "incompatible stack layout" { *-*-darwin* } } */
 /* { dg-options "-O2 -fstack-clash-protection -fomit-frame-pointer --param stack-clash-protection-guard-size=12 -fno-stack-protector" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
