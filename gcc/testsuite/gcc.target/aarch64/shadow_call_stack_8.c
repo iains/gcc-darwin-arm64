@@ -10,7 +10,7 @@
 
 /* { dg-do compile } */
 /* { dg-options "-O0 -fomit-frame-pointer -fsanitize=shadow-call-stack -fno-exceptions -ffixed-x18 --save-temps -fno-stack-protector" } */
-/* { dg-skip-if "conflicts with x18" { aarch64-*-vxworks* } } */
+/* { dg-skip-if "conflicts with x18" { aarch64-*-vxworks* aarch64*-*-darwin* } } */
 
 int func1 (void)
 {
