@@ -20,6 +20,16 @@
 load_lib gcc-dg.exp
 
 # Initialize `dg'.
+# Memory tagging has no meaning on Darwin: the hardware does not implement MTE
+# and there is no interface to enable tagged addressing (the execution tests
+# reach for prctl, which is Linux's), so nothing built this way can run.  The
+# compile-only tests do pass, but they only restate target-independent codegen
+# that the ELF arms already check.  Skip the directory, as is done for SVE,
+# while leaving a way to run it deliberately.
+if { [istarget *-*-darwin*] && ![info exists env(DARWIN_TEST_MTE)] } then {
+  return
+}
+
 dg-init
 
 # Main loop.

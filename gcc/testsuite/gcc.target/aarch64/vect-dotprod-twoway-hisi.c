@@ -1,4 +1,5 @@
 /* { dg-do run } */
+/* { dg-skip-if "the Darwin assembler rejects the SVE condition-code aliases (b.any etc.)" { *-*-darwin* } } */
 /* { dg-require-effective-target vect_dotprod_hisi } */
 /* { dg-options "-static -O3 -ftree-vectorize -fdump-tree-vect-details -save-temps" } */
 /* Ensure runtime correctness in the autovectorized two-way dot product operations.  */
