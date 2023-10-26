@@ -24,6 +24,11 @@ if {![istarget aarch64*-*-*] } {
     return
 }
 
+# Darwin's assembler support for sme2 appears incomplete.
+if { [istarget *-*-darwin*] && ![info exists env(DARWIN_TEST_SME2)]} then {
+  return
+}
+
 # Load support procs.
 load_lib g++-dg.exp
 

@@ -3,7 +3,7 @@
 /* scs_pop: ldr x30, [x18, #-8]! */
 /* { dg-do compile } */
 /* { dg-options "-O2 -fno-omit-frame-pointer -fsanitize=shadow-call-stack -ffixed-x18 -fno-exceptions" } */
-/* { dg-skip-if "conflicts with x18" { aarch64-*-vxworks* } } */
+/* { dg-skip-if "conflicts with x18" { aarch64-*-vxworks* aarch64*-*-darwin* } } */
 
 int foo (int);
 
