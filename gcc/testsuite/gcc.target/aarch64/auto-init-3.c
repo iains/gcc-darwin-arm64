@@ -2,13 +2,19 @@
 /* { dg-do compile } */
 /* { dg-options "-ftrivial-auto-var-init=zero -fdump-rtl-expand" } */
 
-long double result;
+#ifdef __APPLE__
+# define TYPE _Float128
+#else
+# define TYPE long double
+#endif
 
-long double foo()
+TYPE result;
+
+TYPE foo()
 {
   float temp1;
   double temp2;
-  long double temp3;
+  TYPE temp3;
   
   result = temp1 + temp2 + temp3;
   return result;
