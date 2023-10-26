@@ -1,9 +1,9 @@
 /* { dg-do compile } */
 // { dg-options "-g -dA" }
-// { dg-final { scan-assembler-times "DW_AT_name: \"svbool_t\"" 1 } }
-// { dg-final { scan-assembler-times "DW_AT_name: \"svcount_t\"" 1 } }
-// { dg-final { scan-assembler-times ".byte	0x1	// DW_AT_bit_stride" 1 } }
-// { dg-final { scan-assembler-times ".byte	0x1	// DW_AT_bit_size" 1 } }
+// { dg-final { scan-assembler-times "DW_AT_name: \"svbool_t\"|\"svbool_t\\\\0\"\t; DW_AT_name" 1 } }
+// { dg-final { scan-assembler-times "DW_AT_name: \"svcount_t\"|\"svcount_t\\\\0\"\t; DW_AT_name" 1 } }
+// { dg-final { scan-assembler-times ".byte	0x1	(//|;) DW_AT_bit_stride" 1 } }
+// { dg-final { scan-assembler-times ".byte	0x1	(//|;) DW_AT_bit_size" 1 } }
 
 #include <arm_sme.h>
 

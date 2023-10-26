@@ -1,9 +1,9 @@
 /* { dg-do compile } */
 // { dg-options "-g -dA" }
-// { dg-final { scan-assembler-times "DW_AT_name: \"__SVBool_t\"" 2 } }
-// { dg-final { scan-assembler-times "DW_AT_name: \"__SVCount_t\"" 1 } }
-// { dg-final { scan-assembler-times ".byte	0x1	// DW_AT_bit_stride" 2 } }
-// { dg-final { scan-assembler-times ".byte	0x1	// DW_AT_bit_size" 1 } }
+// { dg-final { scan-assembler-times "DW_AT_name: \"__SVBool_t\"|\"__SVBool_t\\\\0\"\t; DW_AT_name" 2 } }
+// { dg-final { scan-assembler-times "DW_AT_name: \"__SVCount_t\"|\"__SVCount_t\\\\0\"\t; DW_AT_name" 1 } }
+// { dg-final { scan-assembler-times ".byte	0x1	(//|;) DW_AT_bit_stride" 2 } }
+// { dg-final { scan-assembler-times ".byte	0x1	(//|;) DW_AT_bit_size" 1 } }
 
 #pragma GCC target "+sve2p1+sme2"
 

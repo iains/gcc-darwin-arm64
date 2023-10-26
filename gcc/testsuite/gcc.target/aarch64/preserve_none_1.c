@@ -10,9 +10,9 @@ void preserve_none_callee() [[gnu::preserve_none]];
 
 /*
 ** preserve_none_caller1:
-** ?#APP
+** ?(#APP|;.*)
 **	nop
-** ?#NO_APP
+** ?(#NO_APP|;.*)
 **	ret
 */
 void preserve_none_caller1() [[gnu::preserve_none]]
