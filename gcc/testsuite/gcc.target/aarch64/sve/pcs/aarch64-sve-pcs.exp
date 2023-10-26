@@ -25,6 +25,11 @@ if {![istarget aarch64*-*-*] } then {
     return
 }
 
+# Darwin does not support .variant_pcs at present.
+if { [istarget *-*-darwin*] } then {
+    return
+}
+
 # Load support procs.
 load_lib gcc-dg.exp
 
