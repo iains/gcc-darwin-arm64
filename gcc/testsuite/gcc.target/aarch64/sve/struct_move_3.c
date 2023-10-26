@@ -1,4 +1,5 @@
 /* { dg-do assemble { target aarch64_asm_sve_ok } } */
+/* { dg-skip-if "no BE support" { aarch64-*-darwin* } } */
 /* { dg-options "-O -msve-vector-bits=256 -mbig-endian --save-temps" } */
 
 typedef char vnx16qi __attribute__((vector_size(32)));
