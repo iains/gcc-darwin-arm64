@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "no BE support" { aarch64-*-darwin* } } */
 /* { dg-options "-O2 -mbig-endian" } */
 
 /* To avoid needing big-endian header files.  */
