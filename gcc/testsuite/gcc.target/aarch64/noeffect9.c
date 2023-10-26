@@ -1,6 +1,7 @@
 /* { dg-do compile } */
 /* { dg-options "-O3 -march=armv8-a" } */
-/* { dg-final { check-function-bodies "**" "" "" } } */
+/* { dg-final { check-function-bodies {"**" "*E"} "" "" { target { ! *-*-darwin* } } } } */
+/* { dg-final { check-function-bodies {"**" "*M"} "" "" { target *-*-darwin* } } } */
 
 #define N 1000
 int a[N] = {0};
@@ -10,8 +11,8 @@ int c[N] = {0};
 /*
 ** foo:
 **	...
-**	add	x[0-9]+, x[0-9]+, 4000
-**	add	x[0-9]+, x[0-9]+, 3648
+*E	add	x[0-9]+, x[0-9]+, 4000
+*E	add	x[0-9]+, x[0-9]+, 3648
 **	mov	w0, 0
 **	b	\.L[0-9]+
 **	...
