@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -march=armv8.2-a+sve2+fp8dot2" } */
 #include <arm_sve.h>
 
