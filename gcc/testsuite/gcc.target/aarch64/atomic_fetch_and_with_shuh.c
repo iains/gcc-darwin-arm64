@@ -107,10 +107,14 @@ testFun6 ()
 /*
 ** testFun7:
 ** ...
-**	add	(x[0-9]+), \1, 1
-**	mov	(w[0-9]+), -8
-**	shuh	ph
-**	ldclrb	\2, \2, \[x[0-9]+\]
+*E	add	(x[0-9]+), \1, 1
+*E	mov	(w[0-9]+), -8
+*E	shuh	ph
+*E	ldclrb	\2, \2, \[x[0-9]+\]
+*M	mov	(w[0-9]+), -8
+*M	...
+*M	shuh	ph
+*M	ldclrb	\1, \1, \[x[0-9]+\]
 ** ...
 */
 static char buf[8];
