@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "darwinpcs D.4, and no GCC 9.1 ABI-change notes on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -fno-stack-protector -save-temps" } */
 
 #define ALIGN 32

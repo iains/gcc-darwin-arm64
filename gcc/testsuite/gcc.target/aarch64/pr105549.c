@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "darwinpcs D.4: aligned x-reg passing differs" { *-*-darwin* } } */
 /* { dg-options "-save-temps" } */
 
 enum e { E1 };
