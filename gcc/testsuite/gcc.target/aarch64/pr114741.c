@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2" } */
 /* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
 

@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -fno-schedule-insns2" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 /* { dg-skip-if "" { *-*-mingw* } } */
