@@ -19,5 +19,7 @@ dummy ()
   return result;
 }
 
-/* { dg-final { scan-assembler-times "zero\t4" 2 } } */
-/* { dg-final { scan-assembler "zero\t268435452" } } */
+/* { dg-final { scan-assembler-times "zero\t4" 2 { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler "zero\t268435452" { target { ! *-*-darwin*} }  } } */
+/* { dg-final { scan-assembler-times ".zerofill __DATA,__bss,_y,4,28" 1 { target { *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times ".zerofill __DATA,__bss,_x,4,28" 1 { target { *-*-darwin* } } } } */

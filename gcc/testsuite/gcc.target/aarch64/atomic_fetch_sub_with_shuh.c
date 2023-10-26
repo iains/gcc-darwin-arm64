@@ -119,10 +119,14 @@ testFun6 ()
 /*
 ** testFun7:
 ** ...
-**	add	(x[0-9]+), \1, 1
-**	mov	(w[0-9]+), -7
-**	shuh	ph
-**	ldaddb	\2, \2, \[\1\]
+*E	add	(x[0-9]+), \1, 1
+*E	mov	(w[0-9]+), -7
+*E	shuh	ph
+*E	ldaddb	\2, \2, \[\1\]
+*M	mov	(w[0-9]+), -7
+*M	...
+*M	shuh	ph
+*M	ldaddb	\1, \1, \[x[0-9]+\]
 ** ...
 */
 static char buf[8];
