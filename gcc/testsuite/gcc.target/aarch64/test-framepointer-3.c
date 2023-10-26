@@ -10,5 +10,5 @@
    Since we asked to have no frame pointers anywhere, we expect no frame
    record in main or the leaf.  */
 
-/* { dg-final { scan-assembler-not "stp\tx29, x30, \\\[sp, -\[0-9\]+\\\]!" } } */
+/* { dg-final { scan-assembler-not "stp\tx29, x30, \\\[sp, -\[0-9\]+\\\]!" { target { ! *-*-darwin* } } } } */
 

@@ -1,5 +1,6 @@
 /* { dg-do assemble } */
 /* { dg-options "-O2 -mbig-endian --save-temps" } */
+/* { dg-skip-if "no BE" { *-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 typedef unsigned char v16qi __attribute__((vector_size(16)));
