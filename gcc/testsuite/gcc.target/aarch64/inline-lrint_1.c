@@ -15,4 +15,4 @@ TEST (fllf, float , long long, l)
 
 /* { dg-final { scan-assembler-times "frintx\t\[d,s\]\[0-9\]+, \[d,s\]\[0-9\]+" 6 } } */
 /* { dg-final { scan-assembler-times "fcvtzs\tx\[0-9\]+, \[d,s\]\[0-9\]+" 6 } } */
-/* { dg-final { scan-assembler-not "bl"    } } */
+/* { dg-final { scan-assembler-not "bl\t" } } */

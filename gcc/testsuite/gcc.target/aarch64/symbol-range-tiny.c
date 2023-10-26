@@ -1,4 +1,5 @@
 /* { dg-do link } */
+/* { dg-skip-if "no mcmodel tiny" *-*-darwin* } */
 /* { dg-options "-O3 -save-temps -mcmodel=tiny" } */
 
 char fixed_regs[0x00080000];
