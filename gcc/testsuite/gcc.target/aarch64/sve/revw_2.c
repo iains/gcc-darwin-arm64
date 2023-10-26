@@ -1,4 +1,5 @@
 /* { dg-do assemble { target aarch64_asm_sve_ok } } */
+/* { dg-skip-if "no BE support" { aarch64-*-darwin* } } */
 /* { dg-options "-O -msve-vector-bits=256 --save-temps -mbig-endian" } */
 
 #include "revw_1.c"
