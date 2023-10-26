@@ -8,7 +8,8 @@
 /*
 ** ctzb:
 **	...
-**	movi	v([0-9]+)\.16b, 0xffffffffffffff80
+*E	movi	v([0-9]+)\.16b, 0xffffffffffffff80
+*M	movi	v([0-9]+)\.16b, 0x80
 **	ldr	q([0-9]+), \[x[0-9]+\]
 **	orr	v([0-9]+)\.16b, v\2\.16b, v\1\.16b
 **	rbit	v([0-9]+)\.16b, v\3\.16b

@@ -13,8 +13,10 @@ int8x16_t z;
 
 /*
 ** test_addressable:
-**	adrp	x([0-9]+), \.LANCHOR0
-**	ldr	q([0-9]+), \[x\1, #?:lo12:\.LANCHOR0\]
+*E	adrp	x([0-9]+), \.LANCHOR0
+*E	ldr	q([0-9]+), \[x\1, #?:lo12:\.LANCHOR0\]
+*M	adrp	x([0-9]+), _z@PAGE
+*M	ldr	q([0-9]+), \[x\1, #_z@PAGEOFF\]
 **	sxtl2	v0\.8h, v\2\.16b
 **	ret
 */

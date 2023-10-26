@@ -315,6 +315,6 @@ sc_caller () [[arm::streaming_compatible]]
   return sc_callee ();
 }
 
-/* { dg-final { scan-assembler {n_caller:(?:(?!ret).)*\.cfi_offset 46, -16\n} } } */
-/* { dg-final { scan-assembler {s_caller:(?:(?!ret).)*\.cfi_offset 46, -16\n} } } */
-/* { dg-final { scan-assembler {sc_caller:(?:(?!ret).)*\.cfi_offset 46, -8\n} } } */
+/* { dg-final { scan-assembler {n_caller:(?:(?!ret).)*\.cfi_offset 46, -16\n} { target cfi } } } */
+/* { dg-final { scan-assembler {s_caller:(?:(?!ret).)*\.cfi_offset 46, -16\n} { target cfi } } } */
+/* { dg-final { scan-assembler {sc_caller:(?:(?!ret).)*\.cfi_offset 46, -8\n} { target cfi } } } */
