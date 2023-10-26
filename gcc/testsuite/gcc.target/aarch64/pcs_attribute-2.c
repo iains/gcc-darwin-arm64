@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "Not applicable to darwinpcs" { *-*-darwin* } } */
 /* { dg-require-effective-target aarch64_variant_pcs } */
 
 /* Test that .variant_pcs is emitted for vector PCS symbol references.  */
