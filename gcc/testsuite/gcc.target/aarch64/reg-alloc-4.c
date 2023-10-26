@@ -61,7 +61,9 @@ foo (volatile struct L *head, int inc)
 			"r" (inner->next),	/* x15 */
 			"r" (inner->next),	/* x16 */
 			"r" (inner->next),	/* x17 */
-#ifndef __vxworks /* x18 is a fixed register on VxWorks, used for the TCB.  */
+#if !defined (__vxworks) && !defined (__MACH__)
+		      /* x18 is a fixed register on VxWorks, used for the TCB,
+			 and is reserved by darwinpcs.  */
 			"r" (inner->next),	/* x18 */
 #endif
 			"r" (inner->next) :	/* x30 */

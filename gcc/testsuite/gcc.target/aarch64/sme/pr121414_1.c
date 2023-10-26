@@ -1,3 +1,8 @@
+/* Every check in this test verifies a .variant_pcs directive.  Darwin does not
+   emit pcs variant info (see aarch64_darwin_declare_function_name): Mach-O has
+   nothing that consumes the marker, so emitting it would only make the assembly
+   longer to no purpose.  There is therefore nothing here to test.  */
+/* { dg-skip-if "Darwin does not emit pcs variant info" { *-*-darwin* } } */
 #pragma GCC target "+sme2"
 
 void f1() __arm_streaming_compatible {}

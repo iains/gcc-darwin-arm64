@@ -479,29 +479,29 @@ void consume_varargs (float, ...);
 /*
 ** test_varargs:
 **	...
-**	stp	q3, q7, \[sp, #?-32\]!
+*E	stp	q3, q7, \[sp, #?-32\]!
 **	fmov	w10, s0
-**	fmov	x11, d1
-** (
-**	fmov	x12, d2
-** |
-**	umov	x12, v2.d\[0\]
-** )
-**	fmov	x13, d4
-**	fmov	x14, d5
-** (
-**	fmov	x15, d6
-** |
-**	umov	x15, v6.d\[0\]
-** )
+*E	fmov	x11, d1
+*E (
+*E	fmov	x12, d2
+*E |
+*E	umov	x12, v2.d\[0\]
+*E )
+*E	fmov	x13, d4
+*E	fmov	x14, d5
+*E (
+*E	fmov	x15, d6
+*E |
+*E	umov	x15, v6.d\[0\]
+*E )
 **	smstop	sm
 **	fmov	s0, w10
-**	fmov	d1, x11
-**	fmov	d2, x12
-**	fmov	d4, x13
-**	fmov	d5, x14
-**	fmov	d6, x15
-**	ldp	q3, q7, \[sp\], #?32
+*E	fmov	d1, x11
+*E	fmov	d2, x12
+*E	fmov	d4, x13
+*E	fmov	d5, x14
+*E	fmov	d6, x15
+*E	ldp	q3, q7, \[sp\], #?32
 **	bl	consume_varargs
 **	...
 */
