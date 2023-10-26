@@ -1,8 +1,14 @@
 /* { dg-do compile } */
 /* { dg-options "-O2" } */
 
+#if __APPLE__
+#define F128TYPE __float128
+#else
+#define F128TYPE long double
+#endif
+
 void
-foo (long double *output)
+foo (F128TYPE *output)
 {
   *output = 0.0;
 }
