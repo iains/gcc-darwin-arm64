@@ -1,6 +1,12 @@
 /* PR target/94514. Unwind across mixed pac-ret and non-pac-ret frames.  */
 /* { dg-do run } */
 /* { dg-require-effective-target lp64 } */
+/* The Darwin unwinder comes from libSystem and does not act on
+   DW_CFA_AARCH64_negate_ra_state, so unwinding through a frame whose return
+   address is signed fails.  Apple clang fails this identically, and both
+   toolchains emit correct unwind data, so this is an OS limitation rather than
+   a codegen bug.  An XPASS here means the OS unwinder has gained support.  */
+/* { dg-xfail-run-if "OS unwinder ignores DW_CFA_AARCH64_negate_ra_state" { aarch64*-*-darwin* } } */
 /* { dg-options "-fexceptions -O2" } */
 
 #include <unwind.h>

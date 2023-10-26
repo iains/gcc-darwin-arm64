@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-march=armv8-a+sve -O2 -fharden-conditional-branches -fno-tree-scev-cprop" } */
 
 /* -fharden-conditional-branches prevents optimization of its redundant

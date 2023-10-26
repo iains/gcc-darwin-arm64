@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -ftree-vectorize -fdump-tree-vect-details -march=armv8-a+sve -msve-vector-bits=scalable" } */
 
 void f(unsigned char y[restrict],
