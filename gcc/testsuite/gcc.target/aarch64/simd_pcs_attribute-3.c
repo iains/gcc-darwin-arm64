@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-Ofast" } */
+/* { dg-skip-if "no system variant_pcs support" *-*-darwin* } */
 
 __attribute__ ((__simd__))
 __attribute__ ((__nothrow__ , __leaf__ , __const__))

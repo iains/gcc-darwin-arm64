@@ -1,5 +1,6 @@
 /* { dg-do compile { target bitint } } */
 /* { dg-additional-options "-std=c23 -O2 -fno-stack-protector -save-temps -fno-schedule-insns -fno-schedule-insns2 -fno-late-combine-instructions" } */
+/* { dg-skip-if "aligned x-reg passing is altered by darwinpcs" { aarch64-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 #define ALIGN 16
