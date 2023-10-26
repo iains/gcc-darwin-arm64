@@ -12,11 +12,11 @@ enum E {
   N3
 };
 
-extern void bar (char, short, int, enum E, long, long long, int *, bool);
+extern void bar (unsigned char, short, int, enum E, long, long long, int *, bool);
 
 void foo()
 {
-  char temp1;
+  unsigned char temp1;
   short temp2;
   int temp3;
   enum E temp4;
