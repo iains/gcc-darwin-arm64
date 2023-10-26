@@ -1,5 +1,6 @@
 /* PR target/99767 */
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options " -O1 -fopenmp-simd -fno-tree-dce -march=armv8-a+sve" } */
 
 int a[1024], b[1024];
