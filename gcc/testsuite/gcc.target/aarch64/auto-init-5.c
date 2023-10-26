@@ -2,14 +2,19 @@
 /* { dg-do compile } */
 /* { dg-options "-ftrivial-auto-var-init=zero" } */
 
+#ifdef __APPLE__
+# define TYPE _Float128
+#else
+# define TYPE long double
+#endif
 
-_Complex long double result;
+_Complex TYPE result;
 
-_Complex long double foo()
+_Complex TYPE foo()
 {
   _Complex float temp1;
   _Complex double temp2;
-  _Complex long double temp3;
+  _Complex TYPE temp3;
 
   result = temp1 + temp2 + temp3;
   return result;
