@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -fdump-tree-optimized" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 

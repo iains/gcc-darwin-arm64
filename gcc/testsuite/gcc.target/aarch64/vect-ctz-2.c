@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O3 -march=armv8.2-a+sve -fno-schedule-insns -fno-schedule-insns2" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
