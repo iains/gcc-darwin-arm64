@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "Darwin platforms do not support big-endian arm64" *-*-darwin* } */
 /* { dg-options "-fpermissive -Ofast -mbig-endian -w" } */
 
 int cc;
