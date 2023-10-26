@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <string.h>
 
-struct used_struct 
+struct used_struct
 {
   int key;
   char *name;
@@ -26,7 +26,7 @@ struct unused_struct
   struct unused_struct *next;
 };
 
-void 
+void
 foo (struct used_struct *list)
 {
   enum list_name_type {
@@ -41,7 +41,7 @@ foo (struct used_struct *list)
   enum list_name_type *enum_list;
 
   enum_list = (enum list_name_type *) malloc (10 * sizeof (enum list_name_type));
-  
+
   for (i = 0; i < 10; i++)
     {
       if (strncmp (list[i].name, "Alice", 5) == 0)
@@ -67,7 +67,7 @@ main (int argc, char **argv)
   struct used_struct *my_list;
 
   my_list = (struct used_struct *) malloc (10 * sizeof (struct used_struct));
-  
+
   for (i = 0; i < 10; i++)
     {
       my_list[i].key = i;
@@ -79,6 +79,6 @@ main (int argc, char **argv)
 
   for (i = 0; i < 10; i++)
     fprintf (stdout, "Key: %d, Name: %s\n", my_list[i].key, my_list[i].name);
-  
+
   return 0;
 }
