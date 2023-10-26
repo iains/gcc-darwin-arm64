@@ -156,10 +156,14 @@ testFun9 ()
 /*
 ** testFun10:
 ** ...
-**	add	(x[0-9]+), \1, 1
-**	mov	(w[0-9]+), 7
-**	stshh	strm
-**	strb	\2, \[\1\]
+*E	add	(x[0-9]+), \1, 1
+*E	mov	(w[0-9]+), 7
+*E	stshh	strm
+*E	strb	\2, \[\1\]
+*M	mov	(w[0-9]+), 7
+*M	...
+*M	stshh	strm
+*M	strb	\1, \[x[0-9]+\]
 ** ...
 */
 static char buf[8];
