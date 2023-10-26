@@ -1,3 +1,4 @@
+/* { dg-skip-if "no 32b support" { aarch64-*-darwin* } } */
 /* { dg-options "-O2 -mabi=ilp32 -Wno-deprecated -fdata-sections" } */
 
 int a[128];
