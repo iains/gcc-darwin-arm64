@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "Darwin ABI is different, test separately" { *-*-darwin* } } */
 /* { dg-options "-O2 -fno-stack-protector -save-temps -Wno-narrowing" } */
 
 #define ALIGN 32
