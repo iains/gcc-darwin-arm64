@@ -1,3 +1,4 @@
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 #pragma GCC target "arch=armv9.5-a+sme"
 #ifdef __ARM_FEATURE_SME_TMOP
 #error Foo

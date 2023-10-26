@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -ftree-loop-vectorize -funsafe-math-optimizations -march=armv8.2-a+sve -mstrict-align" } */
 
 float

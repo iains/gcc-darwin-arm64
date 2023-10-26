@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O3 -mcpu=neoverse-n1+sve -fdump-tree-vect" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 

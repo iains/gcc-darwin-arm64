@@ -1,4 +1,5 @@
 /* { dg-options "" } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 
 void multi1() [[gnu::aarch64_vector_pcs, gnu::preserve_none]]; /* { dg-warning {ignoring attribute 'preserve_none' because it conflicts} } */
 void multi2() [[gnu::preserve_none, gnu::aarch64_vector_pcs]]; /* { dg-warning {ignoring attribute 'aarch64_vector_pcs' because it conflicts} } */

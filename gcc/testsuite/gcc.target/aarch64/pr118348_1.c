@@ -1,4 +1,5 @@
 /* { dg-do run { target { aarch64_sve128_hw && fstack_protector } } } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -fopenmp-simd -fno-trapping-math -msve-vector-bits=128 --param aarch64-autovec-preference=sve-only -fstack-protector-strong" } */
 
 #pragma GCC target "+sve"

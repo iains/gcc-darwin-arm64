@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 // { dg-options "-g -dA" }
 // { dg-final { scan-assembler-times "DW_AT_name: \"svbool_t\"" 1 } }
 // { dg-final { scan-assembler-times "DW_AT_name: \"svcount_t\"" 1 } }
