@@ -1,5 +1,6 @@
 /* { dg-do assemble } */
 /* { dg-options "-O2 -mbig-endian --save-temps" } */
+/* { dg-skip-if "no BE" { *-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 struct di_qi_1 { unsigned char c[4]; unsigned int x; };
