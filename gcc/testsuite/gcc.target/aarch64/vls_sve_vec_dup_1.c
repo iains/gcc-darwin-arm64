@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O3 -march=armv8.2-a+sve -msve-vector-bits=128" } */
 
 float fasten_main_etot_0;

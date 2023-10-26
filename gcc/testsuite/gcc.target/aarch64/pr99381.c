@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 /* { dg-options "-march=armv8-a" } */
 /* PR99381: we shouldn't ICE if the user forgets -march=armv8.2-a+sve. */
 

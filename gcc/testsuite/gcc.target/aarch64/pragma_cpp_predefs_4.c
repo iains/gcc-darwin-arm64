@@ -1,3 +1,4 @@
+/* { dg-skip-if "SVE is not available on Darwin" { *-*-darwin* } } */
 #pragma GCC target "+nothing+dotprod"
 #ifndef __ARM_FEATURE_FMA
 #error Foo
