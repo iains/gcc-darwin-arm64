@@ -4,7 +4,7 @@
 #pragma GCC target "+nosve"
 
 int 
-t6(int len, void * dummy, char * __restrict x)
+t6(int len, void * dummy, unsigned char * __restrict x)
 {
   len = len & ~31;
   unsigned short result = 0;

@@ -3,7 +3,7 @@
 
 #pragma GCC target "+sve2+nosha3"
 
-typedef char __attribute__ ((vector_size (16))) v16qi;
+typedef unsigned char __attribute__ ((vector_size (16))) v16qi;
 typedef unsigned short __attribute__ ((vector_size (16))) v8hi;
 typedef unsigned int __attribute__ ((vector_size (16))) v4si;
 typedef unsigned long long __attribute__ ((vector_size (16))) v2di;

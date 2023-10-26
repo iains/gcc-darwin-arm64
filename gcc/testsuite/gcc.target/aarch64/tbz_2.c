@@ -61,7 +61,8 @@ void g4(int x)
 ** 	ret
 ** 	...
 */
-void g5(char x)
+/* Unsigned: the tested bits depend on char signedness.  */
+void g5(unsigned char x)
 {
   if (__builtin_expect (x, 0))
     h ();
@@ -98,7 +99,8 @@ void g7(char x)
 ** 	ret
 ** 	...
 */
-void g8(char x)
+/* Unsigned: the tested bits depend on char signedness.  */
+void g8(unsigned char x)
 {
   if (__builtin_expect (x & (1 << 7), 0))
     h ();

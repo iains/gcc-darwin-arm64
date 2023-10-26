@@ -2,7 +2,11 @@
 /* { dg-options "-O3 -march=armv8.2-a+dotprod -mautovec-preference=asimd-only --param vect-epilogues-nomask=0 -fno-schedule-insns -fno-reorder-blocks -fno-schedule-insns2 -fdump-tree-vect-details" }*/
 /* { dg-final { check-function-bodies "**" "" } } */
 
-inline char char_abs(char i) {
+/* Spelled unsigned so that this source means the same thing on every target.
+   With a plain char parameter the 'i < 0' test is dead where char is unsigned
+   (as on aarch64-linux) and live where it is signed (as on Darwin), so the two
+   compile to different loops.  */
+inline unsigned char char_abs(unsigned char i) {
   return (i < 0 ? -i : i);
 }
 

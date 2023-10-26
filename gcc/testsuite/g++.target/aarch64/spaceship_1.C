@@ -101,8 +101,17 @@ SPACESHIP_FP_IDIOM(double);
 */
 SPACESHIP_FN(int32_t);
 
+/* int64_t is long where LP64 ELF mangles it 'l'/'m', but long long on
+   Darwin, so the function name differs; the body does not.  */
 /*
-** _Z10ss_int64_tll:
+** _Z10ss_int64_tll: { target { ! *-*-darwin* } }
+**	cmp	x0, x1
+**	cset	(w[0-9]+), gt
+**	csinv	w0, \1, wzr, ge
+**	ret
+*/
+/*
+** _Z10ss_int64_txx: { target *-*-darwin* }
 **	cmp	x0, x1
 **	cset	(w[0-9]+), gt
 **	csinv	w0, \1, wzr, ge
@@ -119,8 +128,17 @@ SPACESHIP_FN(int64_t);
 */
 SPACESHIP_FN(uint32_t);
 
+/* int64_t is long where LP64 ELF mangles it 'l'/'m', but long long on
+   Darwin, so the function name differs; the body does not.  */
 /*
-** _Z11ss_uint64_tmm:
+** _Z11ss_uint64_tmm: { target { ! *-*-darwin* } }
+**	cmp	x0, x1
+**	cset	(w[0-9]+), hi
+**	csinv	w0, \1, wzr, cs
+**	ret
+*/
+/*
+** _Z11ss_uint64_tyy: { target *-*-darwin* }
 **	cmp	x0, x1
 **	cset	(w[0-9]+), hi
 **	csinv	w0, \1, wzr, cs

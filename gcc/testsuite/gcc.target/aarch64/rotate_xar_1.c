@@ -2,11 +2,11 @@
 /* { dg-options "-O2" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
-typedef char __attribute__ ((vector_size (16))) v16qi;
+typedef unsigned char __attribute__ ((vector_size (16))) v16qi;
 typedef unsigned short __attribute__ ((vector_size (16))) v8hi;
 typedef unsigned int __attribute__ ((vector_size (16))) v4si;
 typedef unsigned long long __attribute__ ((vector_size (16))) v2di;
-typedef char __attribute__ ((vector_size (8))) v8qi;
+typedef unsigned char __attribute__ ((vector_size (8))) v8qi;
 typedef unsigned short __attribute__ ((vector_size (8))) v4hi;
 typedef unsigned int __attribute__ ((vector_size (8))) v2si;
 
