@@ -124,9 +124,9 @@ set1 (char *x, char y, long z, char **res)
 **	ret
 */
 void
-set2 (char *x, char *yptr, long z, char *res)
+set2 (unsigned char *x, unsigned char *yptr, long z, unsigned char *res)
 {
-  char y = *yptr;
+  unsigned char y = *yptr;
   __builtin_memset (x, y, z);
   *res = y;
 }
