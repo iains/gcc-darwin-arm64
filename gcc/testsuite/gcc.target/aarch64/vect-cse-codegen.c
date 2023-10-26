@@ -38,6 +38,7 @@ test1 (uint64_t a, uint64x2_t b, uint64x2_t* rt)
 **	orr	x[0-9]+, x[0-9]+, x[0-9]+
 **	str	q[0-9]+, \[x[0-9]+\]
 **	ret
+
 */
 
 uint64_t
