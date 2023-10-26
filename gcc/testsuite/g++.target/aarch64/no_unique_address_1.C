@@ -169,15 +169,25 @@ T (O, o); int caller_o (O &o) { return callee_o (o); } /* { dg-bogus {argument o
 T (P, p); int caller_p (P &p) { return callee_p (p); } /* { dg-bogus {argument of type 'P'} } */
 
 /*
-** _Z8caller_qR1Q: { target aarch64_little_endian }
+** _Z8caller_qR1Q: { target { aarch64_little_endian && { ! *-*-darwin* } } }
 **	ldr	w0, \[x0\]
+**	b	.*
+*/
+/* darwinpcs D.10c: the empty member is ignored, so Q is an HFA.
+** _Z8caller_qR1Q: { target *-*-darwin* }
+**	ldr	s0, \[x0\]
 **	b	.*
 */
 T (Q, q); int caller_q (Q &q) { return callee_q (q); } /* { dg-bogus {argument of type 'Q'} } */
 
 /*
-** _Z8caller_rR1R: { target aarch64_little_endian }
+** _Z8caller_rR1R: { target { aarch64_little_endian && { ! *-*-darwin* } } }
 **	ldr	w0, \[x0\]
+**	b	.*
+*/
+/* darwinpcs D.10c: the empty member is ignored, so R is an HFA.
+** _Z8caller_rR1R: { target *-*-darwin* }
+**	ldr	s0, \[x0\]
 **	b	.*
 */
 T (R, r); int caller_r (R &r) { return callee_r (r); } /* { dg-bogus {argument of type 'R'} } */
