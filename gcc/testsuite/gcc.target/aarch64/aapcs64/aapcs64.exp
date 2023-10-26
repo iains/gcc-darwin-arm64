@@ -25,6 +25,11 @@ if { ![istarget aarch64*-*-*] } then {
   return
 }
 
+if { [istarget *-*-darwin*] } then {
+  # darwinpcs and mach-o will need different test mechanisms.
+  return
+}
+
 torture-init
 set-torture-options $C_TORTURE_OPTIONS
 set additional_flags "-W -Wall -Wno-abi -fno-pie -no-pie"
