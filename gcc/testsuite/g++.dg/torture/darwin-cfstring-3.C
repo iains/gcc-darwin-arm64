@@ -26,5 +26,5 @@ void foo(void) {
 
 /* { dg-final { scan-assembler "\\.long\[ \\t\]+___CFConstantStringClassReference\n\[ \\t\]*\\.long\[ \\t\]+1992\n\[ \\t\]*\\.long\[ \\t\]+\[lL\]C.*\n\[ \\t\]*\\.long\[ \\t\]+4\n" { target { *-*-darwin* && { ! lp64 } } } } } */
 /* { dg-final { scan-assembler "\\.long\[ \\t\]+___CFConstantStringClassReference\n\[ \\t\]*\\.long\[ \\t\]+1992\n\[ \\t\]*\\.long\[ \\t\]+\[lL\]C.*\n\[ \\t\]*\\.long\[ \\t\]+10\n" { target { *-*-darwin* && { ! lp64 } } } } } */
-/* { dg-final { scan-assembler ".quad\t___CFConstantStringClassReference\n\t.long\t1992\n\t.space 4\n\t.quad\t.*\n\t.quad\t4\n" { target { *-*-darwin* && {  lp64 } } } } } */
-/* { dg-final { scan-assembler ".quad\t___CFConstantStringClassReference\n\t.long\t1992\n\t.space 4\n\t.quad\t.*\n\t.quad\t10\n" { target { *-*-darwin* && {  lp64 } } } } } */
+/* { dg-final { scan-assembler {.(quad|xword)\t___CFConstantStringClassReference\n\t.(long|word)\t1992\n\t.space 4\n\t.(quad|xword)\t.*\n\t.(quad|xword)\t4\n} { target { *-*-darwin* && {  lp64 } } } } } */
+/* { dg-final { scan-assembler {.(quad|xword)\t___CFConstantStringClassReference\n\t.(long|word)\t1992\n\t.space 4\n\t.(quad|xword)\t.*\n\t.(quad|xword)\t10\n} { target { *-*-darwin* && {  lp64 } } } } } */
