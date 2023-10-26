@@ -9,4 +9,9 @@ __attribute__ ((target("branch-protection=bti"),
 f10_bti ()
 {
 }
-/* { dg-final { scan-assembler "hint\t34 // bti c\n.*\.LPFE0:\n\tnop\n.*\tret\n" } } */
+/* Mach-O emits no __patchable_function_entries table and no LPFE label (as
+   clang does), so there is no label to locate the patch area with; the
+   ordering this PR is about - the NOP placed after the BTI - is asserted
+   directly instead.  */
+/* { dg-final { scan-assembler "hint\t34 // bti c\n.*\.LPFE0:\n\tnop\n.*\tret\n" { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler "hint\t34 // bti c\n\tnop\n.*\tret\n" { target *-*-darwin* } } } */

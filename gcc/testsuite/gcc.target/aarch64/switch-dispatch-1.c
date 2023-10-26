@@ -30,10 +30,11 @@ interp (const unsigned char *pc, volatile unsigned *state)
 }
 
 /* { dg-final { scan-assembler-times "\\tbr\\tx" 13 } } */
-/* { dg-final { scan-assembler-times "\\.Lrtx\[0-9\]+:" 1 } } */
+/* { dg-final { scan-assembler-times "\\.?Lrtx\[0-9\]+:" 1 } } */
 
 /* A copy can sit far from that one base label, further than ADR reaches, so the
    copies materialise it with ADRP and ADD.  */
-/* { dg-final { scan-assembler-times "adrp\\tx\[0-9\]+, \\.Lrtx" 13 } } */
-/* { dg-final { scan-assembler-times "add\\tx\[0-9\]+, x\[0-9\]+, :lo12:\\.Lrtx" 13 } } */
-/* { dg-final { scan-assembler-not "\\tadr\\tx\[0-9\]+, \\.Lrtx" } } */
+/* { dg-final { scan-assembler-times "adrp\\tx\[0-9\]+, \\.?Lrtx" 13 } } */
+/* { dg-final { scan-assembler-times "add\\tx\[0-9\]+, x\[0-9\]+, :lo12:\\.Lrtx" 13 { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times "add\\tx\[0-9\]+, x\[0-9\]+, Lrtx\[0-9\]+@PAGEOFF" 13 { target *-*-darwin* } } } */
+/* { dg-final { scan-assembler-not "\\tadr\\tx\[0-9\]+, \\.?Lrtx" } } */

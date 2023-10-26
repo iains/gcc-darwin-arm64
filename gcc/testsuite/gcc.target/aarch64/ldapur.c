@@ -23,7 +23,8 @@ test_##name (void)						\
 /*
 ** test_u8_u64:
 **	...
-**	ldapurb	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapurb	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldaprb	w[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u8_u64, u8[1], uint64_t)
@@ -31,7 +32,8 @@ TEST(u8_u64, u8[1], uint64_t)
 /*
 ** test_u16_u64:
 **	...
-**	ldapurh	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapurh	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldaprh	w[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u16_u64, u16, uint64_t)
@@ -39,7 +41,8 @@ TEST(u16_u64, u16, uint64_t)
 /*
 **test_u32_u64:
 **	...
-**	ldapur	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapur	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldapr	w[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u32_u64, u32, uint64_t)
@@ -47,7 +50,8 @@ TEST(u32_u64, u32, uint64_t)
 /*
 **test_u64_u64:
 **	...
-**	ldapur	x[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapur	x[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldapr	x[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u64_u64, u64, uint64_t)
@@ -55,7 +59,8 @@ TEST(u64_u64, u64, uint64_t)
 /*
 **test_u8_u32:
 **	...
-**	ldapurb	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapurb	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldaprb	w[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u8_u32, u8[1], uint32_t)
@@ -63,7 +68,8 @@ TEST(u8_u32, u8[1], uint32_t)
 /*
 **test_u16_u32:
 **	...
-**	ldapurh	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapurh	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldaprh	w[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u16_u32, u16, uint32_t)
@@ -71,7 +77,8 @@ TEST(u16_u32, u16, uint32_t)
 /*
 **test_u32_u32:
 **	...
-**	ldapur	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*E	ldapur	w[0-9]+, \[x[0-9]+, [0-9]+\]
+*M	ldapr	w[0-9]+, \[x[0-9]+\]
 **	ret
 */
 TEST(u32_u32, u32, uint32_t)

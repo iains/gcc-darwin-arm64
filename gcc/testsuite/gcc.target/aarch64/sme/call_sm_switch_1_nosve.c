@@ -234,7 +234,7 @@ sc_caller_stack () [[arm::streaming_compatible]]
   ns_callee_stack (0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
-/* { dg-final { scan-assembler {n_caller:(?:(?!ret).)*\.cfi_offset 46, -80\n} } } */
-/* { dg-final { scan-assembler {s_caller:(?:(?!ret).)*\.cfi_offset 46, -80\n} } } */
-/* { dg-final { scan-assembler {sc_caller_sme:(?:(?!ret).)*\.cfi_offset 46, -72\n} } } */
-/* { dg-final { scan-assembler {sc_caller:(?:(?!ret).)*\.cfi_offset 46, -72\n} } } */
+/* { dg-final { scan-assembler {n_caller:(?:(?!ret).)*\.cfi_offset 46, -80\n} { target cfi } } } */
+/* { dg-final { scan-assembler {s_caller:(?:(?!ret).)*\.cfi_offset 46, -80\n} { target cfi } } } */
+/* { dg-final { scan-assembler {sc_caller_sme:(?:(?!ret).)*\.cfi_offset 46, -72\n} { target cfi } } } */
+/* { dg-final { scan-assembler {sc_caller:(?:(?!ret).)*\.cfi_offset 46, -72\n} { target cfi } } } */
