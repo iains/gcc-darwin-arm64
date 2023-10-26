@@ -25,6 +25,11 @@ if {![istarget aarch64*-*-*] } {
     return
 }
 
+# Darwin doesn't have SVE and the testing is expensive, so make it optional.
+if { [istarget *-*-darwin*] && ![info exists env(DARWIN_TEST_SVE)]} then {
+  return
+}
+
 load_lib gcc-defs.exp
 
 if ![gcc_parallel_test_run_p aarch64-ssve] {
