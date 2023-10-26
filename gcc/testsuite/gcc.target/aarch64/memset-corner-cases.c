@@ -77,7 +77,7 @@ set256byte (int64_t *src, char c)
 **set257byte:
 **	mov	x2, 257
 **	mov	w1, 99
-**	b	memset
+**	b	_?memset
 */
 void __attribute__((__noinline__))
 set257byte (int64_t *src)
