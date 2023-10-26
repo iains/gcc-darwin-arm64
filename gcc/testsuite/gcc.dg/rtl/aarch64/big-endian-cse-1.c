@@ -1,4 +1,5 @@
 /* { dg-do compile { target aarch64*-*-* } } */
+/* { dg-skip-if "Darwin platforms do not support big-endian arm64" *-*-darwin* } */
 /* { dg-require-effective-target lp64 } */
 /* { dg-options "-O3 -mbig-endian" } */
 
