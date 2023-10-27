@@ -47,6 +47,7 @@
 #include "stringpool.h"
 #include "attribs.h"
 #include "gimple-fold.h"
+#include "calls.h"
 
 #define v8qi_UP  E_V8QImode
 #define v8di_UP  E_V8DImode
@@ -810,8 +811,12 @@ enum aarch64_builtins
   AARCH64_RBITLL,
   /* OS-specific */
   AARCH64_BUILTIN_CFSTRING,
+  AARCH64_BUILTIN_COPYSIGNQ,
+  AARCH64_BUILTIN_FABSQ,
   AARCH64_BUILTIN_HUGE_VALQ,
   AARCH64_BUILTIN_INFQ,
+  AARCH64_BUILTIN_NANQ,
+  AARCH64_BUILTIN_NANSQ,
   AARCH64_BUILTIN_MAX
 };
 
@@ -956,11 +961,11 @@ tree aarch64_float128_ptr_type_node = NULL_TREE;
    attributes.  */
 static tree
 aarch64_general_add_builtin (const char *name, tree type, unsigned int code,
-			     tree attrs = NULL_TREE)
+			     tree attrs = NULL_TREE, const char *library_name = NULL)
 {
   code = (code << AARCH64_BUILTIN_SHIFT) | AARCH64_BUILTIN_GENERAL;
   return add_builtin_function (name, type, code, BUILT_IN_MD,
-			       NULL, attrs);
+			       library_name, attrs);
 }
 
 static tree
@@ -1730,7 +1735,7 @@ aarch64_init_bf16_types (void)
 static void
 aarch64_init_float128_types (void)
 {
-  tree ftype, fndecl;
+  tree ftype, fndecl, const_string_type;
 
   /* The __float128 type.  The node has already been created as
      _Float128, so for C we only need to register the __float128 name for
@@ -1748,6 +1753,7 @@ aarch64_init_float128_types (void)
 
   aarch64_float128_ptr_type_node = build_pointer_type (float128t_type_node);
 
+  /* TFmode support builtins.  */
   ftype = build_function_type_list (float128t_type_node, NULL_TREE);
 
   fndecl = aarch64_general_add_builtin ("__builtin_huge_valq", ftype,
@@ -1756,9 +1762,43 @@ aarch64_init_float128_types (void)
   aarch64_builtin_decls[AARCH64_BUILTIN_HUGE_VALQ] = fndecl;
 
   fndecl = aarch64_general_add_builtin ("__builtin_infq", ftype,
-					AARCH64_BUILTIN_INFQ);
+					AARCH64_BUILTIN_INFQ, NULL_TREE,
+					"infq");
   TREE_READONLY (fndecl) = 1;
   aarch64_builtin_decls[AARCH64_BUILTIN_INFQ] = fndecl;
+
+  const_string_type
+    = build_pointer_type (build_qualified_type (char_type_node, TYPE_QUAL_CONST));
+  ftype = build_function_type_list (float128t_type_node, const_string_type,
+				    NULL_TREE);
+
+  fndecl = aarch64_general_add_builtin ("__builtin_nanq", ftype,
+					AARCH64_BUILTIN_NANQ, NULL_TREE,
+					"nanq");
+  TREE_READONLY (fndecl) = 1;
+  aarch64_builtin_decls[AARCH64_BUILTIN_NANQ] = fndecl;
+
+  fndecl = aarch64_general_add_builtin ("__builtin_nansq", ftype,
+					AARCH64_BUILTIN_NANSQ, NULL_TREE,
+					"nansq");
+  TREE_READONLY (fndecl) = 1;
+  aarch64_builtin_decls[AARCH64_BUILTIN_NANSQ] = fndecl;
+
+  ftype = build_function_type_list (float128t_type_node, float128t_type_node,
+				    NULL_TREE);
+  fndecl = aarch64_general_add_builtin ("__builtin_fabsq", ftype,
+					AARCH64_BUILTIN_FABSQ, NULL_TREE,
+					"fabsq");
+  TREE_READONLY (fndecl) = 1;
+  aarch64_builtin_decls[AARCH64_BUILTIN_FABSQ] = fndecl;
+
+  ftype = build_function_type_list (float128t_type_node, float128t_type_node,
+				    float128t_type_node, NULL_TREE);
+  fndecl = aarch64_general_add_builtin ("__builtin_copysignq", ftype,
+					AARCH64_BUILTIN_COPYSIGNQ, NULL_TREE,
+					"copysignq");
+  TREE_READONLY (fndecl) = 1;
+  aarch64_builtin_decls[AARCH64_BUILTIN_COPYSIGNQ] = fndecl;
 }
 
 
@@ -2885,6 +2925,10 @@ aarch64_general_expand_builtin (unsigned int fcode, tree exp, rtx target,
     case AARCH64_BUILTIN_RNG_RNDR:
     case AARCH64_BUILTIN_RNG_RNDRRS:
       return aarch64_expand_rng_builtin (exp, target, fcode, ignore);
+
+    case AARCH64_BUILTIN_COPYSIGNQ:
+    case AARCH64_BUILTIN_FABSQ:
+      return expand_call (exp, target, ignore);
     }
 
   if (fcode >= AARCH64_SIMD_BUILTIN_BASE && fcode <= AARCH64_SIMD_BUILTIN_MAX)
@@ -2997,6 +3041,18 @@ aarch64_general_fold_builtin (unsigned int fcode, tree type,
 	  return build_real (type, inf);
 	}
 	break;
+      case AARCH64_BUILTIN_NANQ:
+      case AARCH64_BUILTIN_NANSQ:
+	{
+	  const char *str = c_getstr (*args);
+	  int quiet = (fcode == AARCH64_BUILTIN_NANQ);
+	  REAL_VALUE_TYPE nan;
+
+	  gcc_assert (n_args == 1);
+	  if (str && real_nan (&nan, str, quiet, TYPE_MODE (type)))
+	    return build_real (type, nan);
+	  return NULL_TREE;
+	}
       default:
 	break;
     }
