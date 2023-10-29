@@ -783,9 +783,17 @@ proc scan-lto-assembler { args } {
 proc configure_check-function-bodies { config } {
     upvar $config up_config
 
+    if { [istarget *-*-darwin*] } {
+	set up_config(isMACHO) 1
+    } else {
+	set up_config(isMACHO) 0
+    }
+
     # Regexp for the start of a function definition (name in \1).
     if { [istarget nvptx*-*-*] } {
 	set up_config(start) {^// BEGIN(?: GLOBAL|) FUNCTION DEF: ([a-zA-Z_]\S+)$}
+    } elseif { [istarget *-*-darwin*] } {
+	set up_config(start) {^LFB[0-9]+:}
     } else {
 	set up_config(start) {^([a-zA-Z_]\S+):$}
     }
@@ -793,6 +801,8 @@ proc configure_check-function-bodies { config } {
     # Regexp for the end of a function definition.
     if { [istarget nvptx*-*-*] } {
 	set up_config(end) {^\}$}
+    } elseif { [istarget *-*-darwin*] } {
+	set up_config(end) {^LFE[0-9]+}
     } else {
 	set up_config(end) {^\s*\.size}
     }
@@ -802,6 +812,8 @@ proc configure_check-function-bodies { config } {
 	# Skip lines beginning with '//' comments ('-fverbose-asm', for
 	# example).
 	set up_config(fluff) {^\s*(?://)}
+    } elseif { [istarget *-*-darwin*] } {
+	set up_config(fluff) {^\s*(?:\.|//|@)|^L[0-9ACESV]}
     } else {
 	# Skip lines beginning with labels ('.L[...]:') or other directives
 	# ('.align', '.cfi_startproc', '.quad [...]', '.text', etc.), '//' or
@@ -820,6 +832,13 @@ proc configure_check-function-bodies { config } {
     } else {
 	set up_config(line_prefix) {\t}
     }
+
+    # Regex for a label, account for USER_LABEL_PREFIX
+    if { [istarget *-*-darwin*] } {
+	set up_config(label) {^(_[a-zA-Z_]\S+):$}
+    } else {
+	set up_config(label) {^([a-zA-Z_]\S+):$}
+    }
 }
 
 # Per CONFIG, read assembly file FILENAME and store a mapping from function
@@ -833,8 +852,20 @@ proc parse_function_bodies { config filename result } {
     set fd [open $filename r]
     set in_function 0
     while { [gets $fd line] >= 0 } {
-	if { [regexp $up_config(start) $line dummy function_name] } {
-	    set in_function 1
+	if { $up_config(isMACHO) && $in_function < 2 } {
+	    if { !$in_function && [regexp $up_config(label) $line dummy function_name] } {
+		set in_function 1
+		set function_body ""
+	    } elseif { $in_function == 1 } {
+		if { [regexp $up_config(start) $line] } {
+		  set in_function 2
+		} else {
+		   verbose "parse_function_bodies: skipped $function_name"
+		   set in_function 0
+		}
+	    }
+	} elseif { !$up_config(isMACHO) && [regexp $up_config(start) $line dummy function_name] } {
+	    set in_function 2
 	    set function_body ""
 	} elseif { $in_function } {
 	    if { [regexp $up_config(end) $line] } {
@@ -881,6 +912,12 @@ proc check-function-bodies { args } {
     }
     if { [llength $args] > 4 } {
 	error "too many arguments to check-function-bodies"
+    }
+
+    # some targets have a __USER_LABEL_PREFIX__
+    set needsULP 0
+    if { [istarget *-*-darwin*] } {
+      set needsULP 1
     }
 
     if { [llength $args] >= 3 } {
@@ -938,7 +975,6 @@ proc check-function-bodies { args } {
     set start_expected {^(\S+):$}
 
     configure_check-function-bodies config
-
     set have_bodies 0
     if { [is_remote host] } {
 	remote_upload host "$filename"
@@ -987,6 +1023,9 @@ proc check-function-bodies { args } {
 	    if { ![string equal $selector "N"] } {
 		if { $xfail_all || [string equal $selector "F"] } {
 		    setup_xfail "*-*-*"
+		}
+		if { $needsULP } {
+		    set function_name "_$function_name"
 		}
 		set testname "$testcase check-function-bodies $function_name"
 		if { !$have_bodies } {
