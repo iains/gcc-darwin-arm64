@@ -4995,6 +4995,23 @@ if you would like to apply the same rules given by @code{PROMOTE_MODE}.",
  default_promote_function_mode)
 
 DEFHOOK
+(promote_function_mode_ca,
+ "Like @code{TARGET_PROMOTE_FUNCTION_MODE}, but used for function\n\
+arguments when the state of the call's argument layout is available:\n\
+@var{ca} describes the arguments laid out so far and @var{arg} is the\n\
+argument being promoted, with its unpromoted type and mode.  This allows\n\
+a target whose promotion rules depend on where the argument is passed\n\
+(for example, in a register or on the stack) to decide accordingly.\n\
+It is used for the arguments of a call, including library calls, and for\n\
+the incoming parameters of a function; @code{TARGET_PROMOTE_FUNCTION_MODE}\n\
+is still used in the other cases, such as return values.  The default\n\
+implementation calls @code{promote_function_mode} with the type and mode\n\
+of @var{arg}.",
+ machine_mode, (cumulative_args_t ca, function_arg_info arg,
+		const_tree funtype, int *punsignedp, int for_return),
+ default_promote_function_mode_ca)
+
+DEFHOOK
 (promote_prototypes,
  "This target hook returns @code{true} if an argument declared in a\n\
 prototype as an integral type smaller than @code{int} should actually be\n\

@@ -1110,6 +1110,20 @@ also define the hook to @code{default_promote_function_mode_always_promote}
 if you would like to apply the same rules given by @code{PROMOTE_MODE}.
 @end deftypefn
 
+@deftypefn {Target Hook} machine_mode TARGET_PROMOTE_FUNCTION_MODE_CA (cumulative_args_t @var{ca}, function_arg_info @var{arg}, const_tree @var{funtype}, int *@var{punsignedp}, int @var{for_return})
+Like @code{TARGET_PROMOTE_FUNCTION_MODE}, but used for function
+arguments when the state of the call's argument layout is available:
+@var{ca} describes the arguments laid out so far and @var{arg} is the
+argument being promoted, with its unpromoted type and mode.  This allows
+a target whose promotion rules depend on where the argument is passed
+(for example, in a register or on the stack) to decide accordingly.
+It is used for the arguments of a call, including library calls, and for
+the incoming parameters of a function; @code{TARGET_PROMOTE_FUNCTION_MODE}
+is still used in the other cases, such as return values.  The default
+implementation calls @code{promote_function_mode} with the type and mode
+of @var{arg}.
+@end deftypefn
+
 @defmac PARM_BOUNDARY
 Normal alignment required for function parameters on the stack, in
 bits.  All stack parameters receive at least this much alignment

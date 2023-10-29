@@ -2563,9 +2563,9 @@ assign_parm_find_data_types (struct assign_parm_data_all *all, tree parm,
 
   /* Find mode as it is passed by the ABI.  */
   unsignedp = TYPE_UNSIGNED (data->arg.type);
-  data->arg.mode
-    = promote_function_mode (data->arg.type, data->arg.mode, &unsignedp,
-			     TREE_TYPE (current_function_decl), 0);
+  data->arg.mode = promote_function_mode (all->args_so_far, data->arg,
+					  TREE_TYPE (current_function_decl),
+					  &unsignedp, 0);
 }
 
 /* A subroutine of assign_parms.  Invoke setup_incoming_varargs.  */
