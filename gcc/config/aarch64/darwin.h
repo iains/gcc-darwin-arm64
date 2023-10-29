@@ -34,6 +34,12 @@ along with GCC; see the file COPYING3.  If not see
 #undef  PTRDIFF_TYPE
 #define PTRDIFF_TYPE "long int"
 
+#undef TARGET_PROMOTE_FUNCTION_MODE
+#define TARGET_PROMOTE_FUNCTION_MODE aarch64_darwin_promote_fn_mode
+
+#undef TARGET_PROMOTE_FUNCTION_MODE_CA
+#define TARGET_PROMOTE_FUNCTION_MODE_CA aarch64_darwin_promote_function_mode_ca
+
 /* NOTE that arm64_32 is a valid thing and corresponds to darwinpcs
    and TARGET_ILP32, but we are not implementing that for now.  */
 #define TARGET_OS_CPP_BUILTINS()		\

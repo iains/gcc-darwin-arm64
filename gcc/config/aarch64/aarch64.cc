@@ -7752,7 +7752,7 @@ aarch64_function_arg_alignment (machine_mode mode, const_tree type,
   if (integer_zerop (TYPE_SIZE (type)))
     return 0;
 
-  gcc_assert (TYPE_MODE (type) == mode);
+  gcc_assert (TARGET_MACHO || TYPE_MODE (type) == mode);
 
   if (!AGGREGATE_TYPE_P (type))
     {
@@ -8254,7 +8254,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
       if (TARGET_MACHO
 	  && !arg.named)
 	{
-	  pcum->aapcs_nextncrn = NUM_ARG_REGS;
+	  pcum->aapcs_nextncrn = num_pcs_arg_regs (pcum->pcs_variant);
 	  goto on_stack;
 	}
 
@@ -8694,7 +8694,7 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
 #if TARGET_MACHO
   /* This can only work for unnamed args.  */
   machine_mode comp_mode = VOIDmode;
-  int nregs;
+  int nregs = 0;
   bool is_ha;
   aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
 					   &is_ha, /*silent*/true);
@@ -8734,7 +8734,7 @@ gcc_checking_assert (pcum->aapcs_arg_processed);
   bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
 gcc_checking_assert (named_p == pcum->named_p);
   machine_mode comp_mode = VOIDmode;
-  int nregs;
+  int nregs = 0;
   bool is_ha;
   aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
 					   &is_ha, /*silent*/true);
@@ -8743,13 +8743,18 @@ gcc_checking_assert (named_p == pcum->named_p);
 	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode))
       || TREE_CODE (type) == UNION_TYPE);
 
-  bool in_regs = (pcum->aapcs_reg != NULL_RTX);
+  bool in_reg = pcum->aapcs_reg != NULL_RTX;
+//		 || pcum->aapcs_nextncrn < num_pcs_arg_regs (pcum->pcs_variant);
 
-  if ((named_p && !no_pack) || in_regs)
+  /* See aarch64_layout_arg for comment about mode sizes.  */
+  int size = (type) ? int_size_in_bytes (type)
+		    : GET_MODE_SIZE (mode).to_constant ();
+
+  if ((named_p && (!no_pack || size == 0)) || in_reg)
     ; /* Leave the alignment as natural.  */
   else
     alignment = MAX (alignment, PARM_BOUNDARY);
-gcc_checking_assert (alignment == pcum->darwinpcs_arg_boundary);
+  gcc_checking_assert (alignment == pcum->darwinpcs_arg_boundary);
   return MIN (alignment, STACK_BOUNDARY);
 
 #else
@@ -24477,6 +24482,7 @@ aarch64_vfp_is_call_or_return_candidate (machine_mode mode,
       unsigned int warn_psabi_flags = 0;
       int ag_count = aapcs_vfp_sub_candidate (type, &new_mode,
 					      &warn_psabi_flags);
+      *count = ag_count;
       if (ag_count > 0 && ag_count <= HA_MAX_NUM_FLDS)
 	{
 	  static unsigned last_reported_type_uid;
@@ -24512,9 +24518,7 @@ aarch64_vfp_is_call_or_return_candidate (machine_mode mode,
 			"type %qT changed %{in GCC 12.1%}",
 			TYPE_MAIN_VARIANT (type), url12);
 	    }
-
 	  if (is_ha != NULL) *is_ha = true;
-	  *count = ag_count;
 	}
       else
 	return false;
@@ -34744,6 +34748,91 @@ aarch64_check_target_clone_version (string_slice str, location_t *loc)
     }
   gcc_unreachable ();
 }
+
+#if TARGET_MACHO
+/* This handles the promotion of function return values.
+   It also handles function args under two specific curcumstances:
+     - called from combine with a register argument
+     - caller for a libcall with type == NULL.
+   The remaining cases for argument promotion are handled with access to
+   cumulative args data, below.  */
+machine_mode
+aarch64_darwin_promote_fn_mode (const_tree type, machine_mode mode,
+			       int *punsignedp,
+			       const_tree funtype ATTRIBUTE_UNUSED,
+			       int for_return)
+{
+  /* With the amended use of promote using cargs, the only cases that arrive
+     here with for_return == 0 are from combine (where the value is definitely
+     in a register) and for libcalls, where type == NULL.  We want to promote
+     function return values in the callee, so this becomes pretty much
+     unconditional now.  */
+  /* As in the _ca variant below: __mfp8 is an integer type in QImode but is
+     passed and returned in a SIMD register, so it must not be promoted.
+     TODO: the handling of argument and return value promotion here needs a
+     full evaluation.  In particular, this exemption has to be kept in step
+     with PROMOTE_MODE (see aarch64.h), since expr.cc asserts that the two
+     agree for a call result; it would likely be better to decide this once
+     in a common place -- aarch64_vfp_is_call_or_return_candidate already
+     tests the type to work out that __mfp8 travels in a SIMD register -- and
+     have both promotion paths consult that, rather than repeating the type
+     test in each.
+     The exemption must NOT apply when for_return == 2.  The documented
+     contract for that value (see TARGET_PROMOTE_FUNCTION_MODE in target.def)
+     is that the hook returns the same mode as promote_mode; it asks which
+     register an incoming parameter is copied to, or an outgoing result
+     computed in, not how the value crosses the ABI boundary.  expr.cc relies
+     on that when it recomputes the mode of a call result, so exempting mf8
+     here previously forced the same exemption into PROMOTE_MODE to keep the
+     two in step -- which made *storage* promotion type-sensitive and so made
+     the promoted modes of an __mfp8 and an unsigned char in one SSA partition
+     disagree (ICE in set_rtl, cfgexpand.cc:213, on a PHI mixing the two).  */
+  if (type && for_return != 2
+      && TYPE_MAIN_VARIANT (type) == aarch64_mfp8_type_node)
+    return mode;
+
+  if (type != NULL_TREE)
+    return promote_mode (type, mode, punsignedp);
+  return mode;
+}
+
+/* Ensure that we only promote the mode of named parms when they are passed in
+   a register.  Named values passed on the stack retain their original mode and
+   alignment.  */
+machine_mode
+aarch64_darwin_promote_function_mode_ca (cumulative_args_t ca,
+					 function_arg_info arg,
+					 const_tree funtype ATTRIBUTE_UNUSED,
+					 int *punsignedp,
+					 int for_return ATTRIBUTE_UNUSED)
+{
+  tree type = arg.type;
+  machine_mode mode = arg.mode;
+
+  /* __mfp8 is an 8-bit unsigned integer type with QImode, but it is laid out
+     in a SIMD register (see aarch64_vfp_is_call_or_return_candidate, which
+     tests the type).  Promoting it here makes the caller place the value in
+     a general register, while the callee still reads the SIMD one.  */
+  if (type && TYPE_MAIN_VARIANT (type) == aarch64_mfp8_type_node)
+    return mode;
+
+  machine_mode new_mode = promote_mode (type, mode, punsignedp);
+  if (new_mode == mode || arg.named == false
+      || GET_MODE_CLASS (new_mode) != MODE_INT
+      || known_gt (GET_MODE_SIZE (new_mode), 4))
+    return new_mode;
+
+  CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
+  /* Make sure that changes in assumption do not get missed.  */
+  gcc_checking_assert (for_return == 0 && new_mode == SImode
+		       && !pcum->aapcs_arg_processed);
+  /* We have a named integer value that fits in a reg; if there's one available
+     then promote the value.  */
+  if (pcum->aapcs_ncrn < num_pcs_arg_regs (pcum->pcs_variant))
+    return new_mode;
+  return mode;
+}
+#endif
 
 /* Target-specific selftests.  */
 
