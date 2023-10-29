@@ -810,8 +810,6 @@ enum aarch64_builtins
   AARCH64_RBITLL,
   /* OS-specific */
   AARCH64_BUILTIN_CFSTRING,
-  AARCH64_BUILTIN_HUGE_VALQ,
-  AARCH64_BUILTIN_INFQ,
   AARCH64_BUILTIN_MAX
 };
 
@@ -1730,8 +1728,6 @@ aarch64_init_bf16_types (void)
 static void
 aarch64_init_float128_types (void)
 {
-  tree ftype, fndecl;
-
   /* The __float128 type.  The node has already been created as
      _Float128, so for C we only need to register the __float128 name for
      it.  For C++, we create a distinct type which will mangle differently
@@ -1747,18 +1743,6 @@ aarch64_init_float128_types (void)
   lang_hooks.types.register_builtin_type (float128t_type_node, "__float128");
 
   aarch64_float128_ptr_type_node = build_pointer_type (float128t_type_node);
-
-  ftype = build_function_type_list (float128t_type_node, NULL_TREE);
-
-  fndecl = aarch64_general_add_builtin ("__builtin_huge_valq", ftype,
-					AARCH64_BUILTIN_HUGE_VALQ);
-  TREE_READONLY (fndecl) = 1;
-  aarch64_builtin_decls[AARCH64_BUILTIN_HUGE_VALQ] = fndecl;
-
-  fndecl = aarch64_general_add_builtin ("__builtin_infq", ftype,
-					AARCH64_BUILTIN_INFQ);
-  TREE_READONLY (fndecl) = 1;
-  aarch64_builtin_decls[AARCH64_BUILTIN_INFQ] = fndecl;
 }
 
 
@@ -2987,15 +2971,6 @@ aarch64_general_fold_builtin (unsigned int fcode, tree type,
 	gcc_assert (n_args == 3);
 	if (aarch64_fold_builtin_lane_check (args[0], args[1], args[2]))
 	  return void_node;
-	break;
-      case AARCH64_BUILTIN_HUGE_VALQ:
-      case AARCH64_BUILTIN_INFQ:
-	{
-	  gcc_assert (n_args == 0);
-	  REAL_VALUE_TYPE inf;
-	  real_inf (&inf);
-	  return build_real (type, inf);
-	}
 	break;
       default:
 	break;
