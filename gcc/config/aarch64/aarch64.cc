@@ -6693,7 +6693,7 @@ aarch64_function_arg_alignment (machine_mode mode, const_tree type,
   if (integer_zerop (TYPE_SIZE (type)))
     return 0;
 
-  gcc_assert (TYPE_MODE (type) == mode);
+  gcc_assert (TARGET_MACHO || TYPE_MODE (type) == mode);
 
   if (!AGGREGATE_TYPE_P (type))
     {
@@ -30928,6 +30928,60 @@ aarch64_retrieve_sysreg (const char *regname, bool write_p, bool is128op)
     return NULL;
   return sysreg->encoding;
 }
+
+#if TARGET_MACHO
+/* This handles the promotion of function return values.
+   It also handles function args under two specific curcumstances:
+     - called from combine with a register argument
+     - caller for a libcall with type == NULL.
+   The remaining cases for argument promotion are handled with access to
+   cumulative args data, below.  */
+machine_mode
+aarch64_darwin_promote_fn_mode (const_tree type, machine_mode mode,
+			       int *punsignedp,
+			       const_tree funtype ATTRIBUTE_UNUSED,
+			       int for_return ATTRIBUTE_UNUSED)
+{
+  /* With the amended use of promote using cargs, the only cases that arrive
+     here with for_return == 0 are from combine (where the value is definitely
+     in a register) and for libcalls, where type == NULL.  We want to promote
+     function return values in the callee, so this becomes pretty much
+     unconditional now.  */
+  if (type != NULL_TREE)
+    return promote_mode (type, mode, punsignedp);
+  return mode;
+}
+
+/* Ensure that we only promote the mode of named parms when they are passed in
+   a register.  Named values passed on the stack retain their original mode and
+   alignment.  */
+machine_mode
+aarch64_darwin_promote_function_mode_ca (cumulative_args_t ca,
+					 function_arg_info arg,
+					 const_tree funtype ATTRIBUTE_UNUSED,
+					 int *punsignedp,
+					 int for_return ATTRIBUTE_UNUSED)
+{
+  tree type = arg.type;
+  machine_mode mode = arg.mode;
+  machine_mode new_mode = promote_mode (type, mode, punsignedp);
+  if (new_mode == mode || arg.named == false
+      || GET_MODE_CLASS (new_mode) != MODE_INT
+      || known_gt (GET_MODE_SIZE (new_mode), 4))
+    return new_mode;
+
+  CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
+  /* Make sure that changes in assumption do not get missed.  */
+  gcc_checking_assert (for_return == 0 && new_mode == SImode
+		       && !pcum->aapcs_arg_processed);
+  /* We have a named integer value that fits in a reg; if there's one available
+     then promote the value.  */
+  if (pcum->aapcs_ncrn < 8)
+    return new_mode;
+  return mode;
+}
+
+#endif
 
 /* Target-specific selftests.  */
 
