@@ -55,6 +55,16 @@
 
 /* Target machine storage layout.  */
 
+/* ??? On Darwin, __mfp8 is an 8-bit unsigned integer type in QImode, but it is
+   passed and returned in a SIMD register, so aarch64_darwin_promote_fn_mode and
+   aarch64_darwin_promote_function_mode_ca both decline to promote it.  This has
+   to agree: expr.cc recomputes the promoted mode of a call result with
+   promote_function_mode and then asserts it matches the mode of the RTL built
+   here via promote_mode, so promoting __mfp8 here while exempting it there ICEs
+   on any __mfp8 value crossing a call boundary.
+   TODO: as noted beside those hooks, deciding this once in a common place
+   (aarch64_vfp_is_call_or_return_candidate already tests the type) would be
+   better than repeating the type test in each promotion path.  */
 #define PROMOTE_MODE(MODE, UNSIGNEDP, TYPE)	\
   if (GET_MODE_CLASS (MODE) == MODE_INT		\
       && GET_MODE_SIZE (MODE) < 4)		\
