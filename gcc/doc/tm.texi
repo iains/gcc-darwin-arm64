@@ -1074,6 +1074,10 @@ also define the hook to @code{default_promote_function_mode_always_promote}
 if you would like to apply the same rules given by @code{PROMOTE_MODE}.
 @end deftypefn
 
+@deftypefn {Target Hook} machine_mode TARGET_PROMOTE_FUNCTION_MODE_CA (cumulative_args_t, @var{function_arg_info}, @var{const_tree}, int *@var{}, @var{int})
+Like @code{promote_function_mode}, but takes a cumulative_args pointer   and a current arg to supply the input.
+@end deftypefn
+
 @defmac PARM_BOUNDARY
 Normal alignment required for function parameters on the stack, in
 bits.  All stack parameters receive at least this much alignment
