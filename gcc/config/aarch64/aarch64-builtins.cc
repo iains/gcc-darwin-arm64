@@ -2927,7 +2927,6 @@ aarch64_general_expand_builtin (unsigned int fcode, tree exp, rtx target,
       return aarch64_expand_rng_builtin (exp, target, fcode, ignore);
 
     case AARCH64_BUILTIN_COPYSIGNQ:
-    case AARCH64_BUILTIN_FABSQ:
       return expand_call (exp, target, ignore);
     }
 
@@ -3053,6 +3052,9 @@ aarch64_general_fold_builtin (unsigned int fcode, tree type,
 	    return build_real (type, nan);
 	  return NULL_TREE;
 	}
+      case AARCH64_BUILTIN_FABSQ:
+	gcc_assert (n_args == 1);
+	return fold_build1 (ABS_EXPR, type, args[0]);
       default:
 	break;
     }
