@@ -7758,7 +7758,13 @@ aarch64_function_arg_alignment (machine_mode mode, const_tree type,
   if (aarch64_darwin_small_vector_p (type))
     return 32;  /* darwinpcs D.11.  */
 
-  gcc_assert (TYPE_MODE (type) == mode);
+  /* On Darwin the argument may already have been promoted
+     (see aarch64_darwin_promote_function_mode_ca).  */
+  int unsignedp = TYPE_UNSIGNED (type);
+  gcc_assert (TYPE_MODE (type) == mode
+	      || (TARGET_MACHO
+		  && (promote_mode (type, TYPE_MODE (type), &unsignedp)
+		      == mode)));
 
   if (!AGGREGATE_TYPE_P (type))
     {
@@ -34882,6 +34888,69 @@ aarch64_check_target_clone_version (string_slice str, location_t *loc)
     }
   gcc_unreachable ();
 }
+
+#if TARGET_MACHO
+/* This handles the promotion of function return values.
+   It also handles function args under two specific circumstances:
+     - called from combine with a register argument
+     - called for a libcall with type == NULL.
+   The remaining cases for argument promotion are handled with access to
+   cumulative args data, below.  */
+static machine_mode
+aarch64_darwin_promote_fn_mode (const_tree type, machine_mode mode,
+				int *punsignedp,
+				const_tree funtype ATTRIBUTE_UNUSED,
+				int for_return)
+{
+  /* __mfp8 is not a clang type, so it follows AAPCS64: although it is an
+     integer type in QImode, it is passed and returned in a SIMD register and
+     is not promoted (as in the _ca variant below).  The exemption does not
+     apply when FOR_RETURN == 2, which asks for the mode the value is held
+     in: that must be the mode promote_mode gives (see
+     TARGET_PROMOTE_FUNCTION_MODE), and PROMOTE_MODE does not look at the
+     type.  */
+  if (type && for_return != 2
+      && TYPE_MAIN_VARIANT (type) == aarch64_mfp8_type_node)
+    return mode;
+
+  return promote_mode (type, mode, punsignedp);
+}
+
+/* Ensure that we only promote the mode of named parms when they are passed in
+   a register.  Named values passed on the stack retain their original mode and
+   alignment.  */
+static machine_mode
+aarch64_darwin_promote_function_mode_ca (cumulative_args_t ca,
+					 function_arg_info arg,
+					 const_tree funtype ATTRIBUTE_UNUSED,
+					 int *punsignedp)
+{
+  tree type = arg.type;
+  machine_mode mode = arg.mode;
+
+  /* __mfp8 is an 8-bit unsigned integer type with QImode, but it is laid out
+     in a SIMD register (see aarch64_vfp_is_call_or_return_candidate, which
+     tests the type).  Promoting it here makes the caller place the value in
+     a general register, while the callee still reads the SIMD one.  */
+  if (type && TYPE_MAIN_VARIANT (type) == aarch64_mfp8_type_node)
+    return mode;
+
+  machine_mode new_mode = promote_mode (type, mode, punsignedp);
+  if (new_mode == mode || !arg.named
+      || GET_MODE_CLASS (new_mode) != MODE_INT
+      || known_gt (GET_MODE_SIZE (new_mode), 4))
+    return new_mode;
+
+  CUMULATIVE_ARGS *pcum = get_cumulative_args (ca);
+  /* Make sure that changes in assumption do not get missed.  */
+  gcc_checking_assert (new_mode == SImode && !pcum->aapcs_arg_processed);
+  /* We have a named integer value that fits in a reg; if there's one available
+     then promote the value.  */
+  if (pcum->aapcs_ncrn < num_pcs_arg_regs (pcum->pcs_variant))
+    return new_mode;
+  return mode;
+}
+#endif
 
 /* Target-specific selftests.  */
 

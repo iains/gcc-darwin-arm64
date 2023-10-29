@@ -20,6 +20,8 @@ along with GCC; see the file COPYING3.  If not see
 #ifndef GCC_EXPLOW_H
 #define GCC_EXPLOW_H
 
+class function_arg_info;
+
 /* Return a memory reference like MEMREF, but which is known to have a
    valid address.  */
 extern rtx validize_mem (rtx);
@@ -53,6 +55,12 @@ extern rtx force_not_mem (rtx);
    given mode is promoted.  */
 extern machine_mode promote_function_mode (const_tree, machine_mode, int *,
 					        const_tree, int);
+
+/* As above, for argument ARG, with the cumulative args of the call
+   available to the target.  */
+extern machine_mode promote_function_mode (cumulative_args_t,
+					   function_arg_info, const_tree,
+					   int *);
 
 /* Return mode and signedness to use when an object in the given mode
    is promoted.  */
