@@ -95,14 +95,16 @@ subdi_uxth (unsigned long long a, unsigned short i)
 unsigned long long
 subdi_uxth0 (unsigned long long a, unsigned short i)
 {
-  /* { dg-final { scan-assembler "sub\tx\[0-9\]+,.*uxth\n" } } */
+  /* { dg-final { scan-assembler "sub\tx\[0-9\]+,.*uxth\n" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "sub\tx\[0-9\]+,.*uxtw" { target *-*-darwin* } } } */
   return a - i;
 }
 
 long long
 subdi_sxth (long long a, short i)
 {
-  /* { dg-final { scan-assembler "sub\tx\[0-9\]+,.*sxth #?1" } } */
+  /* { dg-final { scan-assembler "sub\tx\[0-9\]+,.*sxth #?1" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "sub\tx\[0-9\]+,.*sxtw #?1" { target *-*-darwin* } } } */
   return a - ((long long)i << 1);
 }
 
@@ -116,55 +118,63 @@ subdi_sxth0 (long long a, short i)
 unsigned int
 subsi_uxth (unsigned int a, unsigned short i)
 {
-  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*uxth #?1" } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*uxth #?1" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*lsl #?1" { target *-*-darwin* } } } */
   return a - ((unsigned int)i << 1);
 }
 
 unsigned int
 subsi_uxth0 (unsigned int a, unsigned short i)
 {
-  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*uxth\n" } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*uxth\n" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+, w\[0-9\]+, w\[0-9\]+" { target *-*-darwin* } } } */
   return a - i;
 }
 
 int
 subsi_sxth (int a, short i)
 {
-  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*sxth #?1" } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*sxth #?1" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*lsl #?1" { target *-*-darwin* } } } */
   return a - ((int)i << 1);
 }
 
 int
 subsi_sxth0 (int a, short i)
 {
-  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*sxth\n" } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+,.*sxth\n" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "sub\tw\[0-9\]+, w\[0-9\]+, w\[0-9\]+" { target *-*-darwin* } } } */
   return a - (int)i;
 }
 
 unsigned int
 addsi_uxth (unsigned int a, unsigned short i)
 {
-  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*uxth #?1" } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*uxth #?1" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*lsl #?1" { target *-*-darwin* } } } */
   return a + ((unsigned int)i << 1);
 }
 
 unsigned int
 addsi_uxth0 (unsigned int a, unsigned short i)
 {
-  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*uxth\n" } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*uxth\n" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+, w\[0-9\]+, w\[0-9\]+" { target *-*-darwin* } } } */
   return a + i;
 }
 
 int
 addsi_sxth (int a, short i)
 {
-  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*sxth #?1" } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*sxth #?1" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*lsl #?1" { target *-*-darwin* } } } */
   return a + ((int)i << 1);
 }
 
 int
 addsi_sxth0 (int a, short i)
 {
-  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*sxth\n" } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+,.*sxth\n" { target { ! *-*-darwin* } } } } */
+  /* { dg-final { scan-assembler "add\tw\[0-9\]+, w\[0-9\]+, w\[0-9\]+" { target *-*-darwin* } } } */
   return a + (int)i;
 }
