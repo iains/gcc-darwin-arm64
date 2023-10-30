@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O2" } */
+/* { dg-skip-if "darwinpcs extends in the caller" *-*-darwin* } */
 
 int
 f9 (unsigned char x, int y)
