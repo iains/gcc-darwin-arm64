@@ -15,4 +15,5 @@ f (unsigned int x, _Bool y)
     }
 }
 
-/* { dg-final { scan-assembler-times {and\t} 1 } } */
+/* { dg-final { scan-assembler-times {and\t} 1 { target { ! *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-not {and\t} { target *-*-darwin* } } } */
