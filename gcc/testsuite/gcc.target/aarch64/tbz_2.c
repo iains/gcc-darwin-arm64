@@ -62,7 +62,7 @@ void g4(int x)
 ** 	ret
 ** 	...
 */
-void g5(char x)
+void g5(unsigned char x)
 {
   if (__builtin_expect (x, 0))
     h ();
@@ -70,7 +70,7 @@ void g5(char x)
 
 /* 
 ** g6:
-** 	tbnz	w0, 0, .?L[0-9]+
+** 	tbnz	(w|x)0, 0, .?L[0-9]+
 ** 	ret
 ** 	...
 */
@@ -82,7 +82,7 @@ void g6(char x)
 
 /* 
 ** g7:
-** 	tst	w0, 3
+** 	tst	(w|x)0, 3
 ** 	bne	.?L[0-9]+
 ** 	ret
 ** 	...
@@ -95,11 +95,11 @@ void g7(char x)
 
 /* 
 ** g8:
-** 	tbnz	w0, 7, .?L[0-9]+
+** 	tbnz	(w|x)0, 7, .?L[0-9]+
 ** 	ret
 ** 	...
 */
-void g8(char x)
+void g8(unsigned char x)
 {
   if (__builtin_expect (x & (1 << 7), 0))
     h ();
@@ -107,7 +107,7 @@ void g8(char x)
 
 /* 
 ** g9:
-** 	tbnz	w0, 0, .?L[0-9]+
+** 	tbnz	(w|x)0, 0, .?L[0-9]+
 ** 	ret
 ** 	...
 */
@@ -119,7 +119,7 @@ void g9(bool x)
 
 /* 
 ** g10:
-** 	tbnz	w0, 0, .?L[0-9]+
+** 	tbnz	(w|x)0, 0, .?L[0-9]+
 ** 	ret
 ** 	...
 */
