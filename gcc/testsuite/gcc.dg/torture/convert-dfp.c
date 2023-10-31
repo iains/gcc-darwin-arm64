@@ -56,9 +56,16 @@ int main()
   return 0;
 }
 
-/* { dg-final { scan-assembler-times {\t__bid_extendsddd2} 3 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendsdtd2} 3 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendddtd2} 3 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendhfsd} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendhfdd} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendhftd} 2 { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_extendsddd2} 3 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_extendsdtd2} 3 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_extendddtd2} 3 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_extendhfsd} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_extendhfdd} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_extendhftd} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+
+/* { dg-final { scan-assembler-times {\t___bid_extendsddd2} 2 { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t___bid_extendsdtd2} 2 { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t___bid_extendddtd2} 2 { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t___bid_extendhfsd} 1 { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t___bid_extendhfdd} 1 { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t___bid_extendhftd} 1 { target { dfp_bid && *-*-darwin* } } } } */
