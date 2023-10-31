@@ -3094,7 +3094,11 @@ aarch64_constant_alignment (const_tree exp, HOST_WIDE_INT align)
 unsigned
 aarch64_data_alignment (const_tree type, unsigned align)
 {
-  if (optimize_size)
+  /* Darwin does not raise the alignment of global data
+     (aarch64_constant_alignment still raises initialised char arrays and
+     string constants).  */
+
+  if (optimize_size || TARGET_MACHO)
     return align;
 
   if (AGGREGATE_TYPE_P (type))
@@ -7500,6 +7504,15 @@ aarch64_pass_by_reference (cumulative_args_t pcum_v,
   gcc_unreachable ();
 }
 
+/* darwinpcs D.8, D.11.  */
+static bool
+aarch64_darwin_small_vector_p (const_tree type)
+{
+  return (TARGET_MACHO && type && VECTOR_TYPE_P (type)
+	  && tree_fits_uhwi_p (TYPE_SIZE_UNIT (type))
+	  && tree_to_uhwi (TYPE_SIZE_UNIT (type)) < UNITS_PER_WORD);
+}
+
 /* Return TRUE if VALTYPE is padded to its least significant bits.  */
 static bool
 aarch64_return_in_msb (const_tree valtype)
@@ -7552,6 +7565,11 @@ aarch64_function_value (const_tree type, const_tree func,
   pure_scalable_type_info pst_info;
   if (type && pst_info.analyze_registers (type))
     return pst_info.get_rtx (mode, V0_REGNUM, P0_REGNUM);
+
+  if (aarch64_darwin_small_vector_p (type)  /* darwinpcs D.8.  */
+      && (known_eq (TYPE_VECTOR_SUBPARTS (type), 1U)
+	  || FLOAT_TYPE_P (TREE_TYPE (type))))
+    return gen_rtx_REG (mode, V0_REGNUM);
 
   /* Generic vectors that map to full SVE modes with -msve-vector-bits=N
      are returned in memory, not by value.  */
@@ -8128,6 +8146,8 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 
   size = aarch64_arg_size (arg);
   allocate_ncrn = (type) ? !(FLOAT_TYPE_P (type)) : !FLOAT_MODE_P (mode);
+  if (aarch64_darwin_small_vector_p (type))
+    allocate_ncrn = true;  /* darwinpcs D.11.  */
   allocate_nvrn = aarch64_vfp_is_call_candidate (pcum_v,
 						 mode,
 						 type,
@@ -8213,7 +8233,8 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
       /* C.8 if the argument has an alignment of 16 then the NGRN is
 	 rounded up to the next even number.  */
       if (nregs == 2
-	  && ncrn % 2)
+	  && ncrn % 2
+	  && !TARGET_MACHO)  /* darwinpcs D.4.  */
 	{
 	  /* Emit a warning if the alignment changed when taking the
 	     'packed' attribute into account.  */
@@ -8263,7 +8284,13 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 	 NULL_RTX.  */
       if (nregs == 0)
 	pcum->aapcs_reg = NULL_RTX;
-      else if ((nregs == 1 && !sve_p) || GET_MODE_CLASS (mode) == MODE_INT)
+      else if (((nregs == 1 && !sve_p) || GET_MODE_CLASS (mode) == MODE_INT)
+	       /* darwinpcs D.4.  A 16-byte mode needs an even, consecutive
+		  register pair; otherwise use two DImode registers.  */
+	       && !(TARGET_MACHO && nregs == 2
+		    && (get_pcs_arg_reg (pcum->pcs_variant, ncrn) % 2
+			|| (get_pcs_arg_reg (pcum->pcs_variant, ncrn + 1)
+			    != get_pcs_arg_reg (pcum->pcs_variant, ncrn) + 1))))
 	pcum->aapcs_reg
 	  = gen_rtx_REG (mode, get_pcs_arg_reg (pcum->pcs_variant, ncrn));
       else
@@ -14274,7 +14301,21 @@ aarch64_frame_pointer_required ()
 {
   /* If the function needs to record the incoming value of PSTATE.SM,
      make sure that the slot is accessible from the frame pointer.  */
-  return aarch64_need_old_pstate_sm ();
+  if (!TARGET_MACHO)
+    return aarch64_need_old_pstate_sm ();
+
+  /* darwinpcs D.12.  */
+  if (crtl->calls_eh_return || aarch64_need_old_pstate_sm ())
+    return true;
+
+  /* Not used in leaf functions (unless forced).  */
+  if (flag_omit_leaf_frame_pointer && leaf_function_p ())
+    return false;
+
+  /* NOTE: We are allowing the user to force omission of the frame
+     pointer (despite that it is not ABI-compliant).  */
+
+  return flag_omit_frame_pointer != 1;
 }
 
 static bool
@@ -23120,13 +23161,21 @@ static GTY(()) tree va_list_type;
    };
 
    Windows ABI is handled using
-   aarch64_ms_variadic_abi_build_builtin_va_list (void).  */
+   aarch64_ms_variadic_abi_build_builtin_va_list (void).
+   darwinpcs D.6.  */
 
 static tree
 aarch64_build_builtin_va_list (void)
 {
   if (TARGET_AARCH64_MS_ABI)
     return aarch64_ms_variadic_abi_build_builtin_va_list ();
+
+  if (TARGET_MACHO)
+    {
+      /* darwinpcs D.6.  */
+      va_list_type = build_pointer_type (char_type_node);
+      return va_list_type;
+    }
 
   tree va_list_name;
   tree f_stack, f_grtop, f_vrtop, f_groff, f_vroff;
@@ -23222,6 +23271,13 @@ aarch64_expand_builtin_va_start (tree valist, rtx nextarg)
   int vr_save_area_size = cfun->va_list_fpr_size;
   int vr_offset;
 
+  /* darwinpcs D.6.  */
+  if (TARGET_MACHO)
+    {
+      std_expand_builtin_va_start (valist, nextarg);
+      return;
+    }
+
   cum = &crtl->args.info;
   if (cfun->va_list_gpr_size)
     gr_save_area_size = MIN ((num_pcs_arg_regs (cum->pcs_variant)
@@ -23313,6 +23369,21 @@ aarch64_gimplify_va_arg_expr (tree valist, tree type, gimple_seq *pre_p,
   tree stack, f_top, f_off, off, arg, roundup, on_stack;
   HOST_WIDE_INT size, rsize, adjust, align;
   tree t, u, cond1, cond2;
+
+  if (TARGET_MACHO)
+    {
+      /* darwinpcs D.6: the generic lowering is used and none of the code
+	 below is reached.  The -mgeneral-regs-only check still has to be
+	 made here: otherwise the option is silently ignored for a va_arg of a
+	 floating-point or vector type, although it is diagnosed for the same
+	 type in an argument list (aarch64_layout_arg).  */
+      if (!TARGET_FLOAT
+	  && aarch64_vfp_is_call_or_return_candidate (TYPE_MODE (type), type,
+						      &ag_mode, &nregs, &is_ha,
+						      false))
+	aarch64_err_no_fpadvsimd (TYPE_MODE (type));
+      return std_gimplify_va_arg_expr (valist, type, pre_p, post_p);
+    }
 
   indirect_p = pass_va_arg_by_reference (type);
   if (indirect_p)
@@ -23603,6 +23674,10 @@ aarch64_setup_incoming_varargs (cumulative_args_t cum_v,
   int gr_saved = cfun->va_list_gpr_size;
   int vr_saved = cfun->va_list_fpr_size;
 
+  /* darwinpcs D.6.  */
+  if (TARGET_MACHO)
+    return;
+
   /* The caller has advanced CUM up to, but not beyond, the last named
      argument.  Advance a local copy of CUM past the last "real" named
      argument, to find out how many registers are left over.  */
@@ -23783,6 +23858,24 @@ const unsigned int WARN_PSABI_EMPTY_CXX17_BASE = 1U << 0;
 const unsigned int WARN_PSABI_NO_UNIQUE_ADDRESS = 1U << 1;
 const unsigned int WARN_PSABI_ZERO_WIDTH_BITFIELD = 1U << 2;
 
+/* Return true if TYPE is a class whose only fields are unnamed bit-fields or
+   ignored empty members, or a non-zero-length array of such.  */
+
+static bool
+aarch64_darwin_empty_class_p (const_tree type)
+{
+  while (TREE_CODE (type) == ARRAY_TYPE
+	 && TYPE_SIZE (type) && !integer_zerop (TYPE_SIZE (type)))
+    type = TREE_TYPE (type);
+  if (TREE_CODE (type) != RECORD_TYPE)
+    return false;
+  for (tree f = TYPE_FIELDS (type); f; f = DECL_CHAIN (f))
+    if (TREE_CODE (f) == FIELD_DECL
+	&& !DECL_PADDING_P (f) && !DECL_FIELD_ABI_IGNORED (f))
+      return false;
+  return true;
+}
+
 /* Walk down the type tree of TYPE counting consecutive base elements.
    If *MODEP is VOIDmode, then set it to the first valid floating point
    type.  If a non-floating point type is found, or if a floating point
@@ -23814,6 +23907,9 @@ aapcs_vfp_sub_candidate (const_tree type, machine_mode *modep,
     {
     case REAL_TYPE:
       mode = TYPE_MODE (type);
+      /* darwinpcs D.14.  */
+      if (TARGET_MACHO && mode == BFmode)
+	mode = HFmode;
       if (mode != DFmode && mode != SFmode
 	  && mode != TFmode && mode != HFmode
 	  && mode != SDmode && mode != DDmode && mode != TDmode)
@@ -23888,6 +23984,12 @@ aapcs_vfp_sub_candidate (const_tree type, machine_mode *modep,
 	    || !TYPE_MIN_VALUE (index)
 	    || !tree_fits_uhwi_p (TYPE_MIN_VALUE (index))
 	    || count < 0)
+	  return -1;
+
+	/* darwinpcs D.10a.  */
+	if (TARGET_MACHO
+	    && tree_to_uhwi (TYPE_MAX_VALUE (index)) + 1
+	       == tree_to_uhwi (TYPE_MIN_VALUE (index)))
 	  return -1;
 
 	count *= (1 + tree_to_uhwi (TYPE_MAX_VALUE (index))
@@ -23994,6 +24096,11 @@ aapcs_vfp_sub_candidate (const_tree type, machine_mode *modep,
 	for (field = TYPE_FIELDS (type); field; field = TREE_CHAIN (field))
 	  {
 	    if (TREE_CODE (field) != FIELD_DECL)
+	      continue;
+
+	    /* darwinpcs D.10c.  */
+	    if (TARGET_MACHO
+		&& aarch64_darwin_empty_class_p (TREE_TYPE (field)))
 	      continue;
 
 	    sub_count = aapcs_vfp_sub_candidate (TREE_TYPE (field), modep,
@@ -24146,7 +24253,9 @@ aarch64_vfp_is_call_or_return_candidate (machine_mode mode,
       *count = 1;
       new_mode = mode;
     }
-  else if (GET_MODE_CLASS (mode) == MODE_COMPLEX_FLOAT)
+  else if (GET_MODE_CLASS (mode) == MODE_COMPLEX_FLOAT
+	   /* darwinpcs D.10a.  */
+	   && !(TARGET_MACHO && type && AGGREGATE_TYPE_P (type)))
     {
       if (is_ha != NULL) *is_ha = true;
       *count = 2;
@@ -24508,8 +24617,9 @@ aarch64_mangle_type (const_tree type)
   /* The AArch64 ABI documents say that "__va_list" has to be
      mangled as if it is in the "std" namespace.
      The Windows Arm64 ABI uses just an address of the first variadic
-     argument.  */
-  if (!TARGET_AARCH64_MS_ABI
+     argument, and on Darwin va_list is char * (darwinpcs D.6); both are
+     mangled by the default rules.  */
+  if (!TARGET_AARCH64_MS_ABI && !TARGET_MACHO
       && lang_hooks.types_compatible_p (const_cast<tree> (type), va_list_type))
     return "St9__va_list";
 
@@ -30325,6 +30435,8 @@ aarch64_expand_subvti (rtx op0, rtx low_dest, rtx low_in1,
 static unsigned HOST_WIDE_INT
 aarch64_asan_shadow_offset (void)
 {
+  if (TARGET_MACHO)
+    return 0; /* Darwin uses a dynamic allocation.  */
   if (TARGET_ILP32)
     return (HOST_WIDE_INT_1 << 29);
   else
@@ -31879,8 +31991,13 @@ aarch64_bitint_type_info (int n, struct bitint_info *info)
 static machine_mode
 aarch64_c_mode_for_floating_type (enum tree_index ti)
 {
+  if (TARGET_MACHO && ti == TI_LONG_DOUBLE_TYPE)
+    /* darwinpcs D.13.  */
+    return DFmode;
+
   if (TARGET_LONG_DOUBLE_128 && ti == TI_LONG_DOUBLE_TYPE)
     return TFmode;
+
   return default_mode_for_floating_type (ti);
 }
 
@@ -34872,7 +34989,12 @@ aarch64_run_selftests (void)
    should inherit the alignment requirements of an unnamed bitfield's
    type.  */
 #undef TARGET_ALIGN_ANON_BITFIELD
+#if TARGET_MACHO
+/* darwinpcs D.9.  */
+#define TARGET_ALIGN_ANON_BITFIELD hook_bool_void_false
+#else
 #define TARGET_ALIGN_ANON_BITFIELD hook_bool_void_true
+#endif
 
 #undef TARGET_ASM_ALIGNED_DI_OP
 #undef TARGET_ASM_ALIGNED_SI_OP
@@ -35368,6 +35490,11 @@ aarch64_libgcc_floating_mode_supported_p
 
 #undef TARGET_ASAN_SHADOW_OFFSET
 #define TARGET_ASAN_SHADOW_OFFSET aarch64_asan_shadow_offset
+
+#if TARGET_MACHO
+#undef TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P
+#define TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P hook_bool_void_true
+#endif
 
 #undef TARGET_LEGITIMIZE_ADDRESS
 #define TARGET_LEGITIMIZE_ADDRESS aarch64_legitimize_address

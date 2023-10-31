@@ -140,8 +140,9 @@ with 16-byte alignment passed in integer registers begin at an even-numbered
 xN, skipping a previous odd-numbered xN if necessary. The iOS ABI drops this
 requirement.
 
-`D.8` - `D.11`: rules that are not in [2] but are what clang does (and so are
-part of the ABI); see PART 3, "Undocumented ABI differences".
+`D.8` - `D.11`, `D.14` and `D.15`: rules that are not in [2] but are what
+clang does (and so are part of the ABI); see PART 3, "Undocumented ABI
+differences".
 
 #### Variadic Functions
 
@@ -482,15 +483,48 @@ are part of the informal ABI.
   alignment 1 (AAPCS64 [1] gives 16 bytes with alignment 8), and
   `struct { char x; int :5; char y; }` is 3 bytes with alignment 1.
 
-* `D.10` An aggregate with a zero-length array member (a GNU extension) is not
-  a homogeneous floating-point aggregate, wherever the member is and whatever
-  its element type; e.g. `struct { char b[0]; _Complex double c; }` is passed
-  and returned in `x0`/`x1`, not `d0`/`d1`.  An empty struct member does not
-  have this effect (`D.1`).
+* `D.10` Empty and zero-length members, in determining whether an aggregate
+  is a homogeneous floating-point aggregate (HFA):
+
+  * `D.10a` An aggregate with a zero-length array member (a GNU extension) is
+    not an HFA, wherever the member is and whatever its element type; e.g.
+    `struct { char b[0]; _Complex double c; }` is passed and returned in
+    `x0`/`x1`, not `d0`/`d1`, and `struct { float a[0]; float c; }` in `w0`,
+    not `s0`.  This applies to unions too.
+
+  * `D.10b` An empty struct member that occupies no storage does not have this
+    effect (`D.1`).  In C++ an empty class member that occupies storage leaves
+    padding, so the aggregate is not an HFA: `struct { X x; float a; }`, with
+    `struct X {}`, is passed in `x0`.
+
+  * `D.10c` In C++, a union member of empty class type, or a non-zero-length
+    array of such, is ignored; e.g. `union { X x; float a; }` is passed in
+    `s0`.  A member whose class merely contains an empty class is not ignored:
+    `union { struct { X x; } s; float a; }` is passed in `w0`.
 
 * `D.11` A generic vector smaller than 8 bytes is passed as if it were a 32-bit
   integer: in a `W` register, whatever its element type, or on the stack in 4
   bytes with 4-byte alignment.  As an unnamed argument it occupies an 8-byte
   slot, like any other unnamed argument.
+
+* `D.14` In determining whether an aggregate is a homogeneous floating-point
+  aggregate (HFA), `__bf16` is a floating-point base type, and the same base
+  type as `_Float16`; e.g. `struct { __bf16 a, b; }` and
+  `struct { __bf16 a; _Float16 b; }` are passed and returned in `h0`/`h1`,
+  while `struct { __bf16 a; float b; }` is passed in `x0`.
+
+* `D.15` Placement of named arguments passed on the stack, qualifying `D.2`
+  (for unnamed arguments see `D.7`, for small vectors `D.11`).  Whether an
+  aggregate is homogeneous follows `D.10` and `D.14`.
+
+  * `D.15a` Unions, structures that are not homogeneous aggregates, and
+    complex integer types start a new 8-byte slot and occupy whole 8-byte
+    slots, unless they have zero size; e.g. for
+    `f (9×int, union { char a; short b; }, char)` the `char` is at sp+16.
+
+  * `D.15b` Complex floating-point types are packed like the equivalent
+    homogeneous aggregate, at their natural alignment: after a `float` on
+    the stack a `_Complex float` is at sp+4, and after a `_Float16` a
+    `_Complex _Float16` is at sp+2.
 
 ## End.

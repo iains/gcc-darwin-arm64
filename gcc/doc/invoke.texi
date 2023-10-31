@@ -890,7 +890,7 @@ Objective-C and Objective-C++ Dialects}.
 @c so users have a clue at guessing where the ones they want will be.
 
 @emph{AArch64 Options} (@ref{AArch64 Options})
-@gccoptlist{-mabi=@var{name}  -mbig-endian  -mlittle-endian
+@gccoptlist{-mabi=@var{name}  -m64  -mbig-endian  -mlittle-endian
 -menable-sysreg-checking
 -mgeneral-regs-only
 -mcmodel=tiny  -mcmodel=small  -mcmodel=large
@@ -21497,6 +21497,17 @@ the LP64 and ILP32 ABIs are not link-compatible; you must compile your
 entire program with the same ABI, and link with a compatible set of libraries.
 
 The @samp{ilp32} model is deprecated.
+
+On Darwin (@samp{aarch64-*-darwin*}) targets, @samp{darwinpcs} is also
+accepted and selects the same data model as @samp{lp64}; the Darwin variant
+of the procedure call standard is used on those targets whichever of the
+two is given.
+
+@opindex m64
+@item -m64
+On Darwin (@samp{aarch64-*-darwin*}) targets, this is accepted for
+compatibility with other platform variants and is equivalent to
+@option{-mabi=darwinpcs}.
 
 @opindex mbig-endian
 @item -mbig-endian
