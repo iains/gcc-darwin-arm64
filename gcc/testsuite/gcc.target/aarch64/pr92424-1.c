@@ -22,8 +22,9 @@ f10_none ()
 **	hint	34 // bti c
 **	nop
 **	hint	25 // paciasp
-**	hint	29 // autiasp
-**	ret
+*E	hint	29 // autiasp
+*E	ret
+*M	retaa
 */
 void
 __attribute__ ((target("branch-protection=bti+pac-ret+leaf"),
@@ -59,8 +60,9 @@ f11_none ()
 /*
 **f11_pac:
 **	hint	25 // paciasp
-**	hint	29 // autiasp
-**	ret
+*E	hint	29 // autiasp
+*E	ret
+*M	retaa
 */
 void
 __attribute__ ((target("branch-protection=bti+pac-ret+leaf"),
@@ -98,8 +100,9 @@ f21_none ()
 **	hint	34 // bti c
 **	nop
 **	hint	25 // paciasp
-**	hint	29 // autiasp
-**	ret
+*E	hint	29 // autiasp
+*E	ret
+*M	retaa
 */
 void
 __attribute__ ((target("branch-protection=bti+pac-ret+leaf"),

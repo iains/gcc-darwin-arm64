@@ -49,9 +49,6 @@ along with GCC; see the file COPYING3.  If not see
 #undef DEFAULT_SIGNED_CHAR
 #define DEFAULT_SIGNED_CHAR 1
 
-#undef LONG_DOUBLE_TYPE_SIZE
-#define LONG_DOUBLE_TYPE_SIZE	64
-
 /* Disable custom function descriptors on Darwin (we use heap-based
    trampolines).  */
 #undef AARCH64_CUSTOM_FUNCTION_TEST
@@ -85,7 +82,10 @@ along with GCC; see the file COPYING3.  If not see
 "%{!mkernel:%{!static:-fPIC}} " DARWIN_CC1_SPEC
 
 #undef ASM_SPEC
-#define ASM_SPEC "-arch %(darwin_arch) %{march*} %{mtune*}  %{static} "\
+/* Do not pass -mtune= to the assembler: it is a scheduling hint with no
+   effect on assembly, and the system assembler rejects tune names that it
+   does not share with GCC (e.g. generic-armv9-a).  */
+#define ASM_SPEC "-arch %(darwin_arch) %{march*} %{static} "\
   ASM_MMACOSX_VERSION_MIN_SPEC
 
 #undef ENDFILE_SPEC
@@ -104,12 +104,6 @@ along with GCC; see the file COPYING3.  If not see
 
 #undef TARGET_ASM_FILE_END
 #define TARGET_ASM_FILE_END darwin_file_end
-
-/* For now, we do not give global entities any extra alignment
-   TODO: determine if we should for some optimisation level.  */
-#undef DATA_ALIGNMENT
-#define DATA_ALIGNMENT(EXP, ALIGN)			\
-  AARCH64_EXPAND_ALIGNMENT (false, EXP, ALIGN)
 
 /* Darwin binds locally for PIC code (the default) without which
    we lose many in-lineing opportunities.  */

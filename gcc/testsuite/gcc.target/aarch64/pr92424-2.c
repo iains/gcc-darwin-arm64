@@ -1,5 +1,6 @@
 /* { dg-do "compile" } */
 /* { dg-options "-O1" } */
+/* { dg-skip-if "Darwin emits no patchable-entry table or label, as clang does" { *-*-darwin* } } */
 
 /* Test the placement of the .LPFE0 label.  */
 
