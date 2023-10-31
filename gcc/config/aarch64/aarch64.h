@@ -1202,6 +1202,24 @@ typedef struct
 				   aapcs_reg == NULL_RTX.  */
   int aapcs_stack_size;		/* The total size (in words, per 8 byte) of the
 				   stack arg area so far.  */
+
+  /* In the darwinpcs, items smaller than one word are packed onto the stack
+     naturally aligned.  Unnamed parameters passed in a variadic call are,
+     however, aligned the same way as the AAPCS64.  This means that we need to
+     pad the last named arg to the next parm boundary (and hence notice when
+     we are processing that arg).  */
+  int darwinpcs_stack_bytes;	/* If the argument is passed on the stack, this
+				   the byte-size.  */
+  int darwinpcs_sub_word_offset;/* This is the offset of this arg within a word
+				   when placing smaller items for darwinpcs.  */
+  int darwinpcs_sub_word_pos;	/* The next byte available within the word for
+				   darwinpcs.  */
+  unsigned darwinpcs_arg_boundary; /* The computed argument boundary.  */
+  unsigned darwinpcs_arg_padding; /* The computed argument padding.  */
+  unsigned darwinpcs_n_named;	/* Number of named arguments.  */
+  unsigned darwinpcs_n_args_processed; /* Processed so far.  */
+  bool named_p;			/* Is this arg named? */
+  bool last_named_p;		/* Is this the last named arg? */
   bool silent_p;		/* True if we should act silently, rather than
 				   raise an error for invalid calls.  */
 
