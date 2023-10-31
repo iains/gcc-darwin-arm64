@@ -816,7 +816,7 @@ Objective-C and Objective-C++ Dialects}.
 -freg-struct-return  -fshort-enums  -fshort-wchar
 -fverbose-asm  -fpack-struct[=@var{n}]
 -fleading-underscore  -ftls-model=@var{model}
--fstack-reuse=@var{reuse_level}
+-fstack-reuse=@var{reuse_level}  -fstack-use-cumulative-args
 -ftrampolines  -ftrampoline-impl=@r{[}stack@r{|}heap@r{]}
 -ftrapv  -fwrapv  -fwrapv-pointer
 -fvisibility=@r{[}default@r{|}internal@r{|}hidden@r{|}protected@r{]}
@@ -3389,7 +3389,7 @@ the checking and the remainder of the function body.
 @opindex fno-contract-disable-optimized-checks
 @item -fcontract-disable-optimized-checks
 When @code{pre} and @code{post} condition checks are outlined (using
-@option{-fcontract-checks-outlined}), this option disables the optimisation 
+@option{-fcontract-checks-outlined}), this option disables the optimisation
 steps for those functions which can avoid unwanted elision of checking steps.
 
 @opindex fcontracts-client-check
@@ -19172,6 +19172,17 @@ does not overlap with it. However some of the legacy code relies on
 the behavior of older compilers in which temporaries' stack space is
 not reused, the aggressive stack reuse can lead to runtime errors. This
 option is used to control the temporary stack reuse optimization.
+
+@opindex fstack_use_cumulative_args
+@item -fstack-use-cumulative-args
+This option instructs the compiler to use the
+@code{cumulative_args_t}-based stack layout target hooks,
+@code{TARGET_FUNCTION_ARG_BOUNDARY_CA} and
+@code{TARGET_FUNCTION_ARG_ROUND_BOUNDARY_CA}. If a given target does
+not define these hooks, the default behaviour is to fallback to using
+the standard non-@code{_CA} variants instead. Certain targets (such as
+AArch64 Darwin) require using the more advanced @code{_CA}-based
+hooks: For these targets this option should be enabled by default.
 
 @opindex ftrapv
 @opindex fno-trapv
