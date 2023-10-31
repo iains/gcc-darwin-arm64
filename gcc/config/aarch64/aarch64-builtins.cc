@@ -751,6 +751,8 @@ enum aarch64_builtins
   AARCH64_BUILTIN_STSHH_SF,
   AARCH64_BUILTIN_STSHH_DF,
   AARCH64_BUILTIN_STSHH_PTR,
+  /* OS-specific */
+  AARCH64_BUILTIN_CFSTRING,
   AARCH64_BUILTIN_MAX
 };
 
@@ -2422,6 +2424,15 @@ aarch64_general_builtin_decl (unsigned code, bool)
 
   return aarch64_builtin_decls[code];
 }
+
+void
+aarch64_init_subtarget_builtins (void)
+{
+#ifdef SUBTARGET_INIT_BUILTINS
+  SUBTARGET_INIT_BUILTINS;
+#endif
+}
+
 
 /* True if we've already complained about attempts to use functions
    when the required extension is disabled.  */
