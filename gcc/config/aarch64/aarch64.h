@@ -72,6 +72,10 @@
 #define BYTES_BIG_ENDIAN (TARGET_BIG_END != 0)
 #define WORDS_BIG_ENDIAN (BYTES_BIG_ENDIAN)
 
+/* If this is non-zero then generated code of the object format, ABI and
+   assembler syntax used by Darwin (Mach-O) platforms.  */
+#define TARGET_MACHO		0
+
 #define UNITS_PER_WORD		8
 
 #define UNITS_PER_VREG		16
@@ -1522,8 +1526,13 @@ extern const char *is_host_cpu_not_armv8_base (int argc, const char **argv);
 #define ASM_CPU_SPEC \
    MARCH_REWRITE_SPEC
 
+#ifndef SUBTARGET_EXTRA_SPECS
+#define SUBTARGET_EXTRA_SPECS
+#endif
+
 #define EXTRA_SPECS						\
-  { "asm_cpu_spec",		ASM_CPU_SPEC }
+  { "asm_cpu_spec",		ASM_CPU_SPEC },			\
+  SUBTARGET_EXTRA_SPECS
 
 #define ASM_OUTPUT_POOL_EPILOGUE  aarch64_asm_output_pool_epilogue
 
