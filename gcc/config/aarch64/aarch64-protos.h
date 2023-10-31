@@ -109,6 +109,14 @@ enum aarch64_symbol_type
   SYMBOL_TLSLE24,
   SYMBOL_TLSLE32,
   SYMBOL_TLSLE48,
+  SYMBOL_MO_SMALL_ABS,
+  SYMBOL_MO_SMALL_PCR,
+  SYMBOL_MO_SMALL_GOT,
+  SYMBOL_MO_SMALL_TLS,
+  SYMBOL_MO_LARGE_ABS,
+  SYMBOL_MO_LARGE_PCR,
+  SYMBOL_MO_LARGE_GOT,
+  SYMBOL_MO_LARGE_TLS,
   SYMBOL_FORCE_TO_MEM
 };
 
@@ -1109,6 +1117,7 @@ void aarch64_override_options_internal (struct gcc_options *);
 
 const char *aarch64_general_mangle_builtin_type (const_tree);
 void aarch64_general_init_builtins (void);
+void aarch64_init_subtarget_builtins (void);
 tree aarch64_general_fold_builtin (unsigned int, tree, unsigned int, tree *);
 gimple *aarch64_general_gimple_fold_builtin (unsigned int, gcall *,
 					     gimple_stmt_iterator *);
