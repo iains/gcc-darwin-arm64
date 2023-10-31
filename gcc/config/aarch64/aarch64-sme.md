@@ -115,7 +115,9 @@
    (clobber (reg:DI R30_REGNUM))
    (clobber (reg:CC CC_REGNUM))]
   ""
-  "bl\t__arm_get_current_vg"
+  {
+    return "bl\t" USER_LABEL_PREFIX "__arm_get_current_vg";
+  }
   [(set_attr "is_call" "yes")]
 )
 
@@ -128,7 +130,9 @@
    (clobber (reg:DI R30_REGNUM))
    (clobber (reg:CC CC_REGNUM))]
   ""
-  "bl\t__arm_sme_state"
+  {
+    return "bl\t" USER_LABEL_PREFIX "__arm_sme_state";
+  }
   [(set_attr "is_call" "yes")]
 )
 
@@ -270,7 +274,9 @@
    (clobber (reg:DI R30_REGNUM))
    (clobber (reg:CC CC_REGNUM))]
   ""
-  "bl\t__arm_tpidr2_save"
+  {
+    return "bl\t" USER_LABEL_PREFIX "__arm_tpidr2_save";
+  }
   [(set_attr "is_call" "yes")]
 )
 
@@ -387,7 +393,9 @@
    (clobber (reg:DI R30_REGNUM))
    (clobber (reg:CC CC_REGNUM))]
   ""
-  "bl\t__arm_tpidr2_restore"
+  {
+    return "bl\t" USER_LABEL_PREFIX "__arm_tpidr2_restore";
+  }
   [(set_attr "is_call" "yes")]
 )
 
