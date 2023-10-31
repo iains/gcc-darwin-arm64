@@ -884,6 +884,8 @@ enum aarch64_builtins
   AARCH64_PLDX,
   AARCH64_PLI,
   AARCH64_PLIX,
+  /* OS-specific */
+  AARCH64_BUILTIN_CFSTRING,
   AARCH64_BUILTIN_MAX
 };
 
@@ -2296,6 +2298,14 @@ aarch64_general_init_builtins (void)
 
   if (in_lto_p)
     handle_arm_acle_h ();
+}
+
+void
+aarch64_init_subtarget_builtins (void)
+{
+#ifdef SUBTARGET_INIT_BUILTINS
+  SUBTARGET_INIT_BUILTINS;
+#endif
 }
 
 /* Implement TARGET_BUILTIN_DECL for the AARCH64_BUILTIN_GENERAL group.  */
