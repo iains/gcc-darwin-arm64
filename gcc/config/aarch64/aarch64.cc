@@ -2570,7 +2570,7 @@ aarch64_hard_regno_mode_ok (unsigned regno, machine_mode mode)
       if (known_le (GET_MODE_SIZE (mode), 8))
 	return true;
       if (known_le (GET_MODE_SIZE (mode), 16))
-	return (regno & 1) == 0;
+	return (regno & 1) == 0 || TARGET_MACHO; /* darwinpcs D.4 */
     }
   else if (FP_REGNUM_P (regno))
     {
@@ -3094,7 +3094,11 @@ aarch64_constant_alignment (const_tree exp, HOST_WIDE_INT align)
 unsigned
 aarch64_data_alignment (const_tree type, unsigned align)
 {
-  if (optimize_size)
+  /* For now, on Darwin we do not give global entities any extra
+     alignment TODO: determine if we should for some optimisation
+     level.  */
+
+  if (optimize_size || TARGET_MACHO)
     return align;
 
   if (AGGREGATE_TYPE_P (type))
@@ -7500,6 +7504,15 @@ aarch64_pass_by_reference (cumulative_args_t pcum_v,
   gcc_unreachable ();
 }
 
+/* darwinpcs D.8, D.11.  */
+static bool
+aarch64_darwin_small_vector_p (const_tree type)
+{
+  return (TARGET_MACHO && type && VECTOR_TYPE_P (type)
+	  && tree_fits_uhwi_p (TYPE_SIZE_UNIT (type))
+	  && tree_to_uhwi (TYPE_SIZE_UNIT (type)) < UNITS_PER_WORD);
+}
+
 /* Return TRUE if VALTYPE is padded to its least significant bits.  */
 static bool
 aarch64_return_in_msb (const_tree valtype)
@@ -7552,6 +7565,11 @@ aarch64_function_value (const_tree type, const_tree func,
   pure_scalable_type_info pst_info;
   if (type && pst_info.analyze_registers (type))
     return pst_info.get_rtx (mode, V0_REGNUM, P0_REGNUM);
+
+  if (aarch64_darwin_small_vector_p (type)  /* darwinpcs D.8.  */
+      && (known_eq (TYPE_VECTOR_SUBPARTS (type), 1U)
+	  || FLOAT_TYPE_P (TREE_TYPE (type))))
+    return gen_rtx_REG (mode, V0_REGNUM);
 
   /* Generic vectors that map to full SVE modes with -msve-vector-bits=N
      are returned in memory, not by value.  */
@@ -8128,6 +8146,8 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
 
   size = aarch64_arg_size (arg);
   allocate_ncrn = (type) ? !(FLOAT_TYPE_P (type)) : !FLOAT_MODE_P (mode);
+  if (aarch64_darwin_small_vector_p (type))
+    allocate_ncrn = true;  /* darwinpcs D.11.  */
   allocate_nvrn = aarch64_vfp_is_call_candidate (pcum_v,
 						 mode,
 						 type,
@@ -14384,7 +14404,21 @@ aarch64_frame_pointer_required ()
 {
   /* If the function needs to record the incoming value of PSTATE.SM,
      make sure that the slot is accessible from the frame pointer.  */
-  return aarch64_need_old_pstate_sm ();
+  if (!TARGET_MACHO)
+    return aarch64_need_old_pstate_sm ();
+
+  /* darwinpcs D.12.  */
+  if (crtl->calls_eh_return || aarch64_need_old_pstate_sm ())
+    return true;
+
+  /* Not used in leaf functions (unless forced).  */
+  if (flag_omit_leaf_frame_pointer && leaf_function_p ())
+    return false;
+
+  /* NOTE: We are allowing the user to force omission of the frame
+     pointer, (despite that it is not ABI-compliant).  */
+
+  return flag_omit_frame_pointer != 1;
 }
 
 static bool
@@ -23222,13 +23256,21 @@ static GTY(()) tree va_list_type;
    };
 
    Windows ABI is handled using
-   aarch64_ms_variadic_abi_build_builtin_va_list (void).  */
+   aarch64_ms_variadic_abi_build_builtin_va_list (void).
+   darwinpcs D.6.  */
 
 static tree
 aarch64_build_builtin_va_list (void)
 {
   if (TARGET_AARCH64_MS_ABI)
     return aarch64_ms_variadic_abi_build_builtin_va_list ();
+
+  if (TARGET_MACHO)
+    {
+      /* darwinpcs D.6.  */
+      va_list_type = build_pointer_type (char_type_node);
+      return va_list_type;
+    }
 
   tree va_list_name;
   tree f_stack, f_grtop, f_vrtop, f_groff, f_vroff;
@@ -23324,6 +23366,13 @@ aarch64_expand_builtin_va_start (tree valist, rtx nextarg)
   int vr_save_area_size = cfun->va_list_fpr_size;
   int vr_offset;
 
+  /* darwinpcs D.6.  */
+  if (TARGET_MACHO)
+    {
+      std_expand_builtin_va_start (valist, nextarg);
+      return;
+    }
+
   cum = &crtl->args.info;
   if (cfun->va_list_gpr_size)
     gr_save_area_size = MIN ((num_pcs_arg_regs (cum->pcs_variant)
@@ -23415,6 +23464,22 @@ aarch64_gimplify_va_arg_expr (tree valist, tree type, gimple_seq *pre_p,
   tree stack, f_top, f_off, off, arg, roundup, on_stack;
   HOST_WIDE_INT size, rsize, adjust, align;
   tree t, u, cond1, cond2;
+
+  if (TARGET_MACHO)
+    {
+      /* darwinpcs D.6: the generic lowering is used and none of the code
+	 below is reached.  The
+	 -mgeneral-regs-only check still has to be made here: otherwise the
+	 option is silently ignored for a va_arg of a floating-point or vector
+	 type, although it is diagnosed for the same type in an argument list
+	 (aarch64_layout_arg).  */
+      if (!TARGET_FLOAT
+	  && aarch64_vfp_is_call_or_return_candidate (TYPE_MODE (type), type,
+						      &ag_mode, &nregs, &is_ha,
+						      false))
+	aarch64_err_no_fpadvsimd (TYPE_MODE (type));
+      return std_gimplify_va_arg_expr (valist, type, pre_p, post_p);
+    }
 
   indirect_p = pass_va_arg_by_reference (type);
   if (indirect_p)
@@ -23704,6 +23769,10 @@ aarch64_setup_incoming_varargs (cumulative_args_t cum_v,
   CUMULATIVE_ARGS local_cum;
   int gr_saved = cfun->va_list_gpr_size;
   int vr_saved = cfun->va_list_fpr_size;
+
+  /* darwinpcs D.6.  */
+  if (TARGET_MACHO)
+    return;
 
   /* The caller has advanced CUM up to, but not beyond, the last named
      argument.  Advance a local copy of CUM past the last "real" named
@@ -24248,7 +24317,8 @@ aarch64_vfp_is_call_or_return_candidate (machine_mode mode,
       *count = 1;
       new_mode = mode;
     }
-  else if (GET_MODE_CLASS (mode) == MODE_COMPLEX_FLOAT)
+  else if (GET_MODE_CLASS (mode) == MODE_COMPLEX_FLOAT
+	   && !(TARGET_MACHO && composite_p)) /* darwinpcs D.10.  */
     {
       if (is_ha != NULL) *is_ha = true;
       *count = 2;
@@ -24607,6 +24677,11 @@ aarch64_convert_to_type (tree type, tree expr)
 static const char *
 aarch64_mangle_type (const_tree type)
 {
+  /* darwinpcs D.6.  */
+  if (TARGET_MACHO
+      && lang_hooks.types_compatible_p (const_cast<tree> (type), va_list_type))
+    return "Pc";
+
   /* The AArch64 ABI documents say that "__va_list" has to be
      mangled as if it is in the "std" namespace.
      The Windows Arm64 ABI uses just an address of the first variadic
@@ -28073,7 +28148,7 @@ aarch64_init_libfuncs (void)
 static machine_mode
 aarch64_c_mode_for_suffix (char suffix)
 {
-  if (suffix == 'q')
+  if (suffix == 'q' && !TARGET_MACHO)
     return TFmode;
 
   return VOIDmode;
@@ -30284,6 +30359,8 @@ aarch64_expand_subvti (rtx op0, rtx low_dest, rtx low_in1,
 static unsigned HOST_WIDE_INT
 aarch64_asan_shadow_offset (void)
 {
+  if (TARGET_MACHO)
+    return 0; /* macOS uses a dynamic allocation.  */
   if (TARGET_ILP32)
     return (HOST_WIDE_INT_1 << 29);
   else
@@ -31838,8 +31915,13 @@ aarch64_bitint_type_info (int n, struct bitint_info *info)
 static machine_mode
 aarch64_c_mode_for_floating_type (enum tree_index ti)
 {
+  if (TARGET_MACHO && ti == TI_LONG_DOUBLE_TYPE)
+    /* darwinpcs D.13.  */
+    return DFmode;
+
   if (TARGET_LONG_DOUBLE_128 && ti == TI_LONG_DOUBLE_TYPE)
     return TFmode;
+
   return default_mode_for_floating_type (ti);
 }
 
@@ -34759,7 +34841,12 @@ aarch64_run_selftests (void)
    should inherit the alignment requirements of an unnamed bitfield's
    type.  */
 #undef TARGET_ALIGN_ANON_BITFIELD
+#if TARGET_MACHO
+/* darwinpcs D.9.  */
+#define TARGET_ALIGN_ANON_BITFIELD hook_bool_void_false
+#else
 #define TARGET_ALIGN_ANON_BITFIELD hook_bool_void_true
+#endif
 
 #undef TARGET_ASM_ALIGNED_DI_OP
 #undef TARGET_ASM_UNALIGNED_DI_OP
@@ -35262,6 +35349,11 @@ aarch64_libgcc_floating_mode_supported_p
 
 #undef TARGET_ASAN_SHADOW_OFFSET
 #define TARGET_ASAN_SHADOW_OFFSET aarch64_asan_shadow_offset
+
+#if TARGET_MACHO
+#undef TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P
+#define TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P hook_bool_void_true
+#endif
 
 #undef TARGET_LEGITIMIZE_ADDRESS
 #define TARGET_LEGITIMIZE_ADDRESS aarch64_legitimize_address
