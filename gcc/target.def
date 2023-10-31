@@ -5217,6 +5217,18 @@ with the specified mode and type.  The default hook returns\n\
  default_function_arg_boundary)
 
 DEFHOOK
+(function_arg_boundary_ca,
+ "This is the @code{cumulative_args_t}-based version of\n\
+@code{TARGET_FUNCTION_ARG_BOUNDARY}. Define this hook if you need more\n\
+fine-grained control over argument alignment, e.g. depending on whether\n\
+it is a named argument or not, or any other criteria that you choose to\n\
+place in the @var{ca} structure.\n\
+\n\
+The default hook will call @code{TARGET_FUNCTION_ARG_BOUNDARY}.",
+ unsigned int, (machine_mode mode, const_tree type, cumulative_args_t ca),
+ default_function_arg_boundary_ca)
+
+DEFHOOK
 (function_arg_round_boundary,
  "Normally, the size of an argument is rounded up to @code{PARM_BOUNDARY},\n\
 which is the default value for this hook.  You can define this hook to\n\
@@ -5224,6 +5236,18 @@ return a different value if an argument size must be rounded to a larger\n\
 value.",
  unsigned int, (machine_mode mode, const_tree type),
  default_function_arg_round_boundary)
+
+DEFHOOK
+(function_arg_round_boundary_ca,
+ "This is the @code{cumulative_args_t}-based version of\n\
+@code{TARGET_FUNCTION_ARG_ROUND_BOUNDARY}. Define this hook if you need more\n\
+fine-grained control over argument size rounding, e.g. depending on whether\n\
+it is a named argument or not, or any other criteria that you choose to\n\
+place in the @var{ca} structure.\n\
+\n\
+The default hook will call @code{TARGET_FUNCTION_ARG_ROUND_BOUNDARY}.",
+ unsigned int, (machine_mode mode, const_tree type, cumulative_args_t ca),
+ default_function_arg_round_boundary_ca)
 
 /* Return the diagnostic message string if function without a prototype
    is not allowed for this 'val' argument; NULL otherwise. */
