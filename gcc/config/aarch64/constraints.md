@@ -206,7 +206,9 @@
    A constraint that matches a small GOT access."
   (and (match_code "const,symbol_ref")
        (match_test "aarch64_classify_symbolic_expression (op)
-		     == SYMBOL_SMALL_GOT_4G")))
+		     == SYMBOL_SMALL_GOT_4G
+		    || aarch64_classify_symbolic_expression (op)
+		     == SYMBOL_MO_SMALL_GOT")))
 
 (define_constraint "Uss"
   "@internal
