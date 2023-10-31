@@ -652,6 +652,10 @@ through +ssve-fp8dot2.  */
 #define FIXED_X18 0
 #define CALL_USED_X18 1
 
+/* ShadowCallStack uses X18 to hold the shadow stack pointer, so it can only
+   be provided where the platform does not claim that register.  */
+#define AARCH64_HAVE_SHADOW_CALL_STACK true
+
 #define FIXED_REGISTERS					\
   {							\
     0, 0, 0, 0,   0, 0, 0, 0,	/* R0 - R7 */		\
@@ -1626,8 +1630,13 @@ extern const char *is_host_cpu_not_armv8_base (int argc, const char **argv);
 #define ASM_CPU_SPEC \
    MARCH_REWRITE_SPEC
 
+#ifndef SUBTARGET_EXTRA_SPECS
+#define SUBTARGET_EXTRA_SPECS
+#endif
+
 #define EXTRA_SPECS						\
-  { "asm_cpu_spec",		ASM_CPU_SPEC }
+  { "asm_cpu_spec",		ASM_CPU_SPEC },			\
+  SUBTARGET_EXTRA_SPECS
 
 #define ASM_OUTPUT_POOL_EPILOGUE  aarch64_asm_output_pool_epilogue
 
