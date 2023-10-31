@@ -28,6 +28,95 @@
 #include "aarch64-protos.h"
 #include "aarch64-feature-deps.h"
 
+#if TARGET_MACHO
+# include <sys/types.h>
+# include <sys/sysctl.h>
+#endif
+
+
+#if TARGET_MACHO
+
+/* macOS does not have /proc/cpuinfo and needs a different approach,
+   based on sysctl.  It is much simpler.  */
+
+const char *
+host_detect_local_cpu (ATTRIBUTE_UNUSED int argc, ATTRIBUTE_UNUSED const char **argv)
+{
+  bool arch = false;
+  bool tune = false;
+  bool cpu = false;
+  const char *res = NULL;
+  uint32_t family;
+  size_t len = sizeof(family);
+
+  gcc_assert (argc);
+  if (!argv[0])
+    return NULL;
+
+  /* Are we processing -march, mtune or mcpu?  */
+  arch = strcmp (argv[0], "arch") == 0;
+  if (!arch)
+    tune = strcmp (argv[0], "tune") == 0;
+  if (!arch && !tune)
+    cpu = strcmp (argv[0], "cpu") == 0;
+  if (!arch && !tune && !cpu)
+    return NULL;
+
+  sysctlbyname("hw.cpufamily", &family, &len, NULL, 0);
+
+  switch (family)
+  {
+#if 0
+    case 0x37a09642: // Cyclone
+      res = "apple-a7";
+      break;
+    case 0x2c91a47e: // Typhoon
+      res = "apple-a8";
+      break;
+    case 0x92fb37c8: // Twister
+      res = "apple-a9";
+      break;
+    case 0x67ceee93: // Hurricane, Zephyr
+      res = "apple-a10";
+      break;
+    case 0xe81e7ef6: // Monsoon, Mistral
+      res = "apple-a11";
+      break;
+#endif
+    case 0x07d34b9f: // Vortex, Tempest
+      res = "apple-a12";
+      break;
+#if 0
+    case 0x462504d2: // Lightning, Thunder
+      res = "apple-a13";
+      break;
+    case 0x1b588bb3: // Firestorm, Icestorm
+      res = "apple-a14";
+      break;
+    case 0xda33d83d: // Blizzard, Avalanche
+      res = "apple-a15";
+      break;
+    case 0x8765edea: // Everest Sawtooth
+      res = "apple-a16";
+      break;
+#endif
+    case 0x573b5eec:
+    case 0x1b588bb3: // Firestorm, Icestorm
+      res = "apple-m1";
+      break;
+    case 0xda33d83d: // Blizzard, Avalanche
+      res = "apple-m2";
+      break;
+  }
+
+  if (res)
+    return concat ("-m", argv[0], "=", res, NULL);
+  else
+    return NULL;
+}
+
+#else
+
 struct aarch64_arch_extension
 {
   const char *ext;
@@ -477,3 +566,4 @@ not_found:
   }
 }
 
+#endif
