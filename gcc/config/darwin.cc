@@ -135,7 +135,7 @@ struct {
 section * darwin_sections[NUM_DARWIN_SECTIONS];
 
 /* While we transition to using in-tests instead of ifdef'd code.  */
-#if !HAVE_lo_sum
+#if !HAVE_lo_sum || DARWIN_ARM64
 #define gen_macho_high(m,a,b) (a)
 #define gen_macho_low(m,a,b,c) (a)
 #endif
@@ -1109,6 +1109,7 @@ machopic_legitimize_pic_address (rtx orig, machine_mode mode, rtx reg)
   return pic_ref;
 }
 
+#if !DARWIN_ARM64
 /* Callbacks to output the stub or non-lazy pointers.
    Each works on the item in *SLOT,if it has been used.
    DATA is the FILE* for assembly output.
@@ -1267,6 +1268,7 @@ machopic_finish (FILE *out_file)
   machopic_indirections->empty ();
   machopic_indirections = NULL;
 }
+#endif
 
 int
 machopic_operand_p (rtx op)
@@ -3574,7 +3576,15 @@ darwin_file_end (void)
   objc_metadata_seen = 0;
   classes_seen = 0;
 
+#if !DARWIN_ARM64
   machopic_finish (asm_out_file);
+#else
+  /* The arm64 port creates no Mach-O indirections; note that this depends on
+     aarch64/darwin.h overriding ASM_MAYBE_OUTPUT_ENCODED_ADDR_RTX, whose
+     generic version calls darwin_non_lazy_pcrel.  */
+  gcc_checking_assert (!machopic_indirections);
+#endif
+
   if (flag_apple_kext)
     {
       /* These sections are only used for kernel code.  */
