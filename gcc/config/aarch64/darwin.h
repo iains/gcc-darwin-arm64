@@ -49,9 +49,6 @@ along with GCC; see the file COPYING3.  If not see
 #undef DEFAULT_SIGNED_CHAR
 #define DEFAULT_SIGNED_CHAR 1
 
-#undef LONG_DOUBLE_TYPE_SIZE
-#define LONG_DOUBLE_TYPE_SIZE	64
-
 /* Disable custom function descriptors on Darwin (we use heap-based
    trampolines).  */
 #undef AARCH64_CUSTOM_FUNCTION_TEST
@@ -104,12 +101,6 @@ along with GCC; see the file COPYING3.  If not see
 
 #undef TARGET_ASM_FILE_END
 #define TARGET_ASM_FILE_END darwin_file_end
-
-/* For now, we do not give global entities any extra alignment
-   TODO: determine if we should for some optimisation level.  */
-#undef DATA_ALIGNMENT
-#define DATA_ALIGNMENT(EXP, ALIGN)			\
-  AARCH64_EXPAND_ALIGNMENT (false, EXP, ALIGN)
 
 /* Darwin binds locally for PIC code (the default) without which
    we lose many in-lineing opportunities.  */
