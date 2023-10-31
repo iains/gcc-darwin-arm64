@@ -28,6 +28,7 @@
 #include "aarch64-protos.h"
 #include "aarch64-feature-deps.h"
 
+#if !defined (__APPLE__)
 struct aarch64_arch_extension
 {
   const char *ext;
@@ -41,6 +42,7 @@ static struct aarch64_arch_extension aarch64_extensions[] =
 {
 #include "aarch64-option-extensions.def"
 };
+#endif
 
 
 struct aarch64_core_data
@@ -114,6 +116,78 @@ get_cpu_from_id (const char* name)
 
   return NULL;
 }
+
+#if defined (__APPLE__)
+/* macOS does not have /proc/cpuinfo and needs a different approach,
+   based on sysctl.  It is much simpler.  */
+#include <sys/types.h>
+#include <sys/sysctl.h>
+
+const char *
+host_detect_local_cpu (int argc, const char **argv)
+{
+  const char *res;
+  uint32_t family;
+  size_t len = sizeof (family);
+
+  gcc_assert (argc);
+  if (!argv[0])
+    return NULL;
+
+  /* Are we processing -march, -mtune or -mcpu?  */
+  bool arch = strcmp (argv[0], "arch") == 0;
+  if (!arch && strcmp (argv[0], "tune") != 0 && strcmp (argv[0], "cpu") != 0)
+    return NULL;
+
+  /* If the family cannot be read, use the default below.  */
+  if (sysctlbyname ("hw.cpufamily", &family, &len, NULL, 0) != 0)
+    family = 0;
+
+  switch (family)
+    {
+    case 0x07d34b9f: /* Vortex, Tempest.  */
+      res = "apple-a12";
+      break;
+    case 0x573b5eec:
+    case 0x1b588bb3: /* Firestorm, Icestorm.  */
+      res = "apple-m1";
+      break;
+    case 0xda33d83d: /* Blizzard, Avalanche.  */
+      res = "apple-m2";
+      break;
+    case 0xfa33415e: /* Ibiza (M3).  */
+    case 0x5f4dea93: /* Lobos (M3 Pro).  */
+    case 0x72015832: /* Palma (M3 Max).  */
+      res = "apple-m3";
+      break;
+    case 0x6f5129ac: /* Donan (M4).  */
+    case 0x17d5b93a: /* Brava (M4 Pro and Max).  */
+      res = "apple-m4";
+      break;
+    case 0x1d5a87e8: /* Hidra (M5).  */
+    case 0xf76c5b1a: /* Sotra (M5 Pro and Max).  */
+      res = "apple-m5";
+      break;
+    default:
+      /* An unrecognised family: use the baseline Apple core.  */
+      res = "apple-m1";
+    }
+
+  /* For -march, return the architecture of the detected cpu.  */
+  if (arch)
+    {
+      const aarch64_core_data *core = get_cpu_from_id (res);
+      const aarch64_arch_driver_info *arch_info
+	= core ? get_arch_from_id (core->arch) : NULL;
+      if (!arch_info)
+	return NULL;
+      res = arch_info->name;
+    }
+
+  return concat ("-m", argv[0], "=", res, NULL);
+}
+
+#else
 
 /* Choose a generic CPU for unknown cores using FLAGS.  Include extensions
    that require SVE2, since cpuinfo flags aren't transitively closed.  */
@@ -524,3 +598,4 @@ not_found:
     return NULL;
   }
 }
+#endif
