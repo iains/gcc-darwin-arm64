@@ -924,6 +924,9 @@ static const attribute_spec aarch64_gnu_attributes[] =
 {
   /* { name, min_len, max_len, decl_req, type_req, fn_type_req,
        affects_type_identity, handler, exclude } */
+#ifdef SUBTARGET_ATTRIBUTE_TABLE
+  SUBTARGET_ATTRIBUTE_TABLE,
+#endif
   { "aarch64_vector_pcs", 0, 0, false, true,  true,  true,
 			  handle_aarch64_vector_pcs_attribute,
 			  aarch64_pcs_exclusions },
@@ -939,9 +942,6 @@ static const attribute_spec aarch64_gnu_attributes[] =
 #if TARGET_DLLIMPORT_DECL_ATTRIBUTES
   { "dllimport", 0, 0, false, false, false, false, handle_dll_attribute, NULL },
   { "dllexport", 0, 0, false, false, false, false, handle_dll_attribute, NULL },
-#endif
-#ifdef SUBTARGET_ATTRIBUTE_TABLE
-  SUBTARGET_ATTRIBUTE_TABLE
 #endif
 };
 
@@ -17131,15 +17131,18 @@ aarch64_init_builtins ()
     {
       aarch64_ms_variadic_abi_init_builtins ();
     }
-#ifdef SUBTARGET_INIT_BUILTINS
-  SUBTARGET_INIT_BUILTINS;
-#endif
+  aarch64_init_subtarget_builtins ();
 }
 
 /* Implement TARGET_FOLD_BUILTIN.  */
 static tree
-aarch64_fold_builtin (tree fndecl, int nargs, tree *args, bool)
+aarch64_fold_builtin (tree fndecl, int nargs, tree *args,
+		      bool ignore ATTRIBUTE_UNUSED)
 {
+#ifdef SUBTARGET_FOLD_BUILTIN
+  if (tree res = SUBTARGET_FOLD_BUILTIN (fndecl, nargs, args, ignore))
+    return res;
+#endif
   unsigned int code = DECL_MD_FUNCTION_CODE (fndecl);
   unsigned int subcode = code >> AARCH64_BUILTIN_SHIFT;
   tree type = TREE_TYPE (TREE_TYPE (fndecl));
@@ -35341,7 +35344,7 @@ aarch64_libgcc_floating_mode_supported_p
 #define TARGET_ASM_FUNCTION_EPILOGUE aarch64_sls_emit_blr_function_thunks
 
 #undef TARGET_HAVE_SHADOW_CALL_STACK
-#define TARGET_HAVE_SHADOW_CALL_STACK true
+#define TARGET_HAVE_SHADOW_CALL_STACK AARCH64_HAVE_SHADOW_CALL_STACK
 
 #undef TARGET_CONST_ANCHOR
 #define TARGET_CONST_ANCHOR 0x1000000
