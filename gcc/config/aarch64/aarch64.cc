@@ -364,8 +364,10 @@ static bool aarch64_vfp_is_call_or_return_candidate (machine_mode,
 						     const_tree,
 						     machine_mode *, int *,
 						     bool *, bool);
+#if !TARGET_MACHO
 static void aarch64_elf_asm_constructor (rtx, int) ATTRIBUTE_UNUSED;
 static void aarch64_elf_asm_destructor (rtx, int) ATTRIBUTE_UNUSED;
+#endif
 static void aarch64_override_options_after_change (void);
 static bool aarch64_vector_mode_supported_p (machine_mode);
 static int aarch64_address_cost (rtx, machine_mode, addr_space_t, bool);
@@ -3515,6 +3517,7 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
   switch (type)
     {
     case SYMBOL_SMALL_ABSOLUTE:
+    case SYMBOL_MO_SMALL_PCR:
       {
 	/* In ILP32, the mode of dest can be either SImode or DImode.  */
 	rtx tmp_reg = dest;
@@ -3538,6 +3541,22 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 	  }
 	imm = plus_constant (mode, imm, -mid_const);
 
+	if (TARGET_MACHO)
+	  {
+	    rtx sym, off;
+	    split_const (imm, &sym, &off);
+	    /* The Mach-O ADDEND relocation holds a signed 24-bit value, but a
+	       negative addend gives wrong code at link time, so fold only
+	       offsets in [0, 4 MiB).  */
+	    if (INTVAL (off) < 0 || INTVAL (off) >= 4 * 1024 * 1024)
+	      {
+		emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, sym));
+		emit_insn (gen_add_losym (dest, tmp_reg, sym));
+		gcc_checking_assert (mode == DImode);
+		emit_insn (gen_adddi3 (dest, dest, off));
+		return;
+	      }
+	  }
 	emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, copy_rtx (imm)));
 	if (mid_const)
 	  emit_set_insn (tmp_reg, plus_constant (mode, tmp_reg, mid_const));
@@ -3623,6 +3642,7 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 	return;
       }
 
+    case SYMBOL_MO_SMALL_GOT:
     case SYMBOL_SMALL_GOT_4G:
       emit_insn (gen_rtx_SET (dest, imm));
       return;
@@ -7033,6 +7053,7 @@ aarch64_expand_mov_immediate (rtx dest, rtx imm)
 	case SYMBOL_SMALL_TLSIE:
 	case SYMBOL_SMALL_GOT_28K:
 	case SYMBOL_SMALL_GOT_4G:
+	case SYMBOL_MO_SMALL_GOT:
 	case SYMBOL_TINY_GOT:
 	case SYMBOL_TINY_TLSIE:
 	  if (const_offset != 0)
@@ -7046,6 +7067,7 @@ aarch64_expand_mov_immediate (rtx dest, rtx imm)
 	  /* FALLTHRU */
 
 	case SYMBOL_SMALL_ABSOLUTE:
+	case SYMBOL_MO_SMALL_PCR:
 	case SYMBOL_TINY_ABSOLUTE:
 	case SYMBOL_TLSLE12:
 	case SYMBOL_TLSLE24:
@@ -11987,8 +12009,12 @@ aarch64_classify_address (struct aarch64_address_info *info,
 	  rtx sym = strip_offset_and_salt (info->offset, &offset);
 	  if (SYMBOL_REF_P (sym)
 	      && offset.is_constant (&const_offset)
+	      /* No negative Mach-O offsets (see aarch64_valid_symref).  */
+	      && (!TARGET_MACHO || const_offset >= 0)
 	      && (aarch64_classify_symbol (sym, const_offset)
-		  == SYMBOL_SMALL_ABSOLUTE))
+		    == SYMBOL_SMALL_ABSOLUTE
+		  || aarch64_classify_symbol (sym, const_offset)
+		      == SYMBOL_MO_SMALL_PCR))
 	    {
 	      /* The symbol and offset must be aligned to the access size.  */
 	      unsigned int align;
@@ -13217,6 +13243,32 @@ sizetochar (int size)
     }
 }
 
+#if TARGET_MACHO
+/* Output X, a symbol or label reference with an optional constant offset
+   (possibly wrapped in UNSPEC_SALT_ADDR), to FILE as output_addr_const
+   does, but with "@POSTFIX" (the Mach-O relocation specifier, e.g. PAGE or
+   PAGEOFF) between the reference and the offset.  */
+
+static void
+output_macho_postfix_expr (FILE *file, rtx x, const char *postfix)
+{
+  poly_int64 offset;
+  rtx base = strip_offset_and_salt (x, &offset);
+  if (!SYMBOL_REF_P (base) && !LABEL_REF_P (base))
+    {
+      output_operand_lossage ("invalid expression as operand");
+      return;
+    }
+  output_addr_const (file, base);
+  fprintf (file, "@%s", postfix);
+  HOST_WIDE_INT off = offset.to_constant ();
+  if (off > 0)
+    putc ('+', file);
+  if (off != 0)
+    fprintf (file, HOST_WIDE_INT_PRINT_DEC, off);
+}
+#endif
+
 /* Print operand X to file F in a target specific manner according to CODE.
    The acceptable formatting commands given by CODE are:
      'c':		An integer or symbol address without a preceding #
@@ -13622,7 +13674,7 @@ aarch64_print_operand (FILE *f, rtx x, int code)
     case 'A':
       if (GET_CODE (x) == HIGH)
 	x = XEXP (x, 0);
-
+#if !TARGET_MACHO
       switch (aarch64_classify_symbolic_expression (x))
 	{
 	case SYMBOL_SMALL_GOT_4G:
@@ -13653,11 +13705,31 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	  break;
 	}
       output_addr_const (asm_out_file, x);
+#else
+      switch (aarch64_classify_symbolic_expression (x))
+	{
+	case SYMBOL_MO_SMALL_PCR:
+	  output_macho_postfix_expr (asm_out_file, x, "PAGE");
+	  break;
+	case SYMBOL_MO_SMALL_GOT:
+	  output_macho_postfix_expr (asm_out_file, x, "GOTPAGE");
+	  break;
+	default:
+	  /* Large code model unimplemented.  */
+	  gcc_unreachable ();
+	  break;
+	}
+#endif
       break;
 
     case 'L':
+#if !TARGET_MACHO
       switch (aarch64_classify_symbolic_expression (x))
 	{
+	case SYMBOL_SMALL_ABSOLUTE:
+	  asm_fprintf (asm_out_file, ":lo12:");
+	  break;
+
 	case SYMBOL_SMALL_GOT_4G:
 	  asm_fprintf (asm_out_file, ":got_lo12:");
 	  break;
@@ -13694,9 +13766,17 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	  break;
 	}
       output_addr_const (asm_out_file, x);
+#else
+      {
+	const char *reloc = (aarch64_classify_symbolic_expression (x)
+			     == SYMBOL_MO_SMALL_GOT) ? "GOTPAGEOFF" : "PAGEOFF";
+	output_macho_postfix_expr (asm_out_file, x, reloc);
+      }
+#endif
       break;
 
     case 'G':
+#if !TARGET_MACHO
       switch (aarch64_classify_symbolic_expression (x))
 	{
 	case SYMBOL_TLSLE24:
@@ -13705,6 +13785,7 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	default:
 	  break;
 	}
+#endif
       output_addr_const (asm_out_file, x);
       break;
 
@@ -13870,8 +13951,13 @@ aarch64_print_address_internal (FILE *f, machine_mode mode, rtx x,
 	break;
 
       case ADDRESS_LO_SUM:
+#if TARGET_MACHO
+	asm_fprintf (f, "[%s, #", reg_names [REGNO (addr.base)]);
+	output_macho_postfix_expr (f, addr.offset, "PAGEOFF");
+#else
 	asm_fprintf (f, "[%s, #:lo12:", reg_names [REGNO (addr.base)]);
 	output_addr_const (f, addr.offset);
+#endif
 	asm_fprintf (f, "]");
 	return true;
 
@@ -14418,6 +14504,8 @@ aarch64_asm_output_labelref (FILE* f, const char *name)
   asm_fprintf (f, "%U%s", name);
 }
 
+#if !TARGET_MACHO
+
 static void
 aarch64_elf_asm_constructor (rtx symbol, int priority)
 {
@@ -14457,6 +14545,7 @@ aarch64_elf_asm_destructor (rtx symbol, int priority)
       assemble_aligned_integer (POINTER_BYTES, symbol);
     }
 }
+#endif
 
 /* True if the base of a jump table whose body is DIFF_VEC has to be
    materialised with ADRP and ADD rather than ADR.  Once other jumps dispatch
@@ -14519,9 +14608,15 @@ aarch64_output_casesi (rtx *operands)
       /* Several jumps dispatch through this table and there is one base,
 	 so the distance to it is bounded only by the size of the function.
 	 ADR only reaches 1MB.  */
+#if TARGET_MACHO
+      snprintf (buf, sizeof (buf), "adrp\t%%4, %s@PAGE", name);
+      output_asm_insn (buf, operands);
+      snprintf (buf, sizeof (buf), "add\t%%4, %%4, %s@PAGEOFF", name);
+#else
       snprintf (buf, sizeof (buf), "adrp\t%%4, %s", name);
       output_asm_insn (buf, operands);
       snprintf (buf, sizeof (buf), "add\t%%4, %%4, :lo12:%s", name);
+#endif
       output_asm_insn (buf, operands);
     }
   else
@@ -14664,12 +14759,16 @@ aarch64_select_rtx_section (machine_mode mode,
   if (aarch64_can_use_per_function_literal_pools_p ())
     return function_section (current_function_decl);
 
+#if TARGET_MACHO
+  return machopic_select_rtx_section (mode, x, align);
+#else
   /* When using anchors for constants use the readonly section.  */
   if ((CONST_INT_P (x) || CONST_DOUBLE_P (x) || CONST_VECTOR_P (x))
       && known_le (GET_MODE_SIZE (mode), 16))
     return readonly_data_section;
 
   return default_elf_select_rtx_section (mode, x, align);
+#endif
 }
 
 /* Implement ASM_OUTPUT_POOL_EPILOGUE.  */
@@ -20861,7 +20960,9 @@ initialize_aarch64_code_model (struct gcc_options *opts)
   aarch64_cmodel = opts->x_aarch64_cmodel_var;
   if (aarch64_cmodel == AARCH64_CMODEL_LARGE)
     {
-      if (opts->x_aarch64_abi == AARCH64_ABI_ILP32)
+      if (TARGET_MACHO)
+	sorry ("code model %qs not supported yet", "large");
+      else if (opts->x_aarch64_abi == AARCH64_ABI_ILP32)
 	sorry ("code model %qs not supported in ilp32 mode", "large");
     }
 }
@@ -22794,7 +22895,7 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
       if (aarch64_cmodel == AARCH64_CMODEL_TINY)
 	return SYMBOL_TINY_ABSOLUTE;
 
-      return SYMBOL_SMALL_ABSOLUTE;
+      return TARGET_MACHO ? SYMBOL_MO_SMALL_PCR : SYMBOL_SMALL_ABSOLUTE;
     }
 
   if (SYMBOL_REF_P (x))
@@ -22804,7 +22905,7 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 
       /* With -fPIC non-local symbols use the GOT.  For orthogonality
 	 always use the GOT for extern weak symbols.  */
-      if (!TARGET_PECOFF
+      if (!TARGET_PECOFF && !TARGET_MACHO
 	  && (flag_pic || SYMBOL_REF_WEAK (x))
 	  && !aarch64_symbol_binds_local_p (x))
 	{
@@ -22832,15 +22933,24 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 
 	  return SYMBOL_TINY_ABSOLUTE;
 
-
 	case AARCH64_CMODEL_SMALL:
+#if TARGET_MACHO
+	  gcc_checking_assert (flag_pic);
+	  /* Constant pool addresses are always TU-local and PC-relative.  We
+	     indirect common, external and weak symbols (but weak only if not
+	     hidden).  */
+	  if (!CONSTANT_POOL_ADDRESS_P (x)
+	      && (MACHO_SYMBOL_MUST_INDIRECT_P (x)
+		  || !aarch64_symbol_binds_local_p (x)))
+	    return SYMBOL_MO_SMALL_GOT;
+#endif
 	  /* Same reasoning as the tiny code model, but the offset cap here is
 	     1MB, allowing +/-3.9GB for the offset to the symbol.  */
 	  if (!(IN_RANGE (offset, -0x100000, 0x100000)
 		|| offset_within_block_p (x, offset)))
 	    return SYMBOL_FORCE_TO_MEM;
 
-	  return SYMBOL_SMALL_ABSOLUTE;
+	  return TARGET_MACHO ? SYMBOL_MO_SMALL_PCR : SYMBOL_SMALL_ABSOLUTE;
 
 	case AARCH64_CMODEL_LARGE:
 	  if (!TARGET_PECOFF
@@ -25520,7 +25630,8 @@ aarch64_mov_operand_p (rtx x, machine_mode mode)
 
   /* GOT accesses are valid moves.  */
   if (SYMBOL_REF_P (x)
-      && aarch64_classify_symbolic_expression (x) == SYMBOL_SMALL_GOT_4G)
+      && (aarch64_classify_symbolic_expression (x) == SYMBOL_SMALL_GOT_4G
+	  || aarch64_classify_symbolic_expression (x) == SYMBOL_MO_SMALL_GOT))
     return true;
 
   if (SYMBOL_REF_P (x) && mode == DImode && CONSTANT_ADDRESS_P (x))
@@ -27181,12 +27292,11 @@ aarch64_asm_output_variant_pcs (FILE *stream, const tree decl, const char* name)
 static std::string aarch64_last_printed_arch_string;
 static std::string aarch64_last_printed_tune_string;
 
-/* Implement ASM_DECLARE_FUNCTION_NAME.  Output the ISA features used
-   by the function fndecl.  */
+/* Output the .arch directive for FNDECL and, with -dA, a .tune comment,
+   each only when it differs from the last one printed.  */
 
-void
-aarch64_declare_function_name (FILE *stream, const char* name,
-				tree fndecl)
+static void
+aarch64_function_options_preamble (tree fndecl)
 {
   tree target_parts = DECL_FUNCTION_SPECIFIC_TARGET (fndecl);
 
@@ -27221,15 +27331,61 @@ aarch64_declare_function_name (FILE *stream, const char* name,
 		   this_tune->name);
       aarch64_last_printed_tune_string = this_tune->name;
     }
+}
 
+/* Implement ASM_DECLARE_FUNCTION_NAME.  Output the ISA features used
+   by the function fndecl.  */
+
+#if TARGET_MACHO
+void
+aarch64_darwin_declare_function_name (FILE *stream, const char* name,
+				      tree fndecl)
+{
+  gcc_checking_assert (TREE_CODE (fndecl) == FUNCTION_DECL);
+  gcc_checking_assert (!DECL_COMMON (fndecl));
+
+  /* Update .arch and .tune as needed.  */
+  aarch64_function_options_preamble (fndecl);
+
+  rtx decl_rtx = XEXP (DECL_RTL (fndecl), 0);
+  if (GET_CODE (decl_rtx) != SYMBOL_REF)
+    name = IDENTIFIER_POINTER (DECL_NAME (fndecl));
+
+  /* Emit any necessary pcs information.  */
   aarch64_asm_output_variant_pcs (stream, fndecl, name);
 
-  /* Don't forget the type directive for ELF.  */
-  ASM_OUTPUT_TYPE_DIRECTIVE (stream, name, "function");
+  if (! DECL_WEAK (fndecl)
+      && ((TREE_STATIC (fndecl) && !TREE_PUBLIC (fndecl))
+	  || DECL_INITIAL (fndecl)))
+    machopic_define_symbol (DECL_RTL (fndecl));
+  if ((TREE_STATIC (fndecl) && !TREE_PUBLIC (fndecl))
+       || DECL_INITIAL (fndecl))
+    (* targetm.encode_section_info) (fndecl, DECL_RTL (fndecl), false);
   ASM_OUTPUT_FUNCTION_LABEL (stream, name, fndecl);
 
   cfun->machine->label_is_assembled = true;
 }
+
+#else
+
+void
+aarch64_declare_function_name (FILE *stream, const char* name,
+				tree fndecl)
+{
+  /* Update .arch and .tune as needed.  */
+  aarch64_function_options_preamble (fndecl);
+  /* Emit any necessary pcs information.  */
+  aarch64_asm_output_variant_pcs (stream, fndecl, name);
+
+  /* Don't forget the type directive for ELF.  */
+#ifdef ASM_OUTPUT_TYPE_DIRECTIVE
+  ASM_OUTPUT_TYPE_DIRECTIVE (stream, name, "function");
+#endif
+  ASM_OUTPUT_FUNCTION_LABEL (stream, name, fndecl);
+
+  cfun->machine->label_is_assembled = true;
+}
+#endif
 
 /* Implement PRINT_PATCHABLE_FUNCTION_ENTRY.  */
 
@@ -27238,6 +27394,13 @@ aarch64_print_patchable_function_entry (FILE *file,
 					unsigned HOST_WIDE_INT patch_area_size,
 					bool record_p)
 {
+  /* Mach-O has no consumer for the table of patchable entries, and the
+     section name the generic code uses for it is not a valid Mach-O section
+     specification, so recording makes the output unassemblable.  clang emits
+     the NOPs alone there; do the same.  */
+  if (TARGET_MACHO)
+    record_p = false;
+
   if (!cfun->machine->label_is_assembled)
     {
       /* Emit the patching area before the entry label, if any.  */
@@ -27286,12 +27449,17 @@ aarch64_output_patchable_area (unsigned int patch_area_size, bool record_p)
 /* Implement ASM_OUTPUT_DEF_FROM_DECLS.  Output .variant_pcs for aliases.  */
 
 void
-aarch64_asm_output_alias (FILE *stream, const tree decl, const tree target)
+aarch64_asm_output_alias (FILE *stream, const tree decl,
+			  const tree target ATTRIBUTE_UNUSED)
 {
   const char *name = XSTR (XEXP (DECL_RTL (decl), 0), 0);
+#ifdef ASM_OUTPUT_DEF
   const char *value = IDENTIFIER_POINTER (target);
+#endif
   aarch64_asm_output_variant_pcs (stream, decl, name);
+#ifdef ASM_OUTPUT_DEF
   ASM_OUTPUT_DEF (stream, name, value);
+#endif
 }
 
 /* Implement ASM_OUTPUT_EXTERNAL.  Output .variant_pcs for undefined
@@ -27374,6 +27542,9 @@ aarch64_start_file (void)
 	       arch_string.c_str ());
 
   default_file_start ();
+#if TARGET_MACHO
+  darwin_file_start ();
+#endif
 }
 
 /* Emit load exclusive.  */
@@ -27897,6 +28068,12 @@ aarch64_output_simd_imm (rtx const_vector, unsigned width,
     }
 
   gcc_assert (CONST_INT_P (info.u.mov.value));
+  unsigned HOST_WIDE_INT value = UINTVAL (info.u.mov.value);
+
+  /* The 8-bit element value is sign-extended (gen_int_mode), so it would be
+     printed as a 64-bit hex value, which the LLVM assembler rejects.  */
+  if (TARGET_MACHO && known_eq (GET_MODE_BITSIZE (info.elt_mode), 8))
+    value &= GET_MODE_MASK (QImode);
 
   if (which == AARCH64_CHECK_MOV)
     {
@@ -27923,16 +28100,16 @@ aarch64_output_simd_imm (rtx const_vector, unsigned width,
 		  ? "msl" : "lsl");
       if (lane_count == 1)
 	snprintf (templ, sizeof (templ), "%s\t%%d0, " HOST_WIDE_INT_PRINT_HEX,
-		  mnemonic, UINTVAL (info.u.mov.value));
+		  mnemonic, value);
       else if (info.u.mov.shift)
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, "
 		  HOST_WIDE_INT_PRINT_HEX ", %s %d", mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value), shift_op,
+		  element_char, value, shift_op,
 		  info.u.mov.shift);
       else
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, "
 		  HOST_WIDE_INT_PRINT_HEX, mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value));
+		  element_char, value);
     }
   else
     {
@@ -27953,12 +28130,12 @@ aarch64_output_simd_imm (rtx const_vector, unsigned width,
       else if (info.u.mov.shift)
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, #"
 		  HOST_WIDE_INT_PRINT_DEC ", %s #%d", mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value), "lsl",
+		  element_char, value, "lsl",
 		  info.u.mov.shift);
       else
 	snprintf (templ, sizeof (templ), "%s\t%%0.%d%c, #"
 		  HOST_WIDE_INT_PRINT_DEC, mnemonic, lane_count,
-		  element_char, UINTVAL (info.u.mov.value));
+		  element_char, value);
     }
   return templ;
 }
@@ -32923,19 +33100,34 @@ aarch64_sls_emit_shared_blr_thunks (FILE *out_file)
 	continue;
 
       const char *name = indirect_symbol_names[regnum];
-      switch_to_section (get_named_section (decl, NULL, 0));
+      /* If the target uses a unique section for this, switch to it.  */
+      if (DECL_SECTION_NAME (decl))
+	switch_to_section (get_named_section (decl, NULL, 0));
+      else
+	switch_to_section (text_section);
       ASM_OUTPUT_ALIGN (out_file, 2);
+#if TARGET_MACHO
+      if (DECL_WEAK (decl))
+	ASM_WEAKEN_DECL (out_file, decl, name, 0);
+      else
+	targetm.asm_out.globalize_decl_name (out_file, decl);
+#else
       targetm.asm_out.globalize_label (out_file, name);
+#endif
       /* Only emits if the compiler is configured for an assembler that can
 	 handle visibility directives.  */
       targetm.asm_out.assemble_visibility (decl, VISIBILITY_HIDDEN);
+#ifdef ASM_OUTPUT_TYPE_DIRECTIVE
       ASM_OUTPUT_TYPE_DIRECTIVE (out_file, name, "function");
+#endif
       ASM_OUTPUT_LABEL (out_file, name);
       aarch64_sls_emit_function_stub (out_file, regnum);
       /* Use the most conservative target to ensure it can always be used by any
 	 function in the translation unit.  */
       asm_fprintf (out_file, "\tdsb\tsy\n\tisb\n");
+#ifdef ASM_DECLARE_FUNCTION_SIZE
       ASM_DECLARE_FUNCTION_SIZE (out_file, name, decl);
+#endif
     }
 }
 
@@ -34683,18 +34875,20 @@ aarch64_run_selftests (void)
 #define TARGET_ALIGN_ANON_BITFIELD hook_bool_void_true
 
 #undef TARGET_ASM_ALIGNED_DI_OP
-#define TARGET_ASM_ALIGNED_DI_OP "\t.xword\t"
-
-#undef TARGET_ASM_ALIGNED_HI_OP
-#define TARGET_ASM_ALIGNED_HI_OP "\t.hword\t"
-
-#undef TARGET_ASM_JUMP_TABLE_BASE
-#define TARGET_ASM_JUMP_TABLE_BASE aarch64_asm_jump_table_base
-
 #undef TARGET_ASM_ALIGNED_SI_OP
-#define TARGET_ASM_ALIGNED_SI_OP "\t.word\t"
+#undef TARGET_ASM_ALIGNED_HI_OP
 
-#if TARGET_PECOFF
+#if TARGET_MACHO
+# define TARGET_ASM_ALIGNED_HI_OP ASM_SHORT
+# define TARGET_ASM_ALIGNED_SI_OP ASM_LONG
+# define TARGET_ASM_ALIGNED_DI_OP ASM_QUAD
+#else
+# define TARGET_ASM_ALIGNED_DI_OP "\t.xword\t"
+# define TARGET_ASM_ALIGNED_HI_OP "\t.hword\t"
+# define TARGET_ASM_ALIGNED_SI_OP "\t.word\t"
+#endif
+
+#if TARGET_PECOFF || TARGET_MACHO
 #undef TARGET_ASM_UNALIGNED_HI_OP
 #define TARGET_ASM_UNALIGNED_HI_OP TARGET_ASM_ALIGNED_HI_OP
 #undef TARGET_ASM_UNALIGNED_SI_OP
@@ -34702,6 +34896,9 @@ aarch64_run_selftests (void)
 #undef TARGET_ASM_UNALIGNED_DI_OP
 #define TARGET_ASM_UNALIGNED_DI_OP TARGET_ASM_ALIGNED_DI_OP
 #endif
+
+#undef TARGET_ASM_JUMP_TABLE_BASE
+#define TARGET_ASM_JUMP_TABLE_BASE aarch64_asm_jump_table_base
 
 #undef TARGET_ASM_CAN_OUTPUT_MI_THUNK
 #define TARGET_ASM_CAN_OUTPUT_MI_THUNK \
@@ -35104,8 +35301,15 @@ aarch64_libgcc_floating_mode_supported_p
 
 /* Section anchor support.  */
 
+#if !TARGET_MACHO
 #undef TARGET_MIN_ANCHOR_OFFSET
 #define TARGET_MIN_ANCHOR_OFFSET -256
+#else
+/* The static linker is allowed to split objects at visible symbol boundaries,
+   so we must ensure that anchors are at the beginning of a block.  */
+#undef TARGET_MIN_ANCHOR_OFFSET
+#define TARGET_MIN_ANCHOR_OFFSET 0
+#endif
 
 /* Limit the maximum anchor offset to 4k-1, since that's the limit for a
    byte offset; we can do much more for larger data types, but have no way

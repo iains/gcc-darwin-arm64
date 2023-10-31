@@ -414,6 +414,7 @@
     ;; Wraps a constant integer that should be multiplied by the number
     ;; of quadwords in an SME vector.
     UNSPEC_SME_VQ
+    UNSPEC_MACHOPIC_OFFSET	; Common to Mach-O ports.
 ])
 
 (define_c_enum "unspecv" [
@@ -8088,7 +8089,7 @@
 	(lo_sum:P (match_operand:P 1 "register_operand" "r")
 		  (match_operand 2 "aarch64_valid_symref" "S")))]
   ""
-  "add\\t%<w>0, %<w>1, :lo12:%c2"
+  "add\\t%<w>0, %<w>1, %L2"
   [(set_attr "type" "alu_imm")]
 )
 
