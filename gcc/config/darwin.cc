@@ -134,7 +134,7 @@ struct {
 section * darwin_sections[NUM_DARWIN_SECTIONS];
 
 /* While we transition to using in-tests instead of ifdef'd code.  */
-#if !HAVE_lo_sum
+#if !HAVE_lo_sum || DARWIN_ARM64
 #define gen_macho_high(m,a,b) (a)
 #define gen_macho_low(m,a,b,c) (a)
 #endif
@@ -1107,6 +1107,7 @@ machopic_legitimize_pic_address (rtx orig, machine_mode mode, rtx reg)
   return pic_ref;
 }
 
+#if !DARWIN_ARM64
 /* Callbacks to output the stub or non-lazy pointers.
    Each works on the item in *SLOT,if it has been used.
    DATA is the FILE* for assembly output.
@@ -1262,6 +1263,7 @@ machopic_finish (FILE *out_file)
   machopic_indirections->traverse_noresize
     <FILE *, machopic_output_indirection> (out_file);
 }
+#endif
 
 int
 machopic_operand_p (rtx op)
@@ -2650,6 +2652,8 @@ darwin_emit_except_table_label (FILE *file)
 rtx
 darwin_make_eh_symbol_indirect (rtx orig, bool ARG_UNUSED (pubvis))
 {
+  if (DARWIN_ARM64)
+    return orig;
   if (DARWIN_PPC == 0 && TARGET_64BIT)
     return orig;
 
@@ -3498,7 +3502,12 @@ darwin_file_end (void)
       fprintf (asm_out_file, "\t.long\t0\n\t.long\t%u\n", flags);
      }
 
+#if !DARWIN_ARM64
   machopic_finish (asm_out_file);
+#else
+  gcc_checking_assert (!machopic_indirections);
+#endif
+
   if (flag_apple_kext)
     {
       /* These sections are only used for kernel code.  */
