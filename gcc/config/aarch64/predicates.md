@@ -358,6 +358,18 @@
 (define_predicate "aarch64_valid_symref"
   (match_code "const, symbol_ref, label_ref")
 {
+  if (TARGET_MACHO)
+    {
+      rtx x = op;
+      rtx offset;
+      split_const (x, &x, &offset);
+      if (GET_CODE (x) == CONST)
+	x = XEXP (x, 0);
+      if (GET_CODE (x) == UNSPEC && XINT (x, 1) == UNSPEC_SALT_ADDR)
+	x = XVECEXP (x, 0, 0);
+      if (SYMBOL_REF_P (x) && INTVAL (offset) < 0)
+        return false;
+    }
   return (aarch64_classify_symbolic_expression (op)
 	  != SYMBOL_FORCE_TO_MEM);
 })
