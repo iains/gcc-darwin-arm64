@@ -2988,6 +2988,10 @@ fstack-usage
 Common RejectNegative Var(flag_stack_usage)
 Output stack usage information on a per-function basis.
 
+fstack-use-cumulative-args
+Common RejectNegative Var(flag_stack_use_cumulative_args) Init(STACK_USE_CUMULATIVE_ARGS_INIT)
+Use cumulative args-based stack layout hooks.
+
 fstrength-reduce
 Common Ignore
 Does nothing.  Preserved for backward compatibility.
