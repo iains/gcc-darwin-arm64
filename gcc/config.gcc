@@ -1225,6 +1225,12 @@ aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
 	done
 	TM_MULTILIB_CONFIG=`echo $TM_MULTILIB_CONFIG | sed 's/^,//'`
 	;;
+aarch64-*-darwin* | arm64-*-darwin*)
+	tm_file="${tm_file} aarch64/aarch64-errata.h"
+	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-darwin"
+	tm_defines="${tm_defines} TARGET_DEFAULT_ASYNC_UNWIND_TABLES=1"
+	tm_defines="${tm_defines} DISABLE_AARCH64_AS_CRC_BUGFIX=1"
+	;;
 aarch64*-*-freebsd*)
 	tm_file="${tm_file} elfos.h ${fbsd_tm_file}"
 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-freebsd.h"
