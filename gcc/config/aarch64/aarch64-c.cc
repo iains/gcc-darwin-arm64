@@ -450,4 +450,8 @@ aarch64_register_pragmas (void)
   targetm.check_builtin_call = aarch64_check_builtin_call;
 
   c_register_pragma ("GCC", "aarch64", aarch64_pragma_aarch64);
+
+#ifdef REGISTER_SUBTARGET_PRAGMAS
+  REGISTER_SUBTARGET_PRAGMAS ();
+#endif
 }

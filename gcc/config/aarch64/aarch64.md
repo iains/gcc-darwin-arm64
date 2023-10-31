@@ -383,6 +383,7 @@
     ;; Wraps a constant integer that should be multiplied by the number
     ;; of quadwords in an SME vector.
     UNSPEC_SME_VQ
+    UNSPEC_MACHOPIC_OFFSET	; Common to Mach-O ports.
 ])
 
 (define_c_enum "unspecv" [
@@ -1589,7 +1590,7 @@
      [w  , m  ; load_4   , fp  , 4] ldr\t%s0, %1
      [m  , r Z; store_4  , *   , 4] str\t%w1, %0
      [m  , w  ; store_4  , fp  , 4] str\t%s1, %0
-     [r  , Usw; load_4   , *   , 8] adrp\t%x0, %A1\;ldr\t%w0, [%x0, %L1]
+     [r  , Usw; load_4   , *   , 8] << TARGET_MACHO ? \"adrp\\t%x0, %A1\;ldr\\t%w0, [%x0, %O1]\" : \"adrp\\t%x0, %A1\;ldr\\t%w0, [%x0, %L1]\";
      [r  , Usa; adr      , *   , 4] adr\t%x0, %c1
      [r  , Ush; adr      , *   , 4] adrp\t%x0, %A1
      [w  , r Z; f_mcr    , fp  , 4] fmov\t%s0, %w1
@@ -1628,7 +1629,7 @@
      [w, m   ; load_8   , fp  , 4] ldr\t%d0, %1
      [m, r Z ; store_8  , *   , 4] str\t%x1, %0
      [m, w   ; store_8  , fp  , 4] str\t%d1, %0
-     [r, Usw ; load_8   , *   , 8] << TARGET_ILP32 ? "adrp\t%0, %A1\;ldr\t%w0, [%0, %L1]" : "adrp\t%0, %A1\;ldr\t%0, [%0, %L1]";
+     [r, Usw ; load_8   , *   , 8] << TARGET_ILP32 ? (TARGET_MACHO ? \"adrp\\t%0, %A1\;ldr\\t%w0, [%0, %O1]\" : \"adrp\\t%0, %A1\;ldr\\t%w0, [%0, %L1]\") : (TARGET_MACHO ? \"adrp\\t%0, %A1\;ldr\\t%0, [%0, %O1]\" : \"adrp\\t%0, %A1\;ldr\\t%0, [%0, %L1]\");
      [r, Usa ; adr      , *   , 4] adr\t%x0, %c1
      [r, Ush ; adr      , *   , 4] adrp\t%x0, %A1
      [w, r Z ; f_mcr    , fp  , 4] fmov\t%d0, %x1
@@ -7654,7 +7655,10 @@
 	(lo_sum:P (match_operand:P 1 "register_operand" "r")
 		  (match_operand 2 "aarch64_valid_symref" "S")))]
   ""
-  "add\\t%<w>0, %<w>1, :lo12:%c2"
+  { return TARGET_MACHO
+    ? "add\\t%<w>0, %<w>1, %K2;"
+    : "add\\t%<w>0, %<w>1, :lo12:%c2";
+  }
   [(set_attr "type" "alu_imm")]
 )
 
