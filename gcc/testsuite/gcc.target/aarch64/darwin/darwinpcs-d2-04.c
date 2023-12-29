@@ -17,16 +17,15 @@ v2hi_packing (v2hi a, v2hi b, v2hi c, v2hi d, v2hi e, v2hi f, v2hi g, v2hi h,
 **call_v2hi_packing:
 **	...
 **	mov	w[0-9]+, 1
-**	movk	w[0-9]+, 0x2, lsl 16
-**	str	w[0-9]+, \[sp, 4\]
-**	str	w[0-9]+, \[sp\]
-**	mov	w7, w[0-9]+
-**	mov	w6, w[0-9]+
-**	mov	w5, w[0-9]+
-**	mov	w4, w[0-9]+
-**	mov	w3, w[0-9]+
-**	mov	w2, w[0-9]+
-**	mov	w1, w[0-9]+
+**	movk	(w[0-9]+), 0x2, lsl 16
+**	stp	\1, \1, \[sp\]
+**	mov	w7, \1
+**	mov	w6, \1
+**	mov	w5, \1
+**	mov	w4, \1
+**	mov	w3, \1
+**	mov	w2, \1
+**	mov	w1, \1
 **	bl	_v2hi_packing
 **	...
 */
@@ -48,9 +47,8 @@ v4si_packing (int r0, int r1, int r2, int r3, int r4, int r5, int r6, int r7,
 **call_v4si_packing:
 **	...
 **	adrp	x0, lC0@PAGE
-**	ldr	q[0-9]+, \[x[0-9]+, #lC0@PAGEOFF\]
-**	str	q[0-9]+, \[sp, 32\]
-**	str	q[0-9]+, \[sp, 16\]
+**	ldr	(q[0-9]+), \[x[0-9]+, #lC0@PAGEOFF\]
+**	stp	\1, \1, \[sp, 16\]
 **	mov	w[0-9]+, 42
 **	str	w[0-9]+, \[sp\]
 **	...
