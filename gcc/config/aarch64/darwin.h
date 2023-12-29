@@ -173,7 +173,8 @@ along with GCC; see the file COPYING3.  If not see
     1, 1, 1, 1,			/* SFP, AP, CC, VG */	\
     0, 0, 0, 0,   0, 0, 0, 0,   /* P0 - P7 */           \
     0, 0, 0, 0,   0, 0, 0, 0,   /* P8 - P15 */          \
-    1, 1			/* FFR and FFRT */	\
+    1, 1,			/* FFR and FFRT */	\
+    1, 1, 1, 1, 1, 1, 1, 1	/* Fake registers */	\
   }
 
 /* Assign a static chain regnum.  At the moment using R16 (IP0) is
