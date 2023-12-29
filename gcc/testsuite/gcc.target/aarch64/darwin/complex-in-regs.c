@@ -48,14 +48,10 @@ cs_regs_fun (_Complex short r0, _Complex short r1,
 /*
 **call_cs_regs_fun:
 **	...
-**	ldr	w7, \[x0, 16\]
-**	ldr	w6, \[x0, 20\]
-**	ldr	w5, \[x0, 24\]
-**	ldr	w4, \[x0, 28\]
-**	ldr	w3, \[x0, 32\]
-**	ldr	w2, \[x0, 36\]
-**	ldr	w1, \[x0, 40\]
-**	ldr	w0, \[x0, 44\]
+**	ldp	w7, w6, \[x0, 16\]
+**	ldp	w5, w4, \[x0, 24\]
+**	ldp	w3, w2, \[x0, 32\]
+**	ldp	w1, w0, \[x0, 40\]
 **	bl	_cs_regs_fun
 **	...
 */
@@ -80,14 +76,10 @@ ci_regs_fun (_Complex int r0, _Complex int r1,
 /*
 **call_ci_regs_fun:
 **	...
-**	ldr	x7, \[x0, 48\]
-**	ldr	x6, \[x0, 56\]
-**	ldr	x5, \[x0, 64\]
-**	ldr	x4, \[x0, 72\]
-**	ldr	x3, \[x0, 80\]
-**	ldr	x2, \[x0, 88\]
-**	ldr	x1, \[x0, 96\]
-**	ldr	x0, \[x0, 104\]
+**	ldp	x7, x6, \[x0, 48\]
+**	ldp	x5, x4, \[x0, 64\]
+**	ldp	x3, x2, \[x0, 80\]
+**	ldp	x1, x0, \[x0, 96\]
 **	bl	_ci_regs_fun
 **	...
 */

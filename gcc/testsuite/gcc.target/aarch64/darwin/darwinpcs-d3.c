@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-additional-options "-O " } */
-/* { dg-final { check-function-bodies "**" "" "" { xfail *-*-darwin* } } } */
+/* { dg-final { check-function-bodies "**" "" "" { target *-*-darwin* } } } */
 
 /* This will fail, because of issue #74
 **foo: 
