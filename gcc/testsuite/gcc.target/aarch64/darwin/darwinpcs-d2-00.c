@@ -99,9 +99,8 @@ void call_short_packing (void)
 **	mov	w[0-9]+, 10
 **	str	w[0-9]+, \[sp, 8\]
 **	mov	w[0-9]+, 9
-**	str	w[0-9]+, \[sp, 4\]
 **	mov	w[0-9]+, 8
-**	str	w[0-9]+, \[sp\]
+**	stp	w[0-9]+, w[0-9]+, \[sp\]
 **	mov	w7, 7
 **	mov	w6, 6
 **	mov	w5, 5
