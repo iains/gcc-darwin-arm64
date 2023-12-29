@@ -143,10 +143,16 @@ FEATURE_1_AND_MARK (BTI_FLAG|PAC_FLAG|GCS_FLAG)
 # endif
 #endif
 
-# define ENTRY_ALIAS(name)	\
-  .global name;			\
-  SYMBOL_TYPE(name, %function);		\
-  name:
+/* Use an assembler macro rather than a ';'-separated sequence: on Mach-O
+   targets ';' begins a comment, so the label would be swallowed and the
+   symbol declared but never defined.  ENTRY below takes the same approach.  */
+.macro	ENTRY_ALIASm, name
+	GLOBAL (\name)
+	SYMBOL_TYPE(\name, %function)
+\name:
+.endm
+
+# define ENTRY_ALIAS(name) ENTRY_ALIASm name
 
 #define ENTRY_ALIGN(name, align) \
   .global name;		\
