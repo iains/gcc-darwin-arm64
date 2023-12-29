@@ -13700,10 +13700,10 @@ aarch64_frame_pointer_required ()
   if (!TARGET_MACHO)
     return aarch64_need_old_pstate_sm ();
 
-  /* We could do with some more general test.  */
-  gcc_checking_assert (!aarch64_need_old_pstate_sm ());
+  /* We could do with some more general test.
+  gcc_checking_assert (!aarch64_need_old_pstate_sm ());*/
 
-  if (crtl->calls_eh_return)
+  if (crtl->calls_eh_return || aarch64_need_old_pstate_sm ())
     return true;
 
   /* Not used in leaf functions (unless forced).  */
