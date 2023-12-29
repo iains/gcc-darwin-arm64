@@ -7656,7 +7656,7 @@
 		  (match_operand 2 "aarch64_valid_symref" "S")))]
   ""
   { return TARGET_MACHO
-    ? "add\\t%<w>0, %<w>1, %K2;"
+    ? "add\\t%<w>0, %<w>1, %J2;"
     : "add\\t%<w>0, %<w>1, :lo12:%c2";
   }
   [(set_attr "type" "alu_imm")]
