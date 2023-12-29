@@ -12166,7 +12166,7 @@ aarch64_print_operand (FILE *f, rtx x, int code)
 	}
       break;
 
-    case 'K':
+    case 'J':
       output_macho_postfix_expr (f, x, "PAGEOFF");
       break;
     case 'O':
