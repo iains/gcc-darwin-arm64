@@ -36,10 +36,9 @@ c_cs_packing (int a, int b, int c, int d, int e, int f, int g, int h,
 /*
 **call_c_cs_packing:
 **	...
-**	ldr	w[0-9]+, \[x[0-9]+, 4\]
-**	str	w[0-9]+, \[sp, 8\]
-**	ldr	w[0-9]+, \[x[0-9]+, 8\]
-**	str	w[0-9]+, \[sp\]
+**	ldp	(w[0-9]+), (w[0-9]+), \[x[0-9]+, 4\]
+**	str	\1, \[sp, 8\]
+**	str	\2, \[sp\]
 **	...
 **	bl	_c_cs_packing
 **	...
@@ -58,10 +57,9 @@ void c_ci_packing (int a, int b, int c, int d, int e, int f, int g, int h,
 /*
 **call_c_ci_packing:
 **	...
-**	ldr	x[0-9]+, \[x[0-9]+, 12\]
-**	str	x[0-9]+, \[sp, 8\]
-**	ldr	x[0-9]+, \[x[0-9]+, 20\]
-**	str	x[0-9]+, \[sp\]
+**	ldr	(x[0-9]+), \[x[0-9]+, 12\]
+**	ldr	(x[0-9]+), \[x[0-9]+, 20\]
+**	stp	\2, \1, \[sp\]
 **	...
 **	bl	_c_ci_packing
 **	...
