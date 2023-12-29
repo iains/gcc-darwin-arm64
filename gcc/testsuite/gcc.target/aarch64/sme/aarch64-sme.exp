@@ -24,6 +24,11 @@ if {![istarget aarch64*-*-*] } {
     return
 }
 
+# Exit immediately if this is Darwin (for now).
+if {[istarget *-*-darwin*] } {
+    return
+}
+
 # Load support procs.
 load_lib gcc-dg.exp
 
