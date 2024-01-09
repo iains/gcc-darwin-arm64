@@ -635,7 +635,9 @@ __attribute__ ((noinline))
 test11 (void)
 {
   const char *ptr = "abcdefghijklmnopqrstuvwxyz";
-  char *res = strndup (ptr, 21);
+  char *res;
+#ifdef _TESTS_HAVE_STRNDUP
+  res = strndup (ptr, 21);
   if (__builtin_object_size (res, 2) != 22)
     FAIL ();
 
@@ -646,7 +648,7 @@ test11 (void)
     FAIL ();
 
   free (res);
-
+#endif
   res = strdup (ptr);
   if (__builtin_object_size (res, 2) != 27)
     FAIL ();
@@ -656,6 +658,7 @@ test11 (void)
   char *ptr2 = malloc (64);
   strcpy (ptr2, ptr);
 
+#ifdef _TESTS_HAVE_STRNDUP
   res = strndup (ptr2, 21);
   if (__builtin_object_size (res, 2) != 1)
     FAIL ();
@@ -673,7 +676,7 @@ test11 (void)
     FAIL ();
 
   free (res);
-
+#endif
   res = strdup (ptr2);
 
 #ifdef __builtin_object_size
@@ -692,6 +695,7 @@ test11 (void)
     FAIL ();
   free (res);
 
+#ifdef _TESTS_HAVE_STRNDUP
   res = strndup (ptr, 24);
   if (__builtin_object_size (res, 2) != 5)
     FAIL ();
@@ -701,12 +705,13 @@ test11 (void)
   if (__builtin_object_size (res, 2) != 3)
     FAIL ();
   free (res);
-
+#endif
   res = strdup (&ptr[4]);
   if (__builtin_object_size (res, 2) != 1)
     FAIL ();
   free (res);
 
+#ifdef _TESTS_HAVE_STRNDUP
   res = strndup (&ptr[4], 4);
   if (__builtin_object_size (res, 2) != 1)
     FAIL ();
@@ -716,6 +721,7 @@ test11 (void)
   if (__builtin_object_size (res, 2) != 1)
     FAIL ();
   free (res);
+#endif
 }
 #endif /* avr */
 
