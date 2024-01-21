@@ -182,6 +182,10 @@ along with GCC; see the file COPYING3.  If not see
 #undef STATIC_CHAIN_REGNUM
 #define STATIC_CHAIN_REGNUM	R16_REGNUM
 
+/* Heap trampoline support in a CRT.  */
+#undef DARWIN_HEAP_T_LIB
+#define DARWIN_HEAP_T_LIB " -lheapt_w "
+
 #define SUBTARGET_ENCODE_SECTION_INFO  darwin_encode_section_info
 
 #undef ASM_MAYBE_OUTPUT_ENCODED_ADDR_RTX
