@@ -245,9 +245,6 @@ HOST_EXPORTS = \
 	ISLLIBS="$(HOST_ISLLIBS)"; export ISLLIBS; \
 	ISLINC="$(HOST_ISLINC)"; export ISLINC; \
 	XGCC_FLAGS_FOR_TARGET="$(XGCC_FLAGS_FOR_TARGET)"; export XGCC_FLAGS_FOR_TARGET; \
-@if gcc-bootstrap
-	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
-@endif gcc-bootstrap
 	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
 
 POSTSTAGE1_CXX_EXPORT = \
@@ -328,9 +325,6 @@ BASE_TARGET_EXPORTS = \
 	SYSROOT_CFLAGS_FOR_TARGET="$(SYSROOT_CFLAGS_FOR_TARGET)"; export SYSROOT_CFLAGS_FOR_TARGET; \
 	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
 	WINDMC="$(WINDMC_FOR_TARGET)"; export WINDMC; \
-@if gcc-bootstrap
-	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
-@endif gcc-bootstrap
 	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
 	TARGET_CONFIGDIRS="$(TARGET_CONFIGDIRS)"; export TARGET_CONFIGDIRS;
 
@@ -651,27 +645,16 @@ all:
 ###
 
 # This is the list of directories that may be needed in RPATH_ENVVAR
-# so that programs built for the target machine work.
-TARGET_LIB_PATH = [+ FOR target_modules +][+
-  IF lib_path +]$(TARGET_LIB_PATH_[+module+])[+ ENDIF lib_path +][+
-  ENDFOR target_modules +]$(HOST_LIB_PATH_gcc)
-[+ FOR target_modules +][+ IF lib_path +]
-@if target-[+module+]
-TARGET_LIB_PATH_[+module+] = $$r/$(TARGET_SUBDIR)/[+module+]/[+lib_path+]:
-@endif target-[+module+]
-[+ ENDIF lib_path +][+ ENDFOR target_modules +]
-
-
-# This is the list of directories that may be needed in RPATH_ENVVAR
 # so that programs built for the host machine work.
 HOST_LIB_PATH = [+ FOR host_modules +][+
   IF lib_path +]$(HOST_LIB_PATH_[+module+])[+ ENDIF lib_path +][+
-  ENDFOR host_modules +]
+  ENDFOR host_modules +]$(HOST_LIB_PATH_gcc)
 
-# Define HOST_LIB_PATH_gcc here, for the sake of TARGET_LIB_PATH, ouch
-@if gcc
-HOST_LIB_PATH_gcc = $$r/$(HOST_SUBDIR)/gcc$(GCC_SHLIB_SUBDIR):$$r/$(HOST_SUBDIR)/prev-gcc$(GCC_SHLIB_SUBDIR):
-@endif gcc
+# libgcc is a target library in the current stage and a host library
+# in the previous stage (when bootstrapping).
+@if gcc-bootstrap
+HOST_LIB_PATH_gcc = $$r/$(HOST_SUBDIR)/prev-gcc$(GCC_SHLIB_SUBDIR):
+@endif gcc-bootstrap
 
 [+ FOR host_modules +][+ IF lib_path +]
 @if [+module+]

@@ -242,9 +242,6 @@ HOST_EXPORTS = \
 	ISLLIBS="$(HOST_ISLLIBS)"; export ISLLIBS; \
 	ISLINC="$(HOST_ISLINC)"; export ISLINC; \
 	XGCC_FLAGS_FOR_TARGET="$(XGCC_FLAGS_FOR_TARGET)"; export XGCC_FLAGS_FOR_TARGET; \
-@if gcc-bootstrap
-	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
-@endif gcc-bootstrap
 	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR);
 
 POSTSTAGE1_CXX_EXPORT = \
@@ -325,9 +322,6 @@ BASE_TARGET_EXPORTS = \
 	SYSROOT_CFLAGS_FOR_TARGET="$(SYSROOT_CFLAGS_FOR_TARGET)"; export SYSROOT_CFLAGS_FOR_TARGET; \
 	WINDRES="$(WINDRES_FOR_TARGET)"; export WINDRES; \
 	WINDMC="$(WINDMC_FOR_TARGET)"; export WINDMC; \
-@if gcc-bootstrap
-	$(RPATH_ENVVAR)=`echo "$(TARGET_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
-@endif gcc-bootstrap
 	$(RPATH_ENVVAR)=`echo "$(HOST_LIB_PATH)$$$(RPATH_ENVVAR)" | sed 's,::*,:,g;s,^:*,,;s,:*$$,,'`; export $(RPATH_ENVVAR); \
 	TARGET_CONFIGDIRS="$(TARGET_CONFIGDIRS)"; export TARGET_CONFIGDIRS;
 
@@ -728,55 +722,14 @@ all:
 ###
 
 # This is the list of directories that may be needed in RPATH_ENVVAR
-# so that programs built for the target machine work.
-TARGET_LIB_PATH = $(TARGET_LIB_PATH_libstdc++-v3)$(TARGET_LIB_PATH_libsanitizer)$(TARGET_LIB_PATH_libvtv)$(TARGET_LIB_PATH_libssp)$(TARGET_LIB_PATH_libphobos)$(TARGET_LIB_PATH_libgm2)$(TARGET_LIB_PATH_libgomp)$(TARGET_LIB_PATH_libitm)$(TARGET_LIB_PATH_libatomic)$(HOST_LIB_PATH_gcc)
-
-@if target-libstdc++-v3
-TARGET_LIB_PATH_libstdc++-v3 = $$r/$(TARGET_SUBDIR)/libstdc++-v3/src/.libs:
-@endif target-libstdc++-v3
-
-@if target-libsanitizer
-TARGET_LIB_PATH_libsanitizer = $$r/$(TARGET_SUBDIR)/libsanitizer/.libs:
-@endif target-libsanitizer
-
-@if target-libvtv
-TARGET_LIB_PATH_libvtv = $$r/$(TARGET_SUBDIR)/libvtv/.libs:
-@endif target-libvtv
-
-@if target-libssp
-TARGET_LIB_PATH_libssp = $$r/$(TARGET_SUBDIR)/libssp/.libs:
-@endif target-libssp
-
-@if target-libphobos
-TARGET_LIB_PATH_libphobos = $$r/$(TARGET_SUBDIR)/libphobos/src/.libs:
-@endif target-libphobos
-
-@if target-libgm2
-TARGET_LIB_PATH_libgm2 = $$r/$(TARGET_SUBDIR)/libgm2/.libs:
-@endif target-libgm2
-
-@if target-libgomp
-TARGET_LIB_PATH_libgomp = $$r/$(TARGET_SUBDIR)/libgomp/.libs:
-@endif target-libgomp
-
-@if target-libitm
-TARGET_LIB_PATH_libitm = $$r/$(TARGET_SUBDIR)/libitm/.libs:
-@endif target-libitm
-
-@if target-libatomic
-TARGET_LIB_PATH_libatomic = $$r/$(TARGET_SUBDIR)/libatomic/.libs:
-@endif target-libatomic
-
-
-
-# This is the list of directories that may be needed in RPATH_ENVVAR
 # so that programs built for the host machine work.
-HOST_LIB_PATH = $(HOST_LIB_PATH_gmp)$(HOST_LIB_PATH_mpfr)$(HOST_LIB_PATH_mpc)$(HOST_LIB_PATH_isl)
+HOST_LIB_PATH = $(HOST_LIB_PATH_gmp)$(HOST_LIB_PATH_mpfr)$(HOST_LIB_PATH_mpc)$(HOST_LIB_PATH_isl)$(HOST_LIB_PATH_gcc)
 
-# Define HOST_LIB_PATH_gcc here, for the sake of TARGET_LIB_PATH, ouch
-@if gcc
-HOST_LIB_PATH_gcc = $$r/$(HOST_SUBDIR)/gcc$(GCC_SHLIB_SUBDIR):$$r/$(HOST_SUBDIR)/prev-gcc$(GCC_SHLIB_SUBDIR):
-@endif gcc
+# libgcc is a target library in the current stage and a host library
+# in the previous stage (when bootstrapping).
+@if gcc-bootstrap
+HOST_LIB_PATH_gcc = $$r/$(HOST_SUBDIR)/prev-gcc$(GCC_SHLIB_SUBDIR):
+@endif gcc-bootstrap
 
 
 @if gmp
