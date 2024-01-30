@@ -309,14 +309,14 @@ __extension__ extern __inline int
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 __rndr (uint64_t *__res)
 {
-  return __builtin_aarch64_rndr (__res);
+  return __builtin_aarch64_rndr ((__builtin_aarch64_simd_di *) __res);
 }
 
 __extension__ extern __inline int
 __attribute__ ((__always_inline__, __gnu_inline__, __artificial__))
 __rndrrs (uint64_t *__res)
 {
-  return __builtin_aarch64_rndrrs (__res);
+  return __builtin_aarch64_rndrrs ((__builtin_aarch64_simd_di *) __res);
 }
 
 #pragma GCC pop_options
