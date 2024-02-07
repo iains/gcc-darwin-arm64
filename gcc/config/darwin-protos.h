@@ -101,6 +101,7 @@ extern void darwin_asm_output_dwarf_offset (FILE *, int, const char *,
 extern void darwin_asm_declare_object_name (FILE *, const char *, tree);
 extern void darwin_asm_declare_constant_name (FILE *, const char *,
 					      const_tree, HOST_WIDE_INT);
+extern void darwin_asm_declare_cold_fn_name (FILE *, const char *, tree);
 
 extern void darwin_output_aligned_bss (FILE *, tree, const char *,
 				       unsigned HOST_WIDE_INT, unsigned int);
