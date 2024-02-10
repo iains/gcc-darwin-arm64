@@ -2460,6 +2460,21 @@ darwin_asm_declare_constant_name (FILE *file, const char *name,
     }
 }
 
+/* Make cold function labels only visible to the linker, to try and avoid
+   the situation that it appears that a weak definition is directly accessed
+   within the TU, leading to a linker warning.  */
+
+void
+darwin_asm_declare_cold_fn_name (FILE *file, const char *name, tree /*decl*/)
+{
+  name = assemble_name_resolve (name);
+  if (name[0] == '*')
+    fprintf (file, "l%s", &name[1]);
+  else
+    ASM_OUTPUT_LABELREF (file, name);
+  fprintf (file, ":\n");
+}
+
 /* Darwin storage allocators.
 
    Zerofill sections are desirable for large blank data since, otherwise, these
