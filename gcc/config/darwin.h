@@ -847,6 +847,9 @@ ASM_OPTIONS ASM_MMACOSX_VERSION_MIN_SPEC
 #undef TARGET_ASM_DECLARE_CONSTANT_NAME
 #define TARGET_ASM_DECLARE_CONSTANT_NAME darwin_asm_declare_constant_name
 
+#undef ASM_DECLARE_COLD_FUNCTION_NAME
+#define ASM_DECLARE_COLD_FUNCTION_NAME darwin_asm_declare_cold_fn_name
+
 /* Wrap new method names in quotes so the assembler doesn't gag.
    Make Objective-C internal symbols local and in doing this, we need 
    to accommodate the name mangling done by c++ on file scope locals.  */
