@@ -4,6 +4,7 @@
 // { dg-add-options tls }
 // { dg-require-effective-target tls_runtime }
 // { dg-additional-sources "thread_local14-aux.cc" }
+// { dg-xfail-run-if "PR112294/106435" { *-*-darwin* } }
 
 extern thread_local const int t;
 bool bar (int);
