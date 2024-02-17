@@ -1,7 +1,7 @@
 /* Example from glibc manual (16.9.7).  */
 /* { dg-require-effective-target sockets } */
 /* { dg-additional-options "-Wno-analyzer-too-complex" } */
-/* { dg-skip-if "" { hppa*-*-hpux* powerpc*-*-aix* } } */
+/* { dg-skip-if "PR113150" { hppa*-*-hpux* powerpc*-*-aix* *-*-darwin* } } */
 
 #include <stdio.h>
 #include <errno.h>
