@@ -27,7 +27,7 @@ the source, must acknowledge the copyright and authors of this work.
 */
 
 /* { dg-require-effective-target sockets } */
-/* { dg-skip-if "" { hppa*-*-hpux* powerpc*-*-aix* } } */
+/* { dg-skip-if "PR113150" { hppa*-*-hpux* powerpc*-*-aix* *-*-darwin* } } */
 
 #include <sys/types.h>
 #include <stdio.h>
