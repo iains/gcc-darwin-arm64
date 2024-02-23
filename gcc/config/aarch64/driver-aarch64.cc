@@ -36,6 +36,9 @@
 
 #if TARGET_MACHO
 
+/* Default architecture to use if -mcpu=native did not detect a known CPU.  */
+#define DEFAULT_ARCH "apple-m1"
+
 /* macOS does not have /proc/cpuinfo and needs a different approach,
    based on sysctl.  It is much simpler.  */
 
@@ -81,6 +84,8 @@ host_detect_local_cpu (ATTRIBUTE_UNUSED int argc, ATTRIBUTE_UNUSED const char **
     case 0x72015832: // Palma (M3 Max)
       res = "apple-m3";
       break;
+    default:
+      res = DEFAULT_ARCH;
   }
 
   if (res)
