@@ -66,46 +66,20 @@ host_detect_local_cpu (ATTRIBUTE_UNUSED int argc, ATTRIBUTE_UNUSED const char **
 
   switch (family)
   {
-#if 0
-    case 0x37a09642: // Cyclone
-      res = "apple-a7";
-      break;
-    case 0x2c91a47e: // Typhoon
-      res = "apple-a8";
-      break;
-    case 0x92fb37c8: // Twister
-      res = "apple-a9";
-      break;
-    case 0x67ceee93: // Hurricane, Zephyr
-      res = "apple-a10";
-      break;
-    case 0xe81e7ef6: // Monsoon, Mistral
-      res = "apple-a11";
-      break;
-#endif
     case 0x07d34b9f: // Vortex, Tempest
       res = "apple-a12";
       break;
-#if 0
-    case 0x462504d2: // Lightning, Thunder
-      res = "apple-a13";
-      break;
-    case 0x1b588bb3: // Firestorm, Icestorm
-      res = "apple-a14";
-      break;
-    case 0xda33d83d: // Blizzard, Avalanche
-      res = "apple-a15";
-      break;
-    case 0x8765edea: // Everest Sawtooth
-      res = "apple-a16";
-      break;
-#endif
     case 0x573b5eec:
     case 0x1b588bb3: // Firestorm, Icestorm
       res = "apple-m1";
       break;
     case 0xda33d83d: // Blizzard, Avalanche
       res = "apple-m2";
+      break;
+    case 0xfa33415e: // Ibiza (M3)
+    case 0x5f4dea93: // Lobos (M3 Pro)
+    case 0x72015832: // Palma (M3 Max)
+      res = "apple-m3";
       break;
   }
 
