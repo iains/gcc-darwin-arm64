@@ -1,4 +1,12 @@
 typedef __SIZE_TYPE__ size_t;
+
+/* Earlier Darwin does not have the str'n' functions in libc.  */
+#if __APPLE__ && __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ < 1070
+#undef _TESTS_HAVE_STRNDUP
+#else
+#define _TESTS_HAVE_STRNDUP
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -11,7 +19,9 @@ extern "C" {
   extern void *memset (void *, int, size_t);
   extern char *strcpy (char *, const char *);
   extern char *strdup (const char *);
+#ifdef _TESTS_HAVE_STRNDUP
   extern char *strndup (const char *, size_t);
+#endif
 #ifdef __cplusplus
 }
 #endif
