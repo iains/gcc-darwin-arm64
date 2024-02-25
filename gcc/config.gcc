@@ -1239,6 +1239,8 @@ aarch64-*-darwin* )
 	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-darwin"
 	tm_defines="${tm_defines} TARGET_DEFAULT_ASYNC_UNWIND_TABLES=1"
 	tm_defines="${tm_defines} DISABLE_AARCH64_AS_CRC_BUGFIX=1"
+	# Choose a default CPU version that will work for all current releases.
+	with_cpu=${with_cpu:-apple-m1}
 	;;
 aarch64*-*-freebsd*)
 	tm_file="${tm_file} elfos.h ${fbsd_tm_file}"
