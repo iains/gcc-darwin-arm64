@@ -97,6 +97,9 @@ proc prune_gcc_output { text } {
 
     # Ignore dsymutil warning (tool bug is actually linker)
     regsub -all "(^|\n)\[^\n\]*could not find object file symbol for symbol\[^\n\]*" $text "" text
+    # New warning from dsymutil.
+    regsub -all "(^|\n)\[^\n\]*'.debug_macinfo' is not currently supported\[^\n\]*" $text "" text
+    regsub -all "(^|\n)\[^\n\]*note:.*while processing\[^\n\]*" $text "" text
 
     # Ignore stabs obsoletion warnings
     regsub -all "(^|\n)\[^\n\]*\[Ww\]arning: STABS debugging information is obsolete and not supported anymore\[^\n\]*" $text "" text
