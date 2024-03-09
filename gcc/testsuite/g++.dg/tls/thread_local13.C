@@ -4,6 +4,7 @@
 // { dg-add-options tls }
 // { dg-require-effective-target tls_runtime }
 // { dg-additional-sources "thread_local13-aux.cc" }
+// { dg-xfail-run-if "PR112294/106435" { *-*-darwin* } }
 
 struct S { virtual void foo (); int s; };
 extern thread_local S &t;
