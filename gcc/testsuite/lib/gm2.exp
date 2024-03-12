@@ -221,7 +221,7 @@ proc gm2_target_compile_default { source dest type options } {
     if [istarget *-*-solaris2*] {
        lappend options "ldflags=-lnsl -lsocket"
     }
-    if [istarget "powerpc-*-*"] {
+    if { [istarget "powerpc64*-*-*"] && ![istarget "powerpc64*-*-darwin*"] } {
        lappend options "-mabi=ieeelongdouble"
     }
 
@@ -285,7 +285,7 @@ proc gm2_link_flags { paths } {
     set shlib_ext [get_shlib_extension]
     verbose "shared lib extension: $shlib_ext"
 
-    if [istarget "powerpc-*-*"] {
+    if { [istarget "powerpc64*-*-*"] && ![istarget "powerpc64*-*-darwin*"] } {
        lappend flags "-mabi=ieeelongdouble"
     }
     if { $gccpath == "" } {
