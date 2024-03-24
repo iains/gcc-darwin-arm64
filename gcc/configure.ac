@@ -2835,8 +2835,10 @@ ORIGINAL_LLD_FOR_TARGET=${gcc_cv_ld}64.lld
 else
 ORIGINAL_LLD_FOR_TARGET=$gcc_cv_lld
 fi
+ORIGINAL_CLASSIC_LD_FOR_TARGET=$gcc_cv_ld-classic
 AC_SUBST(ORIGINAL_LD_FOR_TARGET)
 AC_SUBST(ORIGINAL_LLD_FOR_TARGET)
+AC_SUBST(ORIGINAL_CLASSIC_LD_FOR_TARGET)
 case "$ORIGINAL_LD_FOR_TARGET" in
   ./collect-ld | ./collect-ld$build_exeext) ;;
   *) AC_CONFIG_FILES(collect-ld:exec-tool.in, [chmod +x collect-ld]) ;;
