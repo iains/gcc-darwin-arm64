@@ -55,6 +55,13 @@ else
 
 ifneq (,$(findstring darwin,$(host)))
 
+# NOTE that we are building here for the host, and so tests for target-
+# specific functionality will only work when host == target.  This causes
+# fails when building cross-compilers with different object formats (at
+# least when the respective linkers do not accept the same command line
+# options).  Fortunately, for Darwin we can safely hard-code the relevant
+# host options, since all usable linkers support them).
+
 LIBGCCJIT_CURRENT = 26
 LIBGCCJIT_REVISION = 0
 LIBGCCJIT_AGE = 26
@@ -68,16 +75,16 @@ LIBGCCJIT_LINKER_NAME = $(LIBGCCJIT_BASENAME).dylib
 
 # Darwin does not have a version script option. Exported symbols are controlled
 # by the following, and library versioning is done using libtool.
-LIBGCCJIT_VERSION_SCRIPT_OPTION = \
-  -Wl,-exported_symbols_list,$(srcdir)/jit/libgccjit.exp
-
-# Conditionalize the use of  LD_SONAME_OPTION on configure finding it, using
-# $(if).  We have to define a COMMA here, otherwise the commas in the "true"
-# result are treated as separators by the $(if).
+# We have to define a COMMA here, otherwise the commas are treated as
+# separators.
 COMMA := ,
+LIBGCCJIT_VERSION_SCRIPT_OPTION = \
+  -Wl$(COMMA)-exported_symbols_list$(COMMA)$(srcdir)/jit/libgccjit.exports
+
+# For Darwin host, we need a l64 or ld64-compatible linker, that uses
+# -install_name to introduce this.
 LIBGCCJIT_SONAME_OPTION = \
-	$(if $(LD_SONAME_OPTION), \
-	     -Wl$(COMMA)$(LD_SONAME_OPTION)$(COMMA)$(LIBGCCJIT_SONAME))
+  -Wl$(COMMA)-install_name$(COMMA)$(LIBGCCJIT_SONAME)
 
 LIBGCCJIT_SONAME_SYMLINK = $(LIBGCCJIT_FILENAME)
 LIBGCCJIT_LINKER_NAME_SYMLINK = $(LIBGCCJIT_LINKER_NAME)
