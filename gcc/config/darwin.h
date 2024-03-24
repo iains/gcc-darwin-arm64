@@ -424,7 +424,8 @@ extern GTY(()) int darwin_ms_struct;
      %{force_cpusubtype_ALL:-arch %(darwin_arch)} \
      %{!force_cpusubtype_ALL:-arch %(darwin_subarch)} "\
     DARWIN_PLATFORM_ID \
-    " %l " \
+    " %l \
+     %{fuse-ld=*:-fuse-ld=%*} " \
     LINK_COMPRESS_DEBUG_SPEC \
    "%X %{s} %{t} %{Z} %{u*} \
     %{e*} %{r} \
