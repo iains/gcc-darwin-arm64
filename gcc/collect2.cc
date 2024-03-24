@@ -777,6 +777,7 @@ main (int argc, char **argv)
       USE_BFD_LD,
       USE_LLD_LD,
       USE_MOLD_LD,
+      USE_CLASSIC_LD,
       USE_LD_MAX
     } selected_linker = USE_DEFAULT_LD;
   static const char *const ld_suffixes[USE_LD_MAX] =
@@ -787,6 +788,7 @@ main (int argc, char **argv)
       "ld.bfd",
       "ld.lld",
       "ld.mold"
+      "ld-classic"
     };
   static const char *const real_ld_suffix = "real-ld";
   static const char *const collect_ld_suffix = "collect-ld";
@@ -868,7 +870,7 @@ main (int argc, char **argv)
 #ifdef CROSS_DIRECTORY_STRUCTURE
     /* lld and mold are platform-agnostic and not prefixed with target
        triple.  */
-    if (!(i == USE_LLD_LD || i == USE_MOLD_LD))
+    if (!(i == USE_LLD_LD || i == USE_MOLD_LD || i == USE_CLASSIC_LD))
       full_ld_suffixes[i] = concat (target_machine, "-", ld_suffixes[i],
 				    NULL);
     else
@@ -964,7 +966,12 @@ main (int argc, char **argv)
 	  selected_linker = USE_LLD_LD;
 	else if (strcmp (argv[i], "-fuse-ld=mold") == 0)
 	  selected_linker = USE_MOLD_LD;
-	else if (startswith (argv[i], "-o"))
+	else if (strcmp (argv[i], "-fuse-ld=classic") == 0) {
+	  selected_linker = USE_CLASSIC_LD;
+	} else if (strcmp (argv[i], "-fuse-ld=") == 0) {
+	   error ("unrecognized linker name %s", argv[1]);
+	   selected_linker = USE_DEFAULT_LD;
+	} else if (startswith (argv[i], "-o"))
 	  {
 	    /* Parse the output filename if it's given so that we can make
 	       meaningful temp filenames.  */
@@ -1055,7 +1062,8 @@ main (int argc, char **argv)
   ld_file_name = 0;
 #ifdef DEFAULT_LINKER
   if (selected_linker == USE_BFD_LD || selected_linker == USE_GOLD_LD ||
-      selected_linker == USE_LLD_LD || selected_linker == USE_MOLD_LD)
+      selected_linker == USE_LLD_LD || selected_linker == USE_MOLD_LD ||
+      selected_linker == USE_CLASSIC_LD)
     {
       char *linker_name;
 # ifdef HOST_EXECUTABLE_SUFFIX
@@ -1085,6 +1093,7 @@ main (int argc, char **argv)
     }
   if (ld_file_name == 0 && access (DEFAULT_LINKER, X_OK) == 0)
     ld_file_name = DEFAULT_LINKER;
+printf("ld name %s\n", ld_file_name);
   if (ld_file_name == 0)
 #endif
 #ifdef REAL_LD_FILE_NAME
