@@ -1,5 +1,5 @@
 /* { dg-require-effective-target sockets } */
-/* { dg-skip-if "" { hppa*-*-hpux* powerpc*-*-aix* } } */
+/* { dg-skip-if "PR113150" { hppa*-*-hpux* powerpc*-*-aix* *-*-darwin* } } */
 
 #include <string.h>
 #include <sys/socket.h>
