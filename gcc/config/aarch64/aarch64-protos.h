@@ -892,7 +892,11 @@ bool aarch64_is_extend_from_extract (scalar_int_mode, rtx, rtx);
 bool aarch64_is_long_call_p (rtx);
 bool aarch64_is_noplt_call_p (rtx);
 bool aarch64_label_mentioned_p (rtx);
+#if TARGET_MACHO
+void aarch64_darwin_declare_function_name (FILE *, const char*, tree );
+#else
 void aarch64_declare_function_name (FILE *, const char*, tree);
+#endif
 void aarch64_asm_output_alias (FILE *, const tree, const tree);
 void aarch64_asm_output_external (FILE *, tree, const char*);
 bool aarch64_legitimate_pic_operand_p (rtx);
