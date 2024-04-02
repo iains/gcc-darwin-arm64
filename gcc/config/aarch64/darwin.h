@@ -205,7 +205,11 @@ along with GCC; see the file COPYING3.  If not see
 	}								\
     }
 
-/* Darwin x86 assemblers support the .ident directive.  */
+#undef ASM_DECLARE_FUNCTION_NAME
+#define ASM_DECLARE_FUNCTION_NAME(STR, NAME, DECL)	\
+  aarch64_darwin_declare_function_name (STR, NAME, DECL)
+
+/* Darwin assemblers support the .ident directive.  */
 
 #undef TARGET_ASM_OUTPUT_IDENT
 #define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
