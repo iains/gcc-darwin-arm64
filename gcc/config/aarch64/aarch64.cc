@@ -25478,12 +25478,8 @@ aarch64_asm_output_variant_pcs (FILE *stream, const tree decl, const char* name)
 static std::string aarch64_last_printed_arch_string;
 static std::string aarch64_last_printed_tune_string;
 
-/* Implement ASM_DECLARE_FUNCTION_NAME.  Output the ISA features used
-   by the function fndecl.  */
-
-void
-aarch64_declare_function_name (FILE *stream, const char* name,
-				tree fndecl)
+static void
+aarch64_function_options_preamble (tree fndecl)
 {
   tree target_parts = DECL_FUNCTION_SPECIFIC_TARGET (fndecl);
 
@@ -25518,7 +25514,49 @@ aarch64_declare_function_name (FILE *stream, const char* name,
 		   this_tune->name);
       aarch64_last_printed_tune_string = this_tune->name;
     }
+}
 
+/* Implement ASM_DECLARE_FUNCTION_NAME.  Output the ISA features used
+   by the function fndecl.  */
+
+#if TARGET_MACHO
+void
+aarch64_darwin_declare_function_name (FILE *stream, const char* name,
+				      tree fndecl)
+{
+  gcc_checking_assert (TREE_CODE (fndecl) == FUNCTION_DECL);
+  gcc_checking_assert (!DECL_COMMON (fndecl));
+
+  /* Update .arch and .tune as needed.  */
+  aarch64_function_options_preamble (fndecl);
+
+  /* Darwin does not emit pcs variant info.  */
+
+  rtx decl_rtx = XEXP (DECL_RTL (fndecl), 0);
+  if (GET_CODE (decl_rtx) != SYMBOL_REF)
+    name = IDENTIFIER_POINTER (DECL_NAME (fndecl));
+
+  if (! DECL_WEAK (fndecl)
+      && ((TREE_STATIC (fndecl) && !TREE_PUBLIC (fndecl))
+	  || DECL_INITIAL (fndecl)))
+    machopic_define_symbol (DECL_RTL (fndecl));
+  if ((TREE_STATIC (fndecl) && !TREE_PUBLIC (fndecl))
+       || DECL_INITIAL (fndecl))
+    (* targetm.encode_section_info) (fndecl, DECL_RTL (fndecl), false);
+  ASM_OUTPUT_FUNCTION_LABEL (stream, name, fndecl);
+
+  cfun->machine->label_is_assembled = true;
+}
+
+#else
+
+void
+aarch64_declare_function_name (FILE *stream, const char* name,
+				tree fndecl)
+{
+  /* Update .arch and .tune as needed.  */
+  aarch64_function_options_preamble (fndecl);
+  /* Emit any necessary pcs information.  */
   aarch64_asm_output_variant_pcs (stream, fndecl, name);
 
   /* Don't forget the type directive for ELF.  */
@@ -25529,6 +25567,7 @@ aarch64_declare_function_name (FILE *stream, const char* name,
 
   cfun->machine->label_is_assembled = true;
 }
+#endif
 
 /* Implement PRINT_PATCHABLE_FUNCTION_ENTRY.  */
 
