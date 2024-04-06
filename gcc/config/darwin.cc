@@ -3601,6 +3601,13 @@ darwin_override_options (void)
 
   /* The c_dialect...() macros are not available to us here.  */
   darwin_running_cxx = (strstr (lang_hooks.name, "C++") != 0);
+
+  /* Workaround for PR109267 / Issue #125. Force __builtin_unreachable
+     to expand as a trap, unless the user has specifically overridden.
+     We need this to work for all languages, including those that do not
+     use the C Preprocessor (so cannot redefine textually).  */
+  if (DARWIN_ARM64 && !OPTION_SET_P (flag_unreachable_traps))
+    flag_unreachable_traps = true;
 }
 
 #if DARWIN_PPC
