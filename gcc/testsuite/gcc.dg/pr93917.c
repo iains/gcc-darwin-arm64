@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -fdump-tree-vrp1 -fdump-tree-vrp2 -fdump-tree-optimized-alias" } */
+/* { dg-additional-options "-fno-unreachable-traps" { target aarch64-*-darwin* } } */
 
 void f3(int n);
 

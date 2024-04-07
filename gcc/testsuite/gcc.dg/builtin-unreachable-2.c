@@ -3,6 +3,7 @@
    dead too, and should be removed.  */
 /* { dg-do compile } */
 /* { dg-options "-O2 -fdump-tree-optimized -fdump-rtl-cse1" } */
+/* { dg-additional-options "-fno-unreachable-traps" { target aarch64-*-darwin* } } */
 void foo (void);
 
 int

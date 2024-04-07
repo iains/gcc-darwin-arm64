@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -fdump-tree-fab1" } */
+/* { dg-additional-options "-fno-unreachable-traps" { target aarch64-*-darwin* } } */
 
 #include "builtin-unreachable-6.c"
 
