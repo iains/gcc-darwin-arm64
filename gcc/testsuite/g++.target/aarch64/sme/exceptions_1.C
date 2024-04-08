@@ -9,10 +9,10 @@ void callee_normal();
 /*
 ** _Z5test1v:
 **	...
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	...
-**	bl	__cxa_begin_catch
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_begin_catch
+**	bl	_?__cxa_end_catch
 **	mov	w0, #?2
 **	...
 */
@@ -33,14 +33,14 @@ test1 ()
 /*
 ** _Z5test2v:
 **	...
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	...
-**	bl	__cxa_begin_catch
+**	bl	_?__cxa_begin_catch
 **	smstart	za
-**	bl	_Z10callee_outv
-**	bl	_Z9callee_inv
+**	bl	_?_Z10callee_outv
+**	bl	_?_Z9callee_inv
 **	smstop	za
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	mov	w0, #?2
 **	...
 */
@@ -63,18 +63,18 @@ test2 ()
 /*
 ** _Z5test3v:
 **	...
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	...
 **	smstop	za
 **	...
-**	bl	_Z13callee_normalv
+**	bl	_?_Z13callee_normalv
 **	...
-**	bl	__cxa_begin_catch
+**	bl	_?__cxa_begin_catch
 **	smstart	za
-**	bl	_Z10callee_outv
-**	bl	_Z9callee_inv
+**	bl	_?_Z10callee_outv
+**	bl	_?_Z9callee_inv
 **	smstop	za
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	mov	w0, #?2
 **	...
 */
@@ -114,28 +114,28 @@ test4 ()
 /*
 ** _Z5test5v:
 **	...
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	...
 **	smstart	za
 **	...
-**	bl	_Z12callee_inoutv
+**	bl	_?_Z12callee_inoutv
 **	add	(x[0-9]+), [^\n]+
 **	msr	tpidr2_el0, \1
-**	bl	_Z13callee_normalv
+**	bl	_?_Z13callee_normalv
 **	msr	tpidr2_el0, xzr
 **	smstop	za
 **	...
-**	bl	__cxa_begin_catch
+**	bl	_?__cxa_begin_catch
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	msr	tpidr2_el0, xzr
-**	bl	_Z12callee_inoutv
+**	bl	_?_Z12callee_inoutv
 **	smstop	za
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_end_catch
 **	mov	w0, #?2
 **	...
 */
@@ -159,17 +159,17 @@ test5 ()
 ** _Z5test6v:
 **	...
 **	msr	tpidr2_el0, x[0-9]+
-**	bl	_Z13callee_normalv
+**	bl	_?_Z13callee_normalv
 **	msr	tpidr2_el0, xzr
 **	...
-**	bl	__cxa_begin_catch
-**	bl	__cxa_end_catch
+**	bl	_?__cxa_begin_catch
+**	bl	_?__cxa_end_catch
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	msr	tpidr2_el0, xzr
 **	...
 */
