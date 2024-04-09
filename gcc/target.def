@@ -7512,6 +7512,16 @@ DEFHOOKPOD
 The default value is NULL.",
  const char *, NULL)
 
+/* This value represents whether __builtin_unreachable should be expanded
+   as a trap instruction (or an abort() if the trap is not available).  */
+DEFHOOK
+(unreachable_should_trap,
+ "This hook should return @code{true} if the target wants \
+  @code{__builtin_unreachable} to expand to a trap or @code{abort ()}.\n\
+  The default value is false.",
+ bool, (void),
+ hook_bool_void_false)
+
 /* Close the 'struct gcc_target' definition.  */
 HOOK_VECTOR_END (C90_EMPTY_HACK)
 
