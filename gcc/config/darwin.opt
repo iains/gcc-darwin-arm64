@@ -91,6 +91,10 @@ mtarget-linker
 Target RejectNegative Joined Separate Var(darwin_target_linker) Init(LD64_VERSION)
 -mtarget-linker <version>	Specify that ld64 <version> is the toolchain linker for the current invocation.
 
+munreachable-traps
+Target Var(darwin_unreachable_traps) Init(1)
+When set (the default) this makes __builtin_unreachable render as a trap.
+
 ; Driver options.
 
 all_load
