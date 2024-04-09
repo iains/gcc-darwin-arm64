@@ -3330,6 +3330,13 @@ darwin_kextabi_p (void) {
   return flag_apple_kext;
 }
 
+/* True, iff we want to map __builtin_unreachable to a trap.  */
+
+bool
+darwin_unreachable_traps_p (void) {
+  return darwin_unreachable_traps;
+}
+
 void
 darwin_override_options (void)
 {
