@@ -373,7 +373,8 @@ extern GTY(()) int darwin_ms_struct;
 */
 
 #define DARWIN_NOCOMPACT_UNWIND \
-" %:version-compare(>= 10.6 mmacosx-version-min= -no_compact_unwind) "
+"%{!fuse-ld=lld: \
+    %:version-compare(>= 10.6 mmacosx-version-min= -no_compact_unwind)}"
 
 /* In Darwin linker specs we can put -lcrt0.o and ld will search the library
    path for crt0.o or -lcrtx.a and it will search for libcrtx.a.  As for
