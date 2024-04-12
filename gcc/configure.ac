@@ -2830,7 +2830,13 @@ fi
 AC_MSG_RESULT($gold_non_default)
 
 ORIGINAL_LD_FOR_TARGET=$gcc_cv_ld
+if test x"$ld64_flag" = x"yes"; then
+ORIGINAL_LLD_FOR_TARGET=${gcc_cv_ld}64.lld
+else
+ORIGINAL_LLD_FOR_TARGET=$gcc_cv_lld
+fi
 AC_SUBST(ORIGINAL_LD_FOR_TARGET)
+AC_SUBST(ORIGINAL_LLD_FOR_TARGET)
 case "$ORIGINAL_LD_FOR_TARGET" in
   ./collect-ld | ./collect-ld$build_exeext) ;;
   *) AC_CONFIG_FILES(collect-ld:exec-tool.in, [chmod +x collect-ld]) ;;
