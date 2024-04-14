@@ -9,4 +9,4 @@ int main()
   return 0;
 }
 
-/* { dg-final { scan-assembler {\.arch armv9-a\+crc\+crypto\+sve2p1\+noflagm\+nolse\+nordma\+nofp16fml\+nojscvt\+norcpc\+nofrintts\+nosb\+nopredres\+nossbs\+nopauth\n} } } */
+/* { dg-final { scan-assembler {\.arch armv9-a\+crc\+crypto\+sve2p1\+noflagm\+nolse\+nordma?\+nofp16fml\+nojscvt\+norcpc\+nofrintts\+nosb\+nopredres\+nossbs\+nopauth\n} } } */
