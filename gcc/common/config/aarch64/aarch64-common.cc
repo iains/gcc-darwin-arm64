@@ -662,7 +662,10 @@ aarch64_get_extension_string_for_isa_flags
     if (added & opt.flag_canonical)
       {
 	outstr += "+";
-	outstr += opt.name;
+	if (startswith (opt.name, "rdm"))
+	  outstr += "rdm";
+	else
+	  outstr += opt.name;
       }
 
   /* Remove the features in current_flags & ~isa_flags.  If the feature does
@@ -691,7 +694,10 @@ aarch64_get_extension_string_for_isa_flags
 	{
 	  current_flags &= ~opt.flags_off;
 	  outstr += "+no";
-	  outstr += opt.name;
+	  if (startswith (opt.name, "rdm"))
+	    outstr += "rdm";
+	  else
+	    outstr += opt.name;
 	}
     }
 
