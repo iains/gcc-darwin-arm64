@@ -137,6 +137,8 @@ AARCH64_OPT_FMV_EXTENSION("rdma", RDMA, (), (SIMD), (), "asimdrdm")
 /* rdm is an alias for rdma.  */
 AARCH64_FMV_FEATURE("rdm", RDM, (RDMA))
 
+AARCH64_OPT_EXTENSION_ALIAS("rdm", RDM, (RDMA), (RDMA), (RDMA), (RDMA), "")
+
 AARCH64_OPT_FMV_EXTENSION("crc", CRC, (), (), (), "crc32")
 
 AARCH64_OPT_FMV_EXTENSION("sha2", SHA2, (SIMD), (), (), "sha1 sha2")
