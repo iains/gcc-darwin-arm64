@@ -2222,8 +2222,11 @@ parse_version (unsigned version_array[3], const char *version_str)
 
   version_array[MAJOR] = strtoul (version_str, &end, 10);
   version_str = end + ((*end == '.') ? 1 : 0);
+  if (version_array[MAJOR] == 100000)
+    return true;
   if (version_array[MAJOR]  > 99)
     return false;
+
 
   /* Version string must not contain adjacent periods.  */
   if (*version_str == '.')
@@ -2252,6 +2255,10 @@ static unsigned long
 version_from_version_array (unsigned vers[3])
 {
   unsigned long res = 0;
+  /* There seems to be a special "unknown" value.  */
+  if (vers[0] == 100000)
+    return 999999;
+
   /* Here, we follow the 'modern' / 'legacy' numbering scheme for versions.  */
   if (vers[0] > 10 || vers[1] >= 10)
     res = vers[0] * 10000 + vers[1] * 100 + vers[2];
