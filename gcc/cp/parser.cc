@@ -834,14 +834,10 @@ cp_lexer_new_main (void)
       attr_state = cp_lexer_attribute_state (*tok, attr_state);
       tok = vec_safe_push (lexer->buffer, cp_token ());
       unsigned int flags = C_LEX_STRING_NO_JOIN;
+      /* If we are processing clang-style attribute args, lex numbers as
+         potential version strings; NN .. NN.MM .. NN.MM.OO */
       if (attr_state == CA_CA_ARGS)
-	{
-	  /* We are handling a clang attribute;
-	     1. do not try to diagnose x.y.z as a bad number, it could be a
-		version.
-	     2. join strings.  */
-          flags = C_LEX_NUMBER_AS_STRING;
-	}
+	flags |= C_LEX_NUMBER_AS_STRING;
       cp_lexer_get_preprocessor_token (flags, tok);
     }
 
@@ -1059,15 +1055,7 @@ cp_lexer_get_preprocessor_token (unsigned flags, cp_token *token)
 {
   static int is_extern_c = 0;
 
-   /* Get a new token from the preprocessor.
-  int lex_flags = 0;
-  if (lexer != NULL)
-    {
-      lex_flags = C_LEX_STRING_NO_JOIN;
-      if (lexer->lex_number_as_string_p)
-	lex_flags |= C_LEX_NUMBER_AS_STRING;
-    }
-  */
+   /* Get a new token from the preprocessor. */
   token->type
     = c_lex_with_flags (&token->u.value, &token->location, &token->flags,
 			flags);
@@ -29829,27 +29817,7 @@ cp_parser_clang_attribute (cp_parser *parser, tree/*attr_id*/)
   bool save_translate_strings_p = parser->translate_strings_p;
   parser->translate_strings_p = false;
   tree attr_args = NULL_TREE;
-  cp_token *token = cp_lexer_peek_token (parser->lexer);
-  if (token->type == CPP_NAME
-      && cp_lexer_peek_nth_token (parser->lexer, 2)->type == CPP_COMMA)
-    {
-      tree platf = token->u.value;
-      cp_lexer_consume_token (parser->lexer);
-      attr_args = tree_cons (NULL_TREE, platf, NULL_TREE);
-    }
-  else
-    {
-      error_at (token->location,
-		"expected a platform name followed by %<,%>");
-      cp_parser_skip_to_closing_parenthesis (parser,
-					     /*recovering=*/true,
-					     /*or_comma=*/false,
-					     /*consume_paren=*/true);
-      parser->translate_strings_p = save_translate_strings_p;
-      return error_mark_node;
-    }
-
-  cp_lexer_consume_token (parser->lexer); /* consume the ',' */
+  cp_token *token;
   do
     {
       tree name = NULL_TREE;
@@ -29857,10 +29825,11 @@ cp_parser_clang_attribute (cp_parser *parser, tree/*attr_id*/)
 
       token = cp_lexer_peek_token (parser->lexer);
       if (token->type == CPP_NAME)
-	{
-	  name = token->u.value;
-	  cp_lexer_consume_token (parser->lexer);
-	}
+	name = token->u.value;
+      else if (token->type == CPP_KEYWORD)
+	name = ridpointers[(int) token->keyword];
+      else if (token->flags & NAMED_OP)
+	name = get_identifier (cpp_type2name (token->type, token->flags));
       else
 	{
 	  /* FIXME: context-sensitive for that attrib.  */
@@ -29868,32 +29837,29 @@ cp_parser_clang_attribute (cp_parser *parser, tree/*attr_id*/)
 	  cp_parser_skip_to_closing_parenthesis (parser,
 						 /*recovering=*/true,
 						 /*or_comma=*/false,
-						 /*consume_paren=*/true);
+						 /*consume_paren=*/false);
 	  attr_args = error_mark_node;
 	  break;
 	}
+      cp_lexer_consume_token (parser->lexer);
 
       if (cp_lexer_next_token_is (parser->lexer, CPP_EQ))
 	{
 	  cp_lexer_consume_token (parser->lexer); /* eat the '=' */
-	  token = cp_lexer_peek_token (parser->lexer);
 	  if (cp_lexer_next_token_is_not (parser->lexer, CPP_CLOSE_PAREN)
 	      && cp_lexer_next_token_is_not (parser->lexer, CPP_COMMA))
 	    {
-	      value = token->u.value;
-	      /* ???: check for error mark and early-return?  */
-	      cp_lexer_consume_token (parser->lexer);
+	      token = cp_lexer_peek_token (parser->lexer);
+	      if (token->type == CPP_STRING)
+		value = cp_parser_string_literal (parser, /*translate=*/false,
+					    /*wide_ok=*/false);
+	      else
+		{
+		  value = token->u.value;
+		  cp_lexer_consume_token (parser->lexer);
+		}
 	    }
-	  else
-	    {
-	      error_at (token->location, "expected a value");
-	      cp_parser_skip_to_closing_parenthesis (parser,
-						     /*recovering=*/true,
-						     /*or_comma=*/false,
-						     /*consume_paren=*/true);
-	      attr_args = error_mark_node;
-	      break;
-	    }
+	  /* else value is missing.  */
 	}
       else if (cp_lexer_next_token_is_not (parser->lexer, CPP_CLOSE_PAREN)
 	       && cp_lexer_next_token_is_not (parser->lexer, CPP_COMMA))
@@ -29902,7 +29868,7 @@ cp_parser_clang_attribute (cp_parser *parser, tree/*attr_id*/)
 	  cp_parser_skip_to_closing_parenthesis (parser,
 						 /*recovering=*/true,
 						 /*or_comma=*/false,
-						 /*consume_paren=*/true);
+						 /*consume_paren=*/false);
 	  attr_args = error_mark_node;
 	  break;
 	}
