@@ -2207,33 +2207,52 @@ static bool
 parse_version (unsigned version_array[3], const char *version_str)
 {
   size_t version_len;
-  char *end;
+  char *end, last = '\0', delimiter = '.', alt_delim = '_';
 
-  version_len = strlen (version_str);
+  if (!version_str)
+    return false;
+
+  /* Handle the odd situation in which we get STRING_CST which contain the
+     starting and ending quotes.  */
+  if (version_str[0] == '"')
+    {
+      version_str++;
+      version_len = strrchr (&version_str[1], '"') - version_str;
+      last = '"';
+   }
+  else
+    version_len = strlen (version_str);
+
   if (version_len < 1)
     return false;
 
   /* Version string must consist of digits and periods only.  */
-  if (strspn (version_str, "0123456789.") != version_len)
+  if (strspn (version_str, "0123456789._") != version_len)
     return false;
 
   if (!ISDIGIT (version_str[0]) || !ISDIGIT (version_str[version_len - 1]))
     return false;
 
   version_array[MAJOR] = strtoul (version_str, &end, 10);
-  version_str = end + ((*end == '.') ? 1 : 0);
+  if (*end == '_')
+    {
+      delimiter = '_';
+      alt_delim = '.';
+    }
+  version_str = end + ((*end == delimiter) ? 1 : 0);
   if (version_array[MAJOR] == 100000)
     return true;
   if (version_array[MAJOR]  > 99)
     return false;
 
-
-  /* Version string must not contain adjacent periods.  */
-  if (*version_str == '.')
+  /* Version string must not contain adjacent delimiters.  */
+  if (*version_str == delimiter || *version_str == alt_delim)
     return false;
 
   version_array[MINOR] = strtoul (version_str, &end, 10);
-  version_str = end + ((*end == '.') ? 1 : 0);
+  if (*end == alt_delim)
+    return false;
+  version_str = end + ((*end == delimiter) ? 1 : 0);
   if (version_array[MINOR]  > 99)
     return false;
 
@@ -2242,7 +2261,7 @@ parse_version (unsigned version_array[3], const char *version_str)
     return false;
 
   /* Version string must contain no more than three tokens.  */
-  if (*end != '\0')
+  if (*end != last)
     return false;
 
   return true;
