@@ -2355,12 +2355,13 @@ darwin_handle_availability_attribute (tree *node, tree name, tree args,
   tree decl = *node;
   *no_add_attrs = true;
 
-  if (! VAR_OR_FUNCTION_DECL_P (decl))
+  if (!decl || (!TYPE_P (decl) && !DECL_P (decl)))
     {
-      warning (OPT_Wattributes, "%qE attribute ignored",
-	       name);
+      warning (OPT_Wattributes, "%qE attribute ignored", name);
       return NULL_TREE;
     }
+  else if (decl == error_mark_node)
+    return NULL_TREE;
 
   location_t loc = DECL_SOURCE_LOCATION (decl);
   if (args == NULL_TREE)
