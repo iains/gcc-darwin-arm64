@@ -794,7 +794,7 @@ main (int argc, char **argv)
       "ld.gold",
       "ld.bfd",
       LLD_NAME,
-      "ld.mold"
+      "ld.mold",
       "ld-classic"
     };
   static const char *const real_ld_suffix = "real-ld";
