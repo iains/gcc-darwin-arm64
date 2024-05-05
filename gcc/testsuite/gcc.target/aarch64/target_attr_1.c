@@ -10,5 +10,5 @@ foo (int a)
   return a + 1;
 }
 
-/* { dg-final { scan-assembler "//.tune cortex-a72.cortex-a53" } } */
+/* { dg-final { scan-assembler "(//|;).tune cortex-a72.cortex-a53" } } */
 /* { dg-final { scan-assembler-not "thunderx" } } */
