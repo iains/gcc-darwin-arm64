@@ -84,6 +84,8 @@ proc dg-scan { name positive testcase output_file orig_args } {
       # ??? Somehow, .*? is still greedy.
       # regsub -all {(^|\n)[[:space:]]*\.section[[:space:]]*"?\.gnu\.lto_.*?\n(?=[[:space:]]*\.text\n)} $text {\1} text
       regsub -all {(^|\n)[[:space:]]*\.section[[:space:]]*"?\.gnu\.lto_(?:[^\n]*\n(?![[:space:]]*\.(section|text|data|bss)))*[^\n]*\n} $text {\1} text
+      # Darwin section IDs are different.
+      regsub -all {(^|\n)[[:space:]]*\.section[[:space:]]*"?__GNU_LTO(?:[^\n]*\n(?![[:space:]]*\.(section|text|data|bss)))*[^\n]*\n} $text {\1} text
     }
 
     set match [regexp -- $pattern $text]
@@ -504,6 +506,7 @@ proc scan-assembler-times { args } {
     set text [read $fd]
     close $fd
     regsub -all {(^|\n)[[:space:]]*\.section[[:space:]]*"?\.gnu\.lto_(?:[^\n]*\n(?![[:space:]]*\.(section|text|data|bss)))*[^\n]*\n} $text {\1} text
+    regsub -all {(^|\n)[[:space:]]*\.section[[:space:]]*"?__GNU_LTO(?:[^\n]*\n(?![[:space:]]*\.(section|text|data|bss)))*[^\n]*\n} $text {\1} text
 
     set result_count [regexp -all -- $pattern $text]
     if {$result_count == $times} {
