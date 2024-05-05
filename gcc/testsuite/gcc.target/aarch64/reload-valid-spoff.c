@@ -2,6 +2,7 @@
 /* { dg-require-effective-target lp64 } */
 /* { dg-options "-O2 -mcmodel=large -fno-builtin -fno-pie" }  */
 /* { dg-skip-if "-mcmodel=large -fPIC not currently supported" { aarch64-*-* }  { "-fPIC" } { "" } } */
+/* { dg-skip-if "-mcmodel=large current unsupported" { aarch64-*-darwin* } } */
 
 typedef long unsigned int size_t;
 typedef unsigned short int sa_family_t;
