@@ -31,7 +31,7 @@ set gm2src ${srcdir}/../m2
 gm2_init_pim "${srcdir}/gm2/pim/intrinsic/run/pass/"
 gm2_link_obj "cstub.o"
 
-if { [istarget powerpc*-*-*] } then {
+if { [istarget powerpc*-*-*] && ![istarget "powerpc-*-darwin*"]  } {
     set mabi_flags "-mabi=ieeelongdouble"
     set options [concat "{additional_flags=$mabi_flags}" $options]
 }
