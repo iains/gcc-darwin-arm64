@@ -29753,7 +29753,8 @@ static machine_mode
 aarch64_c_mode_for_floating_type (enum tree_index ti)
 {
   if (ti == TI_LONG_DOUBLE_TYPE)
-    return TFmode;
+    /* Darwinpcs amends AAPCS S7 to use double as the type for long double.  */
+    return TARGET_MACHO ? DFmode : TFmode;
   return default_mode_for_floating_type (ti);
 }
 
