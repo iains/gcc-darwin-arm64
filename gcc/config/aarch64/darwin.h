@@ -55,9 +55,6 @@ along with GCC; see the file COPYING3.  If not see
 #undef DEFAULT_SIGNED_CHAR
 #define DEFAULT_SIGNED_CHAR 1
 
-#undef LONG_DOUBLE_TYPE_SIZE
-#define LONG_DOUBLE_TYPE_SIZE	64
-
 /* Disable custom function descriptors on Darwin (we use heap-based
    trampolines).  */
 #undef AARCH64_CUSTOM_FUNCTION_TEST
