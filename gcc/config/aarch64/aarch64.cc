@@ -869,9 +869,6 @@ static const attribute_spec aarch64_gnu_attributes[] =
   { "dllimport", 0, 0, false, false, false, false, handle_dll_attribute, NULL },
   { "dllexport", 0, 0, false, false, false, false, handle_dll_attribute, NULL },
 #endif
-#ifdef SUBTARGET_ATTRIBUTE_TABLE
-  SUBTARGET_ATTRIBUTE_TABLE
-#endif
 };
 
 static const scoped_attribute_specs aarch64_gnu_attribute_table =
