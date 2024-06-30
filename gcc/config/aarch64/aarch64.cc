@@ -31155,8 +31155,13 @@ aarch64_bitint_type_info (int n, struct bitint_info *info)
 static machine_mode
 aarch64_c_mode_for_floating_type (enum tree_index ti)
 {
+  if (TARGET_MACHO && ti == TI_LONG_DOUBLE_TYPE)
+    /* darwinpcs amends AAPCS S7 to use double as the type for long double.  */
+    return DFmode;
+
   if (TARGET_LONG_DOUBLE_128 && ti == TI_LONG_DOUBLE_TYPE)
     return TFmode;
+
   return default_mode_for_floating_type (ti);
 }
 
