@@ -155,24 +155,10 @@ along with GCC; see the file COPYING3.  If not see
 #define ASM_QUAD "\t.quad\t"
 
 /* darwinpcs reserves X18.  */
-
-#undef FIXED_REGISTERS
-#define FIXED_REGISTERS					\
-  {							\
-    0, 0, 0, 0,   0, 0, 0, 0,	/* R0 - R7 */		\
-    0, 0, 0, 0,   0, 0, 0, 0,	/* R8 - R15 */		\
-    0, 0, 1, 0,   0, 0, 0, 0,	/* R16 - R23 */		\
-    0, 0, 0, 0,   0, 1, 0, 1,	/* R24 - R30, SP */	\
-    0, 0, 0, 0,   0, 0, 0, 0,   /* V0 - V7 */           \
-    0, 0, 0, 0,   0, 0, 0, 0,   /* V8 - V15 */		\
-    0, 0, 0, 0,   0, 0, 0, 0,   /* V16 - V23 */         \
-    0, 0, 0, 0,   0, 0, 0, 0,   /* V24 - V31 */         \
-    1, 1, 1, 1,			/* SFP, AP, CC, VG */	\
-    0, 0, 0, 0,   0, 0, 0, 0,   /* P0 - P7 */           \
-    0, 0, 0, 0,   0, 0, 0, 0,   /* P8 - P15 */          \
-    1, 1,			/* FFR and FFRT */	\
-    1, 1, 1, 1, 1, 1, 1, 1	/* Fake registers */	\
-  }
+#undef FIXED_X18
+#define FIXED_X18 1
+#undef CALL_USED_X18
+#define CALL_USED_X18 0
 
 /* Assign a static chain regnum.  At the moment using R16 (IP0) is
    available.  */
