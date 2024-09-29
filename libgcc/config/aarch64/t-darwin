@@ -3,5 +3,3 @@
 HOST_LIBGCC2_CFLAGS += -mmacosx-version-min=11.0
 
 LIB2_SIDITI_CONV_FUNCS = yes
-
-BUILD_LIBGCCS1 =
