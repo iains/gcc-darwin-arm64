@@ -419,7 +419,7 @@ aarch64*-*-darwin*)
 	tmake_file="${tmake_file} t-crtfm t-dfprules"
 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp"
 	tmake_file="${tmake_file} ${cpu_type}/t-heap-trampoline"
-	md_unwind_header=aarch64/aarch64-unwind.h
+	tmake_file="${tmake_file} ${cpu_type}/t-no-eh"
 	;;
 aarch64*-*-freebsd*)
 	extra_parts="$extra_parts crtfastmath.o"
