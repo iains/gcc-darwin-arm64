@@ -23970,9 +23970,16 @@ cp_parser_init_declarator (cp_parser* parser,
 		      "an %<asm%> specification is not allowed "
 		      "on a function-definition");
 	  if (attributes)
-	    error_at (attributes_start_token->location,
-		      "attributes are not allowed "
-		      "on a function-definition");
+	    {
+	      /* When we are allowing attributes in this position, then add
+		 them to the prefix ones.  */
+	      if (flag_allow_ext_attr_placement)
+		prefix_attributes = chainon (prefix_attributes, attributes);
+	      else
+		error_at (attributes_start_token->location,
+			  "attributes are not allowed "
+			  "on a function-definition");
+	    }
 	  /* This is a function-definition.  */
 	  *function_definition_p = true;
 
