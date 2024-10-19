@@ -1227,6 +1227,10 @@ void add_framework_path (char *);
 #define TARGET_N_FORMAT_TYPES 1
 #define TARGET_FORMAT_TYPES darwin_additional_format_types
 
+/* We want __builtin_unreachable to be expanded as a trap instruction.  */
+#undef TARGET_UNREACHABLE_SHOULD_TRAP
+#define TARGET_UNREACHABLE_SHOULD_TRAP darwin_unreachable_traps_p
+
 #ifndef USED_FOR_TARGET
 extern void darwin_driver_init (unsigned int *,struct cl_decoded_option **);
 #define GCC_DRIVER_HOST_INITIALIZATION \
