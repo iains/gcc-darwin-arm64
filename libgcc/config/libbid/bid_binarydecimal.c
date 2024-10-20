@@ -413,7 +413,7 @@ BID_BINARY80LDOUBLE;
 }
 
 #define unpack_binary80(x,s,e,c,t,zero,inf,nan)                             \
-{ BID_BINARY80LDOUBLE x_in;                                                 \
+{ BID_BINARY80LDOUBLE x_in = {0};                                                 \
   x_in.f = x;                                                               \
   c = x_in.i.lo4 + ((UINT64)x_in.i.lo3 << 16) +                             \
       ((UINT64)x_in.i.lo2 << 32) + ((UINT64)x_in.i.lo1 << 48);              \
