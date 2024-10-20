@@ -386,8 +386,8 @@ case ${host} in
 esac
 
 case ${host} in
-*-*-darwin* | *-*-dragonfly* | *-*-freebsd* | *-*-netbsd* | *-*-openbsd* | \
-  *-*-solaris2*)
+i[34567]86-*-darwin* | powerpc*-*-darwin* | x86_64-*-darwin* | \
+*-*-dragonfly* | *-*-freebsd* | *-*-netbsd* | *-*-openbsd* | *-*-solaris2*)
   enable_execute_stack=enable-execute-stack-mprotect.c
   ;;
 i[34567]86-*-mingw* | x86_64-*-mingw*)
