@@ -108,12 +108,6 @@ along with GCC; see the file COPYING3.  If not see
 #undef TARGET_ASM_FILE_END
 #define TARGET_ASM_FILE_END darwin_file_end
 
-/* For now, we do not give global entities any extra alignment
-   TODO: determine if we should for some optimisation level.  */
-#undef DATA_ALIGNMENT
-#define DATA_ALIGNMENT(EXP, ALIGN)			\
-  AARCH64_EXPAND_ALIGNMENT (false, EXP, ALIGN)
-
 /* Darwin binds locally for PIC code (the default) without which
    we lose many in-lineing opportunities.  */
 #undef TARGET_BINDS_LOCAL_P
