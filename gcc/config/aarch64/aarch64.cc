@@ -2691,7 +2691,11 @@ aarch64_constant_alignment (const_tree exp, HOST_WIDE_INT align)
 unsigned
 aarch64_data_alignment (const_tree type, unsigned align)
 {
-  if (optimize_size)
+  /* For now, on Darwin we do not give global entities any extra
+     alignment TODO: determine if we should for some optimisation
+     level.  */
+
+  if (optimize_size || TARGET_MACHO)
     return align;
 
   if (AGGREGATE_TYPE_P (type))
