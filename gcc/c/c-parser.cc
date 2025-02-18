@@ -2691,15 +2691,28 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	    d = d->declarator;
 	  underspec_name = d->u.id.id;
 	}
+      tree postfix_attrs = NULL_TREE;
+      if (flag_allow_ext_attr_placement
+	  && c_parser_next_token_is_keyword (parser, RID_ATTRIBUTE))
+	{
+	  postfix_attrs = c_parser_gnu_attributes (parser);
+	  /* IF we have a function definition, and we're allowing it then
+	     treat these attributes as if they had been prepended.  */
+	  if (c_parser_next_token_is (parser, CPP_OPEN_BRACE))
+	    {
+	      all_prefix_attrs = chainon (all_prefix_attrs, postfix_attrs);
+	      postfix_attrs = NULL_TREE;
+	    }
+	}
       if (c_parser_next_token_is (parser, CPP_EQ)
 	  || c_parser_next_token_is (parser, CPP_COMMA)
 	  || c_parser_next_token_is (parser, CPP_SEMICOLON)
 	  || c_parser_next_token_is_keyword (parser, RID_ASM)
 	  || c_parser_next_token_is_keyword (parser, RID_ATTRIBUTE)
+	  || postfix_attrs
 	  || c_parser_next_token_is_keyword (parser, RID_IN))
 	{
 	  tree asm_name = NULL_TREE;
-	  tree postfix_attrs = NULL_TREE;
 	  if (!diagnosed_no_specs && !specs->declspecs_seen_p)
 	    {
 	      diagnosed_no_specs = true;
@@ -2711,8 +2724,9 @@ c_parser_declaration_or_fndef (c_parser *parser, bool fndef_ok,
 	  if (c_parser_next_token_is_keyword (parser, RID_ASM))
 	    asm_name = c_parser_simple_asm_expr (parser);
 	  if (c_parser_next_token_is_keyword (parser, RID_ATTRIBUTE))
+	    postfix_attrs = c_parser_gnu_attributes (parser);
+	  if (postfix_attrs)
 	    {
-	      postfix_attrs = c_parser_gnu_attributes (parser);
 	      if (c_parser_next_token_is (parser, CPP_OPEN_BRACE))
 		{
 		  /* This means there is an attribute specifier after
