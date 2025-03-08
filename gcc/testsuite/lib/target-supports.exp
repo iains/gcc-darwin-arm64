@@ -3363,8 +3363,12 @@ proc check_effective_target_long_double_ieee128 { } {
 # 128-bit format on PowerPC.
 proc add_options_for_long_double_ieee128 { flags } {
     if { [istarget powerpc*-*-*] } {
-	return "$flags -mlong-double-128 -Wno-psabi -mabi=ieeelongdouble"
-    }
+       if { ![istarget "powerpc-*-darwin*"] } {
+ 	  return "$flags -mlong-double-128 -Wno-psabi "
+       } else {
+ 	  return "$flags -mlong-double-128 -Wno-psabi -mabi=ieeelongdouble"
+       }
+   }
     return "$flags"
 }
 
