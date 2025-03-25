@@ -26,7 +26,7 @@
 LIBGCOBOL_SUPPORTED=no
 
 case "${target}" in
-    aarch64*-*-linux*)
+    aarch64*-*-linux* | aarch64-*-darwin*)
 	LIBGCOBOL_SUPPORTED=yes
 	;;
     powerpc64le-*-linux*)
