@@ -3660,6 +3660,10 @@ darwin_override_options (void)
      headers.  */
   if (!OPTION_SET_P (flag_allow_ext_attr_placement))
     flag_allow_ext_attr_placement = true;
+
+  /* We need to consume some C keywords in C++.  */
+  if (!OPTION_SET_P (flag_allow_extra_keywords))
+    flag_allow_extra_keywords = true;
 }
 
 #if DARWIN_PPC
