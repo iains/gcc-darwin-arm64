@@ -3592,6 +3592,15 @@ darwin_override_options (void)
 
   /* The c_dialect...() macros are not available to us here.  */
   darwin_running_cxx = (strstr (lang_hooks.name, "C++") != 0);
+
+  /* We need to consume attributes on function definitions from the the SDK
+     headers.  */
+  if (!OPTION_SET_P (flag_allow_ext_attr_placement))
+    flag_allow_ext_attr_placement = true;
+
+  /* We need to consume some C keywords in C++.  */
+  if (!OPTION_SET_P (flag_allow_extra_keywords))
+    flag_allow_extra_keywords = true;
 }
 
 #if DARWIN_PPC
