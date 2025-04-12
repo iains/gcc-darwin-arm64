@@ -28,19 +28,21 @@
 #include "aarch64-protos.h"
 #include "aarch64-feature-deps.h"
 
+
+/* Default architecture to use if -mcpu=native did not detect a known CPU.  */
 #if TARGET_MACHO
-# include <sys/types.h>
-# include <sys/sysctl.h>
+#define DEFAULT_ARCH "apple-m1"
+#else
+#define DEFAULT_ARCH "8A"
+#define DEFAULT_CPU "generic-armv8-a"
 #endif
 
 
-#if TARGET_MACHO
-
-/* Default architecture to use if -mcpu=native did not detect a known CPU.  */
-#define DEFAULT_ARCH "apple-m1"
-
+#if defined(__APPLE__)
 /* macOS does not have /proc/cpuinfo and needs a different approach,
    based on sysctl.  It is much simpler.  */
+#include <sys/types.h>
+#include <sys/sysctl.h>
 
 const char *
 host_detect_local_cpu (ATTRIBUTE_UNUSED int argc, ATTRIBUTE_UNUSED const char **argv)
@@ -126,9 +128,6 @@ struct aarch64_core_data
 #define INVALID_IMP ((unsigned char) -1)
 #define INVALID_CORE ((unsigned)-1)
 #define ALL_VARIANTS ((unsigned)-1)
-/* Default architecture to use if -mcpu=native did not detect a known CPU.  */
-#define DEFAULT_ARCH "8A"
-#define DEFAULT_CPU "generic-armv8-a"
 
 #define AARCH64_CORE(CORE_NAME, CORE_IDENT, SCHED, ARCH, FLAGS, COSTS, IMP, PART, VARIANT) \
   { CORE_NAME, #ARCH, IMP, PART, unsigned(VARIANT), feature_deps::cpu_##CORE_IDENT },
