@@ -646,7 +646,7 @@ aarch64_get_extension_string_for_isa_flags
      issue, so we don't need this fix when targeting Armv8-R.  */
   aarch64_feature_flags explicit_flags =
 #ifndef DISABLE_AARCH64_AS_CRC_BUGFIX
-     (!(current_flags & AARCH64_ISA_V8R) ? AARCH64_FL_CRC : 0);
+     (!(current_flags & AARCH64_FL_V8R) ? AARCH64_FL_CRC : 0);
 #else
      0;
 #endif
