@@ -1,5 +1,6 @@
 /* { dg-options "-fprofile-arcs -ftest-coverage" } */
 /* { dg-do run { target native } } */
+/* { dg-additional-options "-fno-allow-const-var-array-size" { target *-*-darwin* } } */
 
 int main (void)
 {
