@@ -26111,7 +26111,7 @@ cp_parser_init_declarator (cp_parser* parser,
   cp_declarator *declarator;
   tree prefix_attributes;
   tree attributes = NULL;
-  tree asm_specification;
+  tree asm_specification = NULL_TREE;
   tree initializer;
   tree decl = NULL_TREE;
   tree scope;
@@ -26193,8 +26193,6 @@ cp_parser_init_declarator (cp_parser* parser,
       asm_spec_start_token = cp_lexer_peek_token (parser->lexer);
       asm_specification = cp_parser_asm_specification_opt (parser);
     }
-  else
-    asm_specification = NULL_TREE;
 
   /* Gather the attributes that were provided with the
      decl-specifiers.  */
@@ -26203,6 +26201,14 @@ cp_parser_init_declarator (cp_parser* parser,
   /* Look for attributes.  */
   attributes_start_token = cp_lexer_peek_token (parser->lexer);
   attributes = cp_parser_attributes_opt (parser);
+
+  if (cp_parser_allow_gnu_extensions_p (parser)
+      && !asm_specification)
+    {
+      /* Look for an asm-specification.  */
+      asm_spec_start_token = cp_lexer_peek_token (parser->lexer);
+      asm_specification = cp_parser_asm_specification_opt (parser);
+    }
 
   /* Peek at the next token.  */
   token = cp_lexer_peek_token (parser->lexer);
