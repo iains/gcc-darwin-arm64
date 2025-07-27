@@ -196,8 +196,10 @@ along with GCC; see the file COPYING3.  If not see
 #undef TARGET_ASM_OUTPUT_IDENT
 #define TARGET_ASM_OUTPUT_IDENT default_asm_output_ident_directive
 
-/* Darwin has experimental support for section anchors on aarch64*; it is
-   not enabled by default (the -fsection-anchors is required), see below.  */
+/* Darwin support for section anchors is disabled at present.
+   TODO: We need to ensure that the anchored content does not contain any
+   linker-visible symbols, since ld is allowed to split the content at
+   such symbols.  Once that is done we can re-enable experimental support.  */
 
 #undef TARGET_ASM_OUTPUT_ANCHOR
 #define TARGET_ASM_OUTPUT_ANCHOR darwin_asm_output_anchor
@@ -206,7 +208,7 @@ along with GCC; see the file COPYING3.  If not see
 #define TARGET_USE_ANCHORS_FOR_SYMBOL_P darwin_use_anchors_for_symbol_p
 
 #undef DARWIN_SECTION_ANCHORS
-#define DARWIN_SECTION_ANCHORS 1
+#define DARWIN_SECTION_ANCHORS 0
 
 /* Executable stack is prohibited by the system security policy.  */
 #undef HAVE_ENABLE_EXECUTE_STACK
