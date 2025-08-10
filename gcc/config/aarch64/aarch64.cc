@@ -35240,8 +35240,16 @@ aarch64_libgcc_floating_mode_supported_p
 
 /* Section anchor support.  */
 
+#if !TARGET_MACHO
 #undef TARGET_MIN_ANCHOR_OFFSET
 #define TARGET_MIN_ANCHOR_OFFSET -256
+#else
+/* The static linker is allowed to split objects at visible symbol boundaries,
+   so we must ensure that anchors are at the beginning of a block.  */
+#undef TARGET_MIN_ANCHOR_OFFSET
+#define TARGET_MIN_ANCHOR_OFFSET 0
+#endif
+
 
 /* Limit the maximum anchor offset to 4k-1, since that's the limit for a
    byte offset; we can do much more for larger data types, but have no way
