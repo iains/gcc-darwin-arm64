@@ -52,3 +52,6 @@ enum Have_Qsort_R = @DCFG_HAVE_QSORT_R@;
 
 // Whether libphobos been configured with --enable-cet.
 enum GNU_Enable_CET = @DCFG_ENABLE_CET@;
+
+// Do we have __fork function
+enum Have___fork = @DCFG_HAVE___FORK@;
