@@ -50,6 +50,7 @@ import core.thread;
 static import core.memory;
 
 version (GNU) import gcc.builtins;
+version (GNU) import gcc.config : Have___fork;
 
 debug (PRINTF_TO_FILE) import core.stdc.stdio : sprintf, fprintf, fopen, fflush, FILE;
 else                   import core.stdc.stdio : sprintf, printf; // needed to output profiling results
@@ -100,7 +101,8 @@ private
 
         version (COLLECT_FORK)
             version (OSX)
-                pid_t __fork() nothrow;
+                static if (Have___fork)
+                  pid_t __fork() nothrow;
     }
 
     enum
@@ -3196,7 +3198,10 @@ struct Gcx
         }
         version (OSX)
         {
-            auto pid = __fork(); // avoids calling handlers (from libc source code)
+            static if (Have___fork)
+                auto pid = __fork(); // avoids calling handlers (from libc source code)
+            else
+                auto pid = fork();
         }
         else version (linux)
         {
