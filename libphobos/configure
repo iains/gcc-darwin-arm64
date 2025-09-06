@@ -654,6 +654,7 @@ LIBATOMIC
 DCFG_HAVE_LIBATOMIC
 DCFG_HAVE_64BIT_ATOMICS
 DCFG_HAVE_ATOMIC_BUILTINS
+DCFG_HAVE___FORK
 DCFG_HAVE_QSORT_R
 OS_DFLAGS
 OS_LINK_SPEC
@@ -11864,7 +11865,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11867 "configure"
+#line 11868 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11970,7 +11971,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11973 "configure"
+#line 11974 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -14776,6 +14777,13 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
   ac_fn_c_check_func "$LINENO" "qsort_r" "ac_cv_func_qsort_r"
 if test "x$ac_cv_func_qsort_r" = xyes; then :
   DCFG_HAVE_QSORT_R=true
+fi
+
+
+  DCFG_HAVE___FORK=false
+  ac_fn_c_check_func "$LINENO" "__fork" "ac_cv_func___fork"
+if test "x$ac_cv_func___fork" = xyes; then :
+  DCFG_HAVE___FORK=true
 fi
 
 
