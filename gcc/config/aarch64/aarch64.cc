@@ -8003,7 +8003,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
       if (TARGET_MACHO
 	  && !arg.named)
 	{
-	  pcum->aapcs_nextncrn = NUM_ARG_REGS;
+	  pcum->aapcs_nextncrn = num_pcs_arg_regs (pcum->pcs_variant);
 	  goto on_stack;
 	}
 
@@ -8444,7 +8444,7 @@ aarch64_function_arg_boundary (machine_mode mode, const_tree type)
 #if TARGET_MACHO
   /* This can only work for unnamed args.  */
   machine_mode comp_mode = VOIDmode;
-  int nregs;
+  int nregs = 0;
   bool is_ha;
   aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
 					   &is_ha, /*silent*/true);
@@ -8484,7 +8484,7 @@ gcc_checking_assert (pcum->aapcs_arg_processed);
   bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
 gcc_checking_assert (named_p == pcum->named_p);
   machine_mode comp_mode = VOIDmode;
-  int nregs;
+  int nregs = 0;
   bool is_ha;
   aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
 					   &is_ha, /*silent*/true);
@@ -8493,13 +8493,18 @@ gcc_checking_assert (named_p == pcum->named_p);
 	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode))
       || TREE_CODE (type) == UNION_TYPE);
 
-  bool in_regs = (pcum->aapcs_reg != NULL_RTX);
+  bool in_reg = pcum->aapcs_reg != NULL_RTX;
+//		 || pcum->aapcs_nextncrn < num_pcs_arg_regs (pcum->pcs_variant);
 
-  if ((named_p && !no_pack) || in_regs)
+  /* See aarch64_layout_arg for comment about mode sizes.  */
+  int size = (type) ? int_size_in_bytes (type)
+		    : GET_MODE_SIZE (mode).to_constant ();
+
+  if ((named_p && (!no_pack || size == 0)) || in_reg)
     ; /* Leave the alignment as natural.  */
   else
     alignment = MAX (alignment, PARM_BOUNDARY);
-gcc_checking_assert (alignment == pcum->darwinpcs_arg_boundary);
+  gcc_checking_assert (alignment == pcum->darwinpcs_arg_boundary);
   return MIN (alignment, STACK_BOUNDARY);
 
 #else
@@ -24004,6 +24009,7 @@ aarch64_vfp_is_call_or_return_candidate (machine_mode mode,
       unsigned int warn_psabi_flags = 0;
       int ag_count = aapcs_vfp_sub_candidate (type, &new_mode,
 					      &warn_psabi_flags);
+      *count = ag_count;
       if (ag_count > 0 && ag_count <= HA_MAX_NUM_FLDS)
 	{
 	  static unsigned last_reported_type_uid;
@@ -24039,9 +24045,7 @@ aarch64_vfp_is_call_or_return_candidate (machine_mode mode,
 			"type %qT changed %{in GCC 12.1%}",
 			TYPE_MAIN_VARIANT (type), url12);
 	    }
-
 	  if (is_ha != NULL) *is_ha = true;
-	  *count = ag_count;
 	}
       else
 	return false;
@@ -33882,7 +33886,7 @@ aarch64_darwin_promote_function_mode_ca (cumulative_args_t ca,
 		       && !pcum->aapcs_arg_processed);
   /* We have a named integer value that fits in a reg; if there's one available
      then promote the value.  */
-  if (pcum->aapcs_ncrn < 8)
+  if (pcum->aapcs_ncrn < num_pcs_arg_regs (pcum->pcs_variant))
     return new_mode;
   return mode;
 }
