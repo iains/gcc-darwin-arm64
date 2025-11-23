@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-fcallgraph-info" } */
+/* { dg-require-alias "" } */
 
 void f() {}
 void g() __attribute__ ((__alias__ ("f")));
