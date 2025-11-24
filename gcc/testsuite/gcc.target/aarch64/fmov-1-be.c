@@ -1,7 +1,7 @@
-/* { dg-skip-if "no big-endian support" *-*-darwin* } */
 /* { dg-do compile } */
 /* { dg-options "-O2 -mbig-endian" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
+/* { dg-skip-if "no big-endian support" *-*-darwin* } */
 
 #pragma GCC target ("arch=armv8-a")
 
