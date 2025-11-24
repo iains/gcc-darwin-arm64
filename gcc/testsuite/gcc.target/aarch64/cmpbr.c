@@ -1,7 +1,8 @@
 // Test that the instructions added by FEAT_CMPBR are emitted
 // { dg-do compile }
+/* { dg-require-effective-target aarch64_asm_cmpbr_ok } */
 // { dg-options "-march=armv9.5-a+cmpbr -O2" }
-// { dg-final { check-function-bodies "**" "*/" "" { target *-*-* } {\.L[0-9]+} } }
+// { dg-final { check-function-bodies "**" "*/" "" { target *-*-* } {\.?L[0-9]+} } }
 
 #include <stdint.h>
 
@@ -120,1644 +121,1644 @@ FAR_BRANCH(u64, 42);
 
 /*
 ** u8_x0_eq_x1:
-**	cbbeq	(?:w1, w0|w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbeq	(?:w1, w0|w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ne_x1:
-**	cbbne	(?:w1, w0|w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbne	(?:w1, w0|w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ult_x1:
-**	(?:cbbhi	w1, w0|cbblo	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbbhi	w1, w0|cbblo	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ule_x1:
-**	(?:cbbhs	w1, w0|cbbls	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbbhs	w1, w0|cbbls	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ugt_x1:
-**	(?:cbblo	w1, w0|cbbhi	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbblo	w1, w0|cbbhi	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_uge_x1:
-**	(?:cbbls	w1, w0|cbbhs	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbbls	w1, w0|cbbhs	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_slt_x1:
-**	(?:cbbgt	w1, w0|cbblt	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbbgt	w1, w0|cbblt	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sle_x1:
-**	(?:cbbge	w1, w0|cbble	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbbge	w1, w0|cbble	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sgt_x1:
-**	(?:cbblt	w1, w0|cbbgt	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbblt	w1, w0|cbbgt	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sge_x1:
-**	(?:cbble	w1, w0|cbbge	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbble	w1, w0|cbbge	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_eq_x1:
-**	cbheq	(?:w1, w0|w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbheq	(?:w1, w0|w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ne_x1:
-**	cbhne	(?:w1, w0|w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhne	(?:w1, w0|w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ult_x1:
-**	(?:cbhhi	w1, w0|cbhlo	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhhi	w1, w0|cbhlo	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ule_x1:
-**	(?:cbhhs	w1, w0|cbhls	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhhs	w1, w0|cbhls	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ugt_x1:
-**	(?:cbhlo	w1, w0|cbhhi	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhlo	w1, w0|cbhhi	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_uge_x1:
-**	(?:cbhls	w1, w0|cbhhs	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhls	w1, w0|cbhhs	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_slt_x1:
-**	(?:cbhgt	w1, w0|cbhlt	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhgt	w1, w0|cbhlt	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sle_x1:
-**	(?:cbhge	w1, w0|cbhle	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhge	w1, w0|cbhle	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sgt_x1:
-**	(?:cbhlt	w1, w0|cbhgt	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhlt	w1, w0|cbhgt	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sge_x1:
-**	(?:cbhle	w1, w0|cbhge	w0, w1), .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	(?:cbhle	w1, w0|cbhge	w0, w1), .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_eq_x1:
-**	cbeq	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbeq	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ne_x1:
-**	cbne	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbne	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ult_x1:
-**	cblo	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cblo	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ule_x1:
-**	cbls	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbls	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ugt_x1:
-**	cbhi	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhi	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_uge_x1:
-**	cbhs	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhs	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_slt_x1:
-**	cblt	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cblt	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sle_x1:
-**	cble	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sgt_x1:
-**	cbgt	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sge_x1:
-**	cbge	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbge	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_eq_x1:
-**	cbeq	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbeq	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ne_x1:
-**	cbne	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbne	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ult_x1:
-**	cblo	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cblo	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ule_x1:
-**	cbls	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbls	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ugt_x1:
-**	cbhi	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhi	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_uge_x1:
-**	cbhs	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhs	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_slt_x1:
-**	cblt	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cblt	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sle_x1:
-**	cble	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sgt_x1:
-**	cbgt	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sge_x1:
-**	cbge	x0, x1, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbge	x0, x1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_eq_42:
-**	cbeq	w0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbeq	w0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ne_42:
-**	cbne	w0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbne	w0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ult_42:
-**	cbls	w0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbls	w0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ule_42:
-**	cbls	w0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbls	w0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ugt_42:
-**	cbhi	w0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhi	w0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_uge_42:
-**	cbhi	w0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhi	w0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_slt_42:
-**	cble	w0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	w0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sle_42:
-**	cble	w0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	w0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sgt_42:
-**	cbgt	w0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	w0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sge_42:
-**	cbgt	w0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	w0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_eq_42:
-**	cbeq	x0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbeq	x0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ne_42:
-**	cbne	x0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbne	x0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ult_42:
-**	cbls	x0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbls	x0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ule_42:
-**	cbls	x0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbls	x0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ugt_42:
-**	cbhi	x0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhi	x0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_uge_42:
-**	cbhi	x0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhi	x0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_slt_42:
-**	cble	x0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	x0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sle_42:
-**	cble	x0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	x0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sgt_42:
-**	cbgt	x0, 42, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	x0, 42, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sge_42:
-**	cbgt	x0, 41, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	x0, 41, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_eq_0:
-**	cbbeq	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbeq	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ne_0:
-**	cbbne	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbne	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ult_0:
-**	b	not_taken
+**	b	_?not_taken
 */
 
 /*
 ** u8_x0_ule_0:
-**	cbbeq	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbeq	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ugt_0:
-**	cbbne	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbne	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_uge_0:
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** i8_x0_slt_0:
-**	tbnz	w0, #7, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbnz	w0, #7, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sle_0:
-**	cbble	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbble	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sgt_0:
-**	cbbgt	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbbgt	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sge_0:
-**	tbz	w0, #7, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbz	w0, #7, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_eq_0:
-**	cbheq	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbheq	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ne_0:
-**	cbhne	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhne	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ult_0:
-**	b	not_taken
+**	b	_?not_taken
 */
 
 /*
 ** u16_x0_ule_0:
-**	cbheq	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbheq	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ugt_0:
-**	cbhne	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhne	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_uge_0:
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** i16_x0_slt_0:
-**	tbnz	w0, #15, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbnz	w0, #15, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sle_0:
-**	cbhle	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhle	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sgt_0:
-**	cbhgt	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbhgt	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sge_0:
-**	tbz	w0, #15, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbz	w0, #15, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_eq_0:
-**	cbz	w0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbz	w0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ne_0:
-**	cbnz	w0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbnz	w0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ult_0:
-**	b	not_taken
+**	b	_?not_taken
 */
 
 /*
 ** u32_x0_ule_0:
-**	cbz	w0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbz	w0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ugt_0:
-**	cbnz	w0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbnz	w0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_uge_0:
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** i32_x0_slt_0:
-**	tbnz	w0, #31, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbnz	w0, #31, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sle_0:
-**	cble	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sgt_0:
-**	cbgt	w0, wzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	w0, wzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sge_0:
-**	tbz	w0, #31, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbz	w0, #31, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_eq_0:
-**	cbz	x0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbz	x0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ne_0:
-**	cbnz	x0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbnz	x0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ult_0:
-**	b	not_taken
+**	b	_?not_taken
 */
 
 /*
 ** u64_x0_ule_0:
-**	cbz	x0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbz	x0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ugt_0:
-**	cbnz	x0, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbnz	x0, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_uge_0:
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** i64_x0_slt_0:
-**	tbnz	x0, #63, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbnz	x0, #63, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sle_0:
-**	cble	x0, xzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cble	x0, xzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sgt_0:
-**	cbgt	x0, xzr, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	cbgt	x0, xzr, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sge_0:
-**	tbz	x0, #63, .L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	tbz	x0, #63, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_eq_42:
 **	mov	w([0-9]+), 42
-**	cbbeq	w0, w\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbeq	w0, w\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ne_42:
 **	mov	(w[0-9]+), 42
-**	cbbne	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbne	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ult_42:
 **	mov	(w[0-9]+), 41
-**	cbbls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ule_42:
 **	mov	(w[0-9]+), 42
-**	cbbls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ugt_42:
 **	mov	(w[0-9]+), 42
-**	cbbhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_uge_42:
 **	mov	(w[0-9]+), 41
-**	cbbhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_slt_42:
 **	mov	(w[0-9]+), 41
-**	cbble	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbble	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sle_42:
 **	mov	(w[0-9]+), 42
-**	cbble	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbble	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sgt_42:
 **	mov	(w[0-9]+), 42
-**	cbbgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sge_42:
 **	mov	(w[0-9]+), 41
-**	cbbgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_eq_42:
 **	mov	w([0-9]+), 42
-**	cbheq	w0, w\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbheq	w0, w\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ne_42:
 **	mov	(w[0-9]+), 42
-**	cbhne	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhne	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ult_42:
 **	mov	(w[0-9]+), 41
-**	cbhls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ule_42:
 **	mov	(w[0-9]+), 42
-**	cbhls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ugt_42:
 **	mov	(w[0-9]+), 42
-**	cbhhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_uge_42:
 **	mov	(w[0-9]+), 41
-**	cbhhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_slt_42:
 **	mov	(w[0-9]+), 41
-**	cbhle	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhle	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sle_42:
 **	mov	(w[0-9]+), 42
-**	cbhle	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhle	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sgt_42:
 **	mov	(w[0-9]+), 42
-**	cbhgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sge_42:
 **	mov	(w[0-9]+), 41
-**	cbhgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_eq_64:
 **	mov	w([0-9]+), 64
-**	cbbeq	w0, w\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbeq	w0, w\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ne_64:
 **	mov	(w[0-9]+), 64
-**	cbbne	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbne	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ult_64:
 **	mov	(w[0-9]+), 63
-**	cbbls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ule_64:
 **	mov	(w[0-9]+), 64
-**	cbbls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_ugt_64:
 **	mov	(w[0-9]+), 64
-**	cbbhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u8_x0_uge_64:
 **	mov	(w[0-9]+), 63
-**	cbbhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_slt_64:
 **	mov	(w[0-9]+), 63
-**	cbble	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbble	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sle_64:
 **	mov	(w[0-9]+), 64
-**	cbble	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbble	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sgt_64:
 **	mov	(w[0-9]+), 64
-**	cbbgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i8_x0_sge_64:
 **	mov	(w[0-9]+), 63
-**	cbbgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbbgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_eq_64:
 **	mov	w([0-9]+), 64
-**	cbheq	w0, w\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbheq	w0, w\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ne_64:
 **	mov	(w[0-9]+), 64
-**	cbhne	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhne	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ult_64:
 **	mov	(w[0-9]+), 63
-**	cbhls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ule_64:
 **	mov	(w[0-9]+), 64
-**	cbhls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ugt_64:
 **	mov	(w[0-9]+), 64
-**	cbhhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_uge_64:
 **	mov	(w[0-9]+), 63
-**	cbhhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_slt_64:
 **	mov	(w[0-9]+), 63
-**	cbhle	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhle	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sle_64:
 **	mov	(w[0-9]+), 64
-**	cbhle	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhle	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sgt_64:
 **	mov	(w[0-9]+), 64
-**	cbhgt	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhgt	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sge_64:
 **	mov	(w[0-9]+), 63
-**	cbhgt	w0, w1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhgt	w0, w1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_eq_64:
 **	cmp	w0, 64
-**	beq	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	beq	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ne_64:
 **	cmp	w0, 64
-**	bne	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bne	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ult_64: { xfail *-*-* }
-**	cbhi	w0, 63, .L([0-9]+)
-**	b	taken
-** .L\1:
-**	b	not_taken
+**	cbhi	w0, 63, .?L([0-9]+)
+**	b	_?taken
+** .?L\1:
+**	b	_?not_taken
 */
 
 /*
 ** u32_x0_ule_64:
 **	cmp	w0, 64
-**	bls	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bls	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ugt_64:
 **	cmp	w0, 64
-**	bhi	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bhi	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_uge_64:
 **	cmp	w0, 63
-**	bhi	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bhi	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_slt_64: { xfail *-*-* }
-**	cbgt	w0, 63, .L([0-9]+)
-**	b	taken
-** .L\1:
-**	b	not_taken
+**	cbgt	w0, 63, .?L([0-9]+)
+**	b	_?taken
+** .?L\1:
+**	b	_?not_taken
 */
 
 /*
 ** i32_x0_sle_64:
 **	cmp	w0, 64
-**	ble	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	ble	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sgt_64:
 **	cmp	w0, 64
-**	bgt	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bgt	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sge_64:
 **	cmp	w0, 63
-**	bgt	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bgt	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_eq_64:
 **	cmp	x0, 64
-**	beq	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	beq	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ne_64:
 **	cmp	x0, 64
-**	bne	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bne	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ult_64: { xfail *-*-* }
-**	cbhi	x0, 63, .L([0-9]+)
-**	b	taken
-** .L\1:
-**	b	not_taken
+**	cbhi	x0, 63, .?L([0-9]+)
+**	b	_?taken
+** .?L\1:
+**	b	_?not_taken
 */
 
 /*
 ** u64_x0_ule_64:
 **	cmp	x0, 64
-**	bls	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bls	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ugt_64:
 **	cmp	x0, 64
-**	bhi	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bhi	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_uge_64:
 **	cmp	x0, 63
-**	bhi	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bhi	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_slt_64: { xfail *-*-* }
-**	cbgt	x0, 63, .L([0-9]+)
-**	b	taken
-** .L\1:
-**	b	not_taken
+**	cbgt	x0, 63, .?L([0-9]+)
+**	b	_?taken
+** .?L\1:
+**	b	_?not_taken
 */
 
 /*
 ** i64_x0_sle_64:
 **	cmp	x0, 64
-**	ble	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	ble	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sgt_64:
 **	cmp	x0, 64
-**	bgt	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bgt	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sge_64:
 **	cmp	x0, 63
-**	bgt	.L([0-9]+)
-**	b	not_taken
-** .L\1:
-**	b	taken
+**	bgt	.?L([0-9]+)
+**	b	_?not_taken
+** .?L\1:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_eq_4098:
 **	mov	w([0-9]+), 4098
-**	cbheq	w0, w\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbheq	w0, w\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ne_4098:
 **	mov	(w[0-9]+), 4098
-**	cbhne	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhne	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ult_4098:
 **	mov	(w[0-9]+), 4097
-**	cbhls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ule_4098:
 **	mov	(w[0-9]+), 4098
-**	cbhls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_ugt_4098:
 **	mov	(w[0-9]+), 4098
-**	cbhhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u16_x0_uge_4098:
 **	mov	(w[0-9]+), 4097
-**	cbhhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_slt_4098:
 **	mov	(w[0-9]+), 4097
-**	cbhle	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhle	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sle_4098:
 **	mov	(w[0-9]+), 4098
-**	cbhle	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhle	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sgt_4098:
 **	mov	(w[0-9]+), 4098
-**	cbhgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i16_x0_sge_4098:
 **	mov	(w[0-9]+), 4097
-**	cbhgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_eq_4098:
 **	mov	w([0-9]+), 4098
-**	cbeq	w0, w\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbeq	w0, w\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ne_4098:
 **	mov	(w[0-9]+), 4098
-**	cbne	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbne	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ult_4098:
 **	mov	(w[0-9]+), 4097
-**	cbls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ule_4098:
 **	mov	(w[0-9]+), 4098
-**	cbls	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbls	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_ugt_4098:
 **	mov	(w[0-9]+), 4098
-**	cbhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u32_x0_uge_4098:
 **	mov	(w[0-9]+), 4097
-**	cbhi	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhi	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_slt_4098:
 **	mov	(w[0-9]+), 4097
-**	cble	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cble	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sle_4098:
 **	mov	(w[0-9]+), 4098
-**	cble	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cble	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sgt_4098:
 **	mov	(w[0-9]+), 4098
-**	cbgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i32_x0_sge_4098:
 **	mov	(w[0-9]+), 4097
-**	cbgt	w0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbgt	w0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_eq_4098:
 **	mov	x([0-9]+), 4098
-**	cbeq	x0, x\1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbeq	x0, x\1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ne_4098:
 **	mov	(x[0-9]+), 4098
-**	cbne	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbne	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ult_4098:
 **	mov	(x[0-9]+), 4097
-**	cbls	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbls	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ule_4098:
 **	mov	(x[0-9]+), 4098
-**	cbls	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbls	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_ugt_4098:
 **	mov	(x[0-9]+), 4098
-**	cbhi	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhi	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** u64_x0_uge_4098:
 **	mov	(x[0-9]+), 4097
-**	cbhi	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbhi	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_slt_4098:
 **	mov	(x[0-9]+), 4097
-**	cble	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cble	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sle_4098:
 **	mov	(x[0-9]+), 4098
-**	cble	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cble	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sgt_4098:
 **	mov	(x[0-9]+), 4098
-**	cbgt	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbgt	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** i64_x0_sge_4098:
 **	mov	(x[0-9]+), 4097
-**	cbgt	x0, \1, .L([0-9]+)
-**	b	not_taken
-** .L\2:
-**	b	taken
+**	cbgt	x0, \1, .?L([0-9]+)
+**	b	_?not_taken
+** .?L\2:
+**	b	_?taken
 */
 
 /*
 ** far_branch_u8_x0_eq_x1:
 **	sub	sp, sp, #16
 **	str	wzr, \[sp, 12\]
-**	cbbeq	w0|w1, w1|w0, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\1:
+**	cbbeq	w0|w1, w1|w0, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\1:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\2:
+** .?L\2:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** far_branch_u16_x0_eq_x1:
 **	sub	sp, sp, #16
 **	str	wzr, \[sp, 12\]
-**	cbheq	w0|w1, w1|w0, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\1:
+**	cbheq	w0|w1, w1|w0, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\1:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\2:
+** .?L\2:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** far_branch_u32_x0_eq_x1:
 **	sub	sp, sp, #16
 **	str	wzr, \[sp, 12\]
-**	cbeq	w0, w1, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\1:
+**	cbeq	w0, w1, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\1:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\2:
+** .?L\2:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** far_branch_u64_x0_eq_x1:
 **	sub	sp, sp, #16
 **	str	wzr, \[sp, 12\]
-**	cbeq	x0, x1, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\1:
+**	cbeq	x0, x1, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\1:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\2:
+** .?L\2:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
@@ -1765,15 +1766,15 @@ FAR_BRANCH(u64, 42);
 **	sub	sp, sp, #16
 **	mov	w([0-9]+), 42
 **	str	wzr, \[sp, 12\]
-**	cbbeq	w0, w\1, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\2:
+**	cbbeq	w0, w\1, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\2:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\3:
+** .?L\3:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
@@ -1781,43 +1782,43 @@ FAR_BRANCH(u64, 42);
 **	sub	sp, sp, #16
 **	mov	w([0-9]+), 42
 **	str	wzr, \[sp, 12\]
-**	cbheq	w0, w\1, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\2:
+**	cbheq	w0, w\1, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\2:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\3:
+** .?L\3:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** far_branch_u32_x0_eq_42:
 **	sub	sp, sp, #16
 **	str	wzr, \[sp, 12\]
-**	cbeq	w0, 42, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\1:
+**	cbeq	w0, 42, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\1:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\2:
+** .?L\2:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
 
 /*
 ** far_branch_u64_x0_eq_42:
 **	sub	sp, sp, #16
 **	str	wzr, \[sp, 12\]
-**	cbeq	x0, 42, .L([0-9]+)
-**	b	.L([0-9]+)
-** .L\1:
+**	cbeq	x0, 42, .?L([0-9]+)
+**	b	.?L([0-9]+)
+** .?L\1:
 **	str	wzr, \[sp, 12\]
 **	...
 **	str	wzr, \[sp, 12\]
-** .L\2:
+** .?L\2:
 **	add	sp, sp, 16
-**	b	taken
+**	b	_?taken
 */
