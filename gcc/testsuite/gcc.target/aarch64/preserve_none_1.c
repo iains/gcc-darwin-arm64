@@ -35,7 +35,7 @@ void preserve_none_caller1() [[gnu::preserve_none]]
 ** preserve_none_caller2:
 **	stp	x29, x30, \[sp, #?-16\]!
 **	mov	x29, sp
-**	bl	normal_callee
+**	bl	_?normal_callee
 **	mov	w0, w20
 **	ldp	x29, x30, \[sp\], #?16
 **	ret
@@ -50,9 +50,9 @@ int preserve_none_caller2(int x) [[gnu::preserve_none]]
 ** preserve_none_caller3:
 **	stp	x29, x30, \[sp, #?-32\]!
 **	mov	x29, sp
-**	str	w20, \[sp, #?[0-9]+\]
-**	bl	preserve_none_callee
-**	ldr	w0, \[sp, #?[0-9]+\]
+**	str	w20, \[(sp|x29), #?[0-9]+\]
+**	bl	_?preserve_none_callee
+**	ldr	w0, \[(sp|x29), #?[0-9]+\]
 **	ldp	x29, x30, \[sp\], #?32
 **	ret
 */
@@ -64,7 +64,7 @@ int preserve_none_caller3(int x) [[gnu::preserve_none]]
 
 /*
 ** preserve_none_caller4:
-**	b	preserve_none_callee
+**	b	_?preserve_none_callee
 */
 void preserve_none_caller4() [[gnu::preserve_none]]
 {
@@ -73,7 +73,7 @@ void preserve_none_caller4() [[gnu::preserve_none]]
 
 /*
 ** preserve_none_caller5:
-**	b	preserve_none_callee
+**	b	_?preserve_none_callee
 */
 void preserve_none_caller5(__SVBool_t x) [[gnu::preserve_none]]
 {
@@ -93,7 +93,7 @@ void preserve_none_caller5(__SVBool_t x) [[gnu::preserve_none]]
 **	stp	d10, d11, \[sp, #?112\]
 **	stp	d12, d13, \[sp, #?128\]
 **	stp	d14, d15, \[sp, #?144\]
-**	bl	preserve_none_callee
+**	bl	_?preserve_none_callee
 **	ldp	d8, d9, \[sp, #?96\]
 **	ldp	d10, d11, \[sp, #?112\]
 **	ldp	d12, d13, \[sp, #?128\]
