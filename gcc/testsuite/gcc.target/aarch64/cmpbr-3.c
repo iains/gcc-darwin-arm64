@@ -1,4 +1,5 @@
 /* { dg-do assemble } */
+/* { dg-require-effective-target aarch64_asm_cmpbr_ok } */
 /* { dg-options "-O2" } */
 
 #pragma GCC target "+cmpbr"
