@@ -11,7 +11,7 @@ foo (int a)
 /*
 **func1:
 **	...
-**	bl	foo
+**	bl	_?foo
 **	...
 **	ret
 */
@@ -24,7 +24,7 @@ func1 (int a, int b)
 /*
 **func2:
 **	...
-**	b	foo
+**	b	_?foo
 */
 int __attribute((indirect_return,weak))
 func2 (int a, int b)
@@ -35,7 +35,7 @@ func2 (int a, int b)
 /*
 **func3:
 **	...
-**	bl	func2
+**	bl	_?func2
 **	...
 **	ret
 */
