@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-additional-options "--save-temps -O1" } */
+/* { dg-additional-options "--save-temps -O1 -std=c99" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 typedef __INT64_TYPE__ __attribute__ ((vector_size (16))) v2di;
