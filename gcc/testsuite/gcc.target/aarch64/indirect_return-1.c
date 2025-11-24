@@ -12,7 +12,7 @@ foo (int a)
 **func1:
 **	hint	34 // bti c
 **	...
-**	bl	foo
+**	bl	_?foo
 **	hint	36 // bti j
 **	...
 **	ret
@@ -27,7 +27,7 @@ func1 (int a, int b)
 **func2:
 **	hint	34 // bti c
 **	...
-**	b	foo
+**	b	_?foo
 */
 int __attribute((indirect_return,weak))
 func2 (int a, int b)
@@ -39,7 +39,7 @@ func2 (int a, int b)
 **func3:
 **	hint	34 // bti c
 **	...
-**	bl	func2
+**	bl	_?func2
 **	hint	36 // bti j
 **	...
 **	ret
