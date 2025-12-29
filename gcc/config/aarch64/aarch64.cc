@@ -3516,8 +3516,9 @@ aarch64_load_symref_appropriately (rtx dest, rtx imm,
 	  {
 	    rtx sym, off;
 	    split_const (imm, &sym, &off);
-	    /* Negative offsets don't work, whether by intention is TBD.  */
-	    if (INTVAL (off) < 0 || INTVAL (off) > 8 * 1024 * 1024)
+	    /* Negative offsets are not used, and we need to fit the result
+	       into 21 bits.  */
+	    if (INTVAL (off) < 0 || INTVAL (off) >= 4 * 1024 * 1024)
 	      {
 		emit_move_insn (tmp_reg, gen_rtx_HIGH (mode, sym));
 		emit_insn (gen_add_losym (dest, tmp_reg, sym));
@@ -30278,6 +30279,8 @@ aarch64_expand_subvti (rtx op0, rtx low_dest, rtx low_in1,
 static unsigned HOST_WIDE_INT
 aarch64_asan_shadow_offset (void)
 {
+  if (TARGET_MACHO)
+    return 0; /* macOS uses a dynamic allocation.  */
   if (TARGET_ILP32)
     return (HOST_WIDE_INT_1 << 29);
   else
@@ -35255,6 +35258,11 @@ aarch64_libgcc_floating_mode_supported_p
 
 #undef TARGET_ASAN_SHADOW_OFFSET
 #define TARGET_ASAN_SHADOW_OFFSET aarch64_asan_shadow_offset
+
+#if TARGET_MACHO
+#undef TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P
+#define TARGET_ASAN_DYNAMIC_SHADOW_OFFSET_P hook_bool_void_true
+#endif
 
 #undef TARGET_LEGITIMIZE_ADDRESS
 #define TARGET_LEGITIMIZE_ADDRESS aarch64_legitimize_address
