@@ -24441,7 +24441,7 @@ aarch64_mangle_type (const_tree type)
   /* The darwinpcs ABI documents say that "__va_list" has to be
      mangled as char *.  */
   if (TARGET_MACHO
-      && lang_hooks.types_compatible_p (CONST_CAST_TREE (type), va_list_type))
+      && lang_hooks.types_compatible_p (const_cast<tree> (type), va_list_type))
     return "Pc";
 
   /* The AArch64 ABI documents say that "__va_list" has to be
