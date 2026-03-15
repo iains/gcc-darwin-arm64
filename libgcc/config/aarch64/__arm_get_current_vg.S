@@ -31,14 +31,19 @@
    - Returns the value of the current VG in x0 if this value exists, and
      returns zero otherwise.  */
 
-HIDDEN (__aarch64_cpu_features)
+HIDDEN (ASMNAME (__aarch64_cpu_features))
 
-variant_pcs (__arm_get_current_vg)
+variant_pcs (ASMNAME (__arm_get_current_vg))
 
-ENTRY (__arm_get_current_vg)
+ENTRY (ASMNAME (__arm_get_current_vg))
 	/* Check if SVE is available.  */
+#ifdef __APPLE__
+	adrp	x16, ASMNAME (__aarch64_cpu_features)@PAGE
+	ldr	x16, [x1, ASMNAME (__aarch64_cpu_features)@PAGEOFF]
+#else
 	adrp	x16, __aarch64_cpu_features
 	ldr	x16, [x16, :lo12:__aarch64_cpu_features]
+#endif
 	tbnz	x16, #30, L(end_cntd)
 
 	/* Check if SME is available.  */
@@ -53,4 +58,4 @@ L(end_cntd):
 L(end_zero):
 	mov	x0, 0
 	ret
-END (__arm_get_current_vg)
+ENDm ASMNAME(__arm_get_current_vg)
