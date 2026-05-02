@@ -22586,7 +22586,7 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 
       /* With -fPIC non-local symbols use the GOT.  For orthogonality
 	 always use the GOT for extern weak symbols.  */
-      if (!TARGET_PECOFF
+      if (!TARGET_PECOFF && !TARGET_MACHO
 	  && (flag_pic || SYMBOL_REF_WEAK (x))
 	  && !aarch64_symbol_binds_local_p (x))
 	{
@@ -22627,9 +22627,6 @@ aarch64_classify_symbol (rtx x, HOST_WIDE_INT offset)
 		      || !aarch64_symbol_binds_local_p (x)))
 		return SYMBOL_MO_SMALL_GOT;
 	    }
-	  else if (SYMBOL_REF_WEAK (x) && !aarch64_symbol_binds_local_p (x))
-	    return aarch64_cmodel == AARCH64_CMODEL_SMALL_SPIC
-		    ? SYMBOL_SMALL_GOT_28K : SYMBOL_SMALL_GOT_4G;
 #endif
 	  /* Same reasoning as the tiny code model, but the offset cap here is
 	     1MB, allowing +/-3.9GB for the offset to the symbol.  */
