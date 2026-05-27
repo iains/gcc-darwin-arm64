@@ -1,6 +1,7 @@
 // Test that -fipa-icf combines i and j.
 // { dg-do run { target c++11 } }
 // { dg-options -fipa-icf }
+// { dg-xfail-run-if "PR111067" { *-*-darwin* } }
 
 [[no_unique_address]] extern const int i[] = { 1,2,3 };
 [[no_unique_address]] extern const int j[] = { 1,2,3 };
