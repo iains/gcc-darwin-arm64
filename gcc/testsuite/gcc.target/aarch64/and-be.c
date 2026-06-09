@@ -1,6 +1,7 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -mbig-endian" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
+/* { dg-skip-if "no big-endian support" *-*-darwin* } */
 
 typedef short v4hi __attribute__ ((vector_size (8)));
 typedef char v8qi __attribute__ ((vector_size (8)));
