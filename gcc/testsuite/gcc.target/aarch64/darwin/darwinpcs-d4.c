@@ -17,7 +17,7 @@ __attribute__((__noinline__))
 int
 foo (unsigned long long x,unsigned __int128 y)
 {
-  return x == y ? 1 : 0; 
+  return x == y ? 1 : 0;
 }
 
 /* we should use x0, x1 and x2.
@@ -33,23 +33,30 @@ __attribute__((__noinline__))
 int
 bar (unsigned __int128 y, unsigned long long x)
 {
-  return x == y ? 1 : 0; 
+  return x == y ? 1 : 0;
 }
 
 int fooo (unsigned long long x, unsigned __int128 y);
 int baro (unsigned __int128 y, unsigned long long x);
+int zooo (long long x, __int128 y);
 
-/* we should use x0, x1 and x2 in both calls.
+/* We pass 64b in both calls, but loading the w regs
+   is equivalent from zero-fill, if we pass negative values we must
+   use the full width.
 **main:
 **	...
-**	mov	x1, 25
-**	mov	x2, 0
-**	mov	x0, 10
+**	mov	w1, 25
+**	mov	w2, 0
+**	mov	w0, 10
 **	bl	_fooo
-**	mov	x2, 10
-**	mov	x0, 25
-**	mov	x1, 0
+**	mov	w2, 10
+**	mov	w0, 25
+**	mov	w1, 0
 **	bl	_baro
+**	mov	x1, -25
+**	mov	x2, -1
+**	mov	x0, -10
+**	bl	_zooo
 **	...
 */
 
@@ -59,4 +66,7 @@ int main ()
   unsigned __int128 y = 25;
   int r = fooo (x, y);
   r += baro (y, x);
+  x = -10;
+  y = -25;
+  r += zooo (x, y);
 }

@@ -13,9 +13,11 @@
 **foo:
 **	sub	sp, sp, #16
 **	...
-**	ldp	x[0-9]+, x[0-9]+, \[sp, 16\]
+**	ldr	x[0-9]+, \[sp, 16\]
 **	...
 **	ldp	x[0-9]+, x[0-9]+, \[sp, 32\]
+**	...
+**	ldr	x[0-9]+, \[sp, 24\]
 **	...
 */
 
@@ -29,16 +31,17 @@ foo (int n, ...)
   va_start(ap, n);
   a = va_arg(ap, __int128);
   b = va_arg(ap, __int128);
-  va_end(ap); 
+  va_end(ap);
   return a + b;
 }
 
 /*
 **call_foo:
 **	...
-**	mov	w0, 2
-**	stp	x[0-9]+, x[0-9]+, \[sp\]
 **	stp	x[0-9]+, x[0-9]+, \[sp, 16\]
+**	...
+**	stp	x[0-9]+, x[0-9]+, \[sp\]
+**	mov	w0, 2
 **	bl	_foo
 **	...
 */
@@ -51,14 +54,16 @@ call_foo (void)
 }
 
 
-/* sp = one int128, sp+16 = int sp + 32 = other int128 
+/* sp = one int128, sp+16 = int sp + 32 = other int128
 **bar:
 **	...
 **	sub	sp, sp, #16
 **	...
-**	ldp	x[0-9]+, x[0-9]+, \[sp, 16\]
+**	ldr	x[0-9]+, \[sp, 16\]
 **	...
 **	ldp	x[0-9]+, x[0-9]+, \[sp, 48\]
+**	...
+**	ldr	x[0-9]+, \[sp, 24\]
 **	...
 */
 
@@ -73,7 +78,7 @@ bar (int n, ...)
   a = va_arg(ap, __int128);
   n = va_arg(ap, int);
   b = va_arg(ap, __int128);
-  va_end(ap); 
+  va_end(ap);
   return a + b;
 }
 
@@ -84,12 +89,14 @@ baro (int n, ...);
 /*
 **call_bar:
 **	...
+**	stp	x[0-9]+, x[0-9]+, \[sp, 32\]
+**	...
 **	mov	w[0-9]+, 42
 **	...
-**	mov	w0, 2
-**	stp	x[0-9]+, x[0-9]+, \[sp\]
 **	str	w[0-9]+, \[sp, 16\]
-**	stp	x[0-9]+, x[0-9]+, \[sp, 32\]
+**	...
+**	stp	x[0-9]+, x[0-9]+, \[sp\]
+**	mov	w0, 2
 **	bl	_baro
 **	...
 */
