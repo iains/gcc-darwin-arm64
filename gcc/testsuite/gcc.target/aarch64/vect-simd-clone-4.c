@@ -11,5 +11,5 @@ void test_fn3 (float *a, float *b, double *c, int n)
     a[i] = fn3 (c[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxv_fn3\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxv_fn3\n} } } */
 
