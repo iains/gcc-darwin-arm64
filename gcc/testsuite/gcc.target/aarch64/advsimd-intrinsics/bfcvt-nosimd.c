@@ -1,7 +1,8 @@
 /* { dg-do assemble { target { aarch64*-*-* } } } */
+/* { dg-skip-if "assemble does not produce ltrans file" { *-*-darwin* } { "-flto" } } */
 /* { dg-skip-if "" { *-*-* } { "-fno-fat-lto-objects" } } */
 /* { dg-require-effective-target aarch64_asm_bf16_ok } */
-/* { dg-additional-options "-save-temps -march=armv8.2-a+bf16+nosimd" } */
+/* { dg-additional-options "-save-temps -march=armv8.2-a+nosimd+bf16" } */
 /* { dg-final { check-function-bodies "**" "" {-O[^0]} } } */
 
 #include <arm_neon.h>
