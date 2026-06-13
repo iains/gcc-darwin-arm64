@@ -1,6 +1,7 @@
 /* { dg-do compile { target { aarch64*-*-* } } } */
-/* { dg-final { check-function-bodies "**" "" {-O[^0]} } } */
+/* { dg-skip-if "assemble does not produce ltrans file" { *-*-darwin* } { "-flto" } } */
 /* { dg-skip-if "" { *-*-* } { "-fno-fat-lto-objects" } } */
+/* { dg-final { check-function-bodies "**" "" {-O[^0]} } } */
 
 #include <arm_neon.h>
 
