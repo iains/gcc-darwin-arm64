@@ -109,7 +109,7 @@ test4 ()
       return 2;
     }
 }
-// { dg-final { scan-assembler {_Z5test4v:(?:(?!msr\ttpidr2_el0, x[0-9]+).)*\tret} } }
+// { dg-final { scan-assembler {_?_Z5test4v:(?:(?!msr\ttpidr2_el0, x[0-9]+).)*\tret} } }
 
 /*
 ** _Z5test5v:
