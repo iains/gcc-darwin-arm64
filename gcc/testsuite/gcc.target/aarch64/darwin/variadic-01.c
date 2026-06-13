@@ -31,7 +31,7 @@ foo (int n, ...)
   va_start(ap, n);
   a = va_arg(ap, _Float128);
   b = va_arg(ap, _Float128);
-  va_end(ap); 
+  va_end(ap);
   return a + b;
 }
 
@@ -77,7 +77,7 @@ bar (int n, ...)
   if (n != 42)
     __builtin_abort ();
   b = va_arg(ap, _Float128);
-  va_end(ap); 
+  va_end(ap);
   return a + b;
 }
 
@@ -88,8 +88,9 @@ bar (int n, ...)
 **	...
 **	str	\1, \[sp, 16\]
 **	...
-**	mov	w0, 2
 **	str	q[0-9]+, \[sp, 32\]
+**	...
+**	mov	w0, 2
 **	str	q[0-9]+, \[sp\]
 **	bl	_bar
 **	...
