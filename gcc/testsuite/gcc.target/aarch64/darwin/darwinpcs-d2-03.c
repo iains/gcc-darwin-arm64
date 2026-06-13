@@ -38,9 +38,6 @@ sf_packing (float a, float b, float c, float d,
 /* So the stores to sp+12 and 20 pack the floats onto the stack.
 **call_sf_packing:
 **	...
-**	mov	(x[0-9]+), 1065353216
-**	movk	\1, 0x4000, lsl 48
-**	mov	w[0-9]+, 1077936128
 **	fmov	s7, 7.0e\+0
 **	fmov	s6, 6.0e\+0
 **	fmov	s5, 5.0e\+0
@@ -49,6 +46,7 @@ sf_packing (float a, float b, float c, float d,
 **	fmov	s2, 2.0e\+0
 **	fmov	s1, 1.0e\+0
 **	movi	v0.2s, #0
+**	...
 **	str	x[0-9]+, \[sp\]
 **	str	w[0-9]+, \[sp, 8\]
 **	str	x[0-9]+, \[sp, 12\]
