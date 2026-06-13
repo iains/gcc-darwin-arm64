@@ -54,7 +54,14 @@ set-torture-options $C_TORTURE_OPTIONS {{}} $LTO_TORTURE_OPTIONS
 
 # Make sure Neon flags are provided, if necessary.  Use fp16 if we can.
 # Use fp16 arithmetic operations if the hardware supports it.
-if {[check_effective_target_arm_v8_2a_fp16_neon_hw]} then {
+if { [istarget *-*-darwin*] } {
+  # Setting these global flags here causes a mis-match when we later test
+  # to see about 8.3-a features (which work without additional options on
+  # Apple Si) so we then do not add any option to override the 8.2-a ones
+  # and that breaks the assumptions.  In general, it's not clear that these
+  # global options can work under such conditions.
+  set additional_flags ""
+} elseif {[check_effective_target_arm_v8_2a_fp16_neon_hw]} then {
   set additional_flags [add_options_for_arm_v8_2a_fp16_neon ""]
 } elseif {[check_effective_target_arm_neon_fp16_ok]} then {
   set additional_flags [add_options_for_arm_neon_fp16 ""]
