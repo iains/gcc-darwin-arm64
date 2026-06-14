@@ -86,6 +86,14 @@ host_detect_local_cpu (ATTRIBUTE_UNUSED int argc, ATTRIBUTE_UNUSED const char **
     case 0x72015832: // Palma (M3 Max)
       res = "apple-m3";
       break;
+    case 0x6f5129ac: // Donan (M4)
+    case 0x17d5b93a: // Brava (M4 Pro and Max)
+      res = "apple-m4";
+      break;
+    case 0x1d5a87e8: // Hidra (M5)
+    case 0xf76c5b1a: // Sotra (M5 Pro and Max)
+      res = "apple-m5";
+      break;
     default:
       res = DEFAULT_ARCH;
   }
