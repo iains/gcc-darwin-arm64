@@ -4,12 +4,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with GCC; see the file COPYING3.  If not see
 # <http://www.gnu.org/licenses/>.
@@ -151,7 +151,7 @@ proc scan-assembler-not { args } {
 
 set_required_options_for scan-assembler-not
 
-# Return the scan for the assembly for hidden visibility. 
+# Return the scan for the assembly for hidden visibility.
 
 proc hidden-scan-for { symbol } {
 
@@ -576,7 +576,7 @@ proc scan-assembler-times { args } {
 
 set_required_options_for scan-assembler-times
 
-# Call pass if pattern is present within a lower or upper bound, 
+# Call pass if pattern is present within a lower or upper bound,
 # otherwise fail.
 # ex /* { dg-final { scan-assembler-bound {RE} > 3 } }
 proc scan-assembler-bound { args } {
@@ -623,7 +623,7 @@ proc scan-assembler-bound { args } {
         error "scan-assembler-bound: illegal argument: $bound"
         return
     }
-    
+
     set fd [open $output_file r]
     set text [read $fd]
     close $fd
@@ -999,7 +999,7 @@ proc configure_check-function-bodies { config } {
         # (starting with .L) and Mach-O (starting with L).  We also accept
         # numeric assembler labels.
 	set up_config(verbatim_regex_cases) {
-	    {^\\?\.?L\[?[0-9].*:$}
+	    {^\\?\.?L.*:$}
 	    {^[0-9]+:.*$}
 	}
     } else {
@@ -1157,6 +1157,17 @@ proc check_function_body { functions name body_regexp } {
     return $fn_res
 }
 
+proc check_line_start {line prefix prefix_len used_len} {
+    upvar $used_len up_used_len
+    foreach p $prefix l $prefix_len {
+      if {[string equal -length $l $line $p]} {
+          set up_used_len $l
+          return 1
+      }
+    }
+    return 0
+}
+
 # Check the implementations of functions against expected output.  Used as:
 #
 # { dg-final { check-function-bodies PREFIX TERMINATOR[ OPTION[ SELECTOR [MATCHED]]] } }
@@ -1228,7 +1239,10 @@ proc check-function-bodies { args } {
     }
 
     set prefix [lindex $args 0]
-    set prefix_len [string length $prefix]
+    foreach s $prefix {
+      lappend prefix_len [string length $s]
+    }
+
     set terminator [lindex $args 1]
     if { [string equal $terminator ""] } {
 	set terminator "*/"
@@ -1258,8 +1272,9 @@ proc check-function-bodies { args } {
     set fd [open $input_filename r]
     set in_function 0
     while { [gets $fd line] >= 0 } {
-	if { [string equal -length $prefix_len $line $prefix] } {
-	    set line [string trim [string range $line $prefix_len end]]
+        set used_len 0
+	if { [check_line_start $line $prefix $prefix_len used_len] } {
+	    set line [string trim [string range $line $used_len end]]
 	    if { !$in_function } {
 		if { [regexp "^(.*?\\S)\\s+{(.*)}\$" $line dummy \
 			  line selector] } {
