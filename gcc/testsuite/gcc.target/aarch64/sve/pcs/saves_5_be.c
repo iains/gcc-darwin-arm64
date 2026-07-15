@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O -mbig-endian -fno-stack-clash-protection -g" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
 void standard_callee (void);

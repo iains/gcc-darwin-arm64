@@ -1,5 +1,6 @@
 /* { dg-do assemble { target aarch64_asm_sve_ok } } */
 /* { dg-additional-options "-O0 -msve-vector-bits=256 -mbig-endian --save-temps" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 
 typedef struct _b {
   __attribute__((__vector_size__(32))) int a[2];

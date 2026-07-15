@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-fpermissive -Ofast -mbig-endian -w" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 
 int cc;
 

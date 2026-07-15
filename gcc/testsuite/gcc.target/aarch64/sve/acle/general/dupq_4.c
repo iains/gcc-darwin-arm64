@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -mbig-endian" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 
 /* To avoid needing big-endian header files.  */
 #pragma GCC aarch64 "arm_sve.h"

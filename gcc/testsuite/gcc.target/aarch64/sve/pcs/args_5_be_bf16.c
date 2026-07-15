@@ -1,5 +1,6 @@
 /* { dg-do compile { target lp64 } } */
 /* { dg-options "-O -mbig-endian -fno-stack-clash-protection -g" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
 #pragma GCC aarch64 "arm_sve.h"

@@ -1,5 +1,6 @@
 /* { dg-do assemble { target aarch64_asm_sve_ok } } */
 /* { dg-options "-O -msve-vector-bits=256 --save-temps -mbig-endian" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 
 #include "revh_1.c"
 

@@ -1,5 +1,6 @@
 /* { dg-do assemble } */
 /* { dg-options "-O2 -mbig-endian --save-temps" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 /* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
 
 struct di_qi_1 { unsigned char c[4]; unsigned int x; };

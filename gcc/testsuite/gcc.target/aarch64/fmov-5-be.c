@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-O2 -mbig-endian" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 #pragma GCC target ("arch=armv8.2-a+fp16")

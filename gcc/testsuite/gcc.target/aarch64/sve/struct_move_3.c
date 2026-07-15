@@ -1,5 +1,6 @@
 /* { dg-do assemble { target aarch64_asm_sve_ok } } */
 /* { dg-options "-O -msve-vector-bits=256 -mbig-endian --save-temps" } */
+/* { dg-require-effective-target aarch64_big_endian_nocache } */
 
 typedef char vnx16qi __attribute__((vector_size(32)));
 typedef struct { vnx16qi a[4]; } vnx64qi;

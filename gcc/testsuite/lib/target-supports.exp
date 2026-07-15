@@ -5050,12 +5050,17 @@ proc check_effective_target_vect_simd_clones { } {
 }
 
 # Return 1 if this is a AArch64 target supporting big endian
-proc check_effective_target_aarch64_big_endian { } {
-    return [check_no_compiler_messages aarch64_big_endian assembly {
+proc check_effective_target_aarch64_big_endian_nocache { } {
+    return [check_no_compiler_messages_nocache aarch64_big_endian assembly {
 	#if !defined(__aarch64__) || !defined(__AARCH64EB__)
 	#error !__aarch64__ || !__AARCH64EB__
 	#endif
     }]
+}
+
+proc check_effective_target_aarch64_big_endian { } {
+    return [check_cached_effective_target aarch64_big_endian \
+		check_effective_target_aarch64_big_endian_nocache]
 }
 
 # Return 1 if this is a AArch64 target supporting little endian
