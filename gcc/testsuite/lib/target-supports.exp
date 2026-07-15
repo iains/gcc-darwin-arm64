@@ -12945,18 +12945,24 @@ proc check_effective_target_ucontext_h { } {
     }]
 }
 
-proc check_effective_target_aarch64_tiny { } {
-    if { [istarget aarch64*-*-*] } {
-	return [check_no_compiler_messages aarch64_tiny object {
-	    #ifdef __AARCH64_CMODEL_TINY__
-	    int dummy;
-	    #else
-	    #error target not AArch64 tiny code model
-	    #endif
-	}]
-    } else {
-	return 0
+# Return 1 if the target accepts -mcmodel=tiny for the flags the test will be
+# compiled with.
+proc check_effective_target_aarch64_tiny_nocache { } {
+    if { ![istarget aarch64*-*-*] } {
+      return 0
     }
+    return [check_no_compiler_messages_nocache aarch64_tiny object {
+      #ifdef __AARCH64_CMODEL_TINY__
+      int dummy;
+      #else
+      #error target not AArch64 tiny code model
+      #endif
+    }]
+}
+
+proc check_effective_target_aarch64_tiny { } {
+    return [check_cached_effective_target aarch64_tiny \
+              check_effective_target_aarch64_tiny_nocache]
 }
 
 # Return 1 if Gas supports AEABI build attributes on AArch64 target
@@ -13043,9 +13049,12 @@ proc check_effective_target_aarch64_asm_sve2p2_ok { } {
     }
 }
 
-proc check_effective_target_aarch64_small { } {
+# Return 1 if the target accepts -mcmodel=small (the default unless there is
+# an override in the board flags) for the flags set by the test.
+# will be compiled with.
+proc check_effective_target_aarch64_small_nocache { } {
     if { [istarget aarch64*-*-*] } {
-	return [check_no_compiler_messages aarch64_small object {
+	return [check_no_compiler_messages_nocache aarch64_small object {
 	    #ifdef __AARCH64_CMODEL_SMALL__
 	    int dummy;
 	    #else
@@ -13057,18 +13066,29 @@ proc check_effective_target_aarch64_small { } {
     }
 }
 
-proc check_effective_target_aarch64_large { } {
-    if { [istarget aarch64*-*-*] } {
-	return [check_no_compiler_messages aarch64_large object {
-	    #ifdef __AARCH64_CMODEL_LARGE__
-	    int dummy;
-	    #else
-	    #error target not AArch64 large code model
-	    #endif
-	}]
-    } else {
-	return 0
+proc check_effective_target_aarch64_small { } {
+    return [check_cached_effective_target aarch64_small  \
+              check_effective_target_aarch64_small_nocache]
+}
+
+# Return 1 if the target accepts -mcmodel=large for the flags the test
+# will be compiled with.
+proc check_effective_target_aarch64_large_nocache { } {
+    if { ![istarget aarch64*-*-*] } {
+      return 0
     }
+    return [check_no_compiler_messages_nocache aarch64_large object {
+      #ifdef __AARCH64_CMODEL_LARGE__
+      int dummy;
+      #else
+      #error target not AArch64 large code model
+      #endif
+    }]
+}
+
+proc check_effective_target_aarch64_large { } {
+    return [check_cached_effective_target aarch64_large  \
+              check_effective_target_aarch64_large_nocache]
 }
 
 # Return 1 if the assembler accepts the aarch64 .variant_pcs directive.
