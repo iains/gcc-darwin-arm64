@@ -1,5 +1,6 @@
 /* { dg-do compile } */
 /* { dg-options "-Og -O3 -mcmodel=tiny" } */
+/* { dg-require-effective-target aarch64_tiny_nocache } */
 
 int
 main (__fp16 x)
