@@ -1,4 +1,5 @@
 /* { dg-do assemble } */
+/* { dg-require-effective-target aarch64_big_endian } */
 /* { dg-options "-O2 -mbig-endian --save-temps" } */
 /* { dg-final { check-function-bodies "**" "" "" { target lp64 } } } */
 

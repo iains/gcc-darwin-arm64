@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-require-effective-target aarch64_big_endian } */
 /* { dg-options "-O1 -mbig-endian" } */
 
 /* PR rtl-optimization/124078 */

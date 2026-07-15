@@ -1,4 +1,5 @@
 /* { dg-do assemble { target aarch64_asm_sve_ok } } */
+/* { dg-require-effective-target aarch64_big_endian } */
 /* { dg-additional-options "-O0 -msve-vector-bits=256 -mbig-endian --save-temps" } */
 
 typedef struct _b {

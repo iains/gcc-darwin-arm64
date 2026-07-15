@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-require-effective-target aarch64_big_endian } */
 /* { dg-require-effective-target stdint_types_mbig_endian } */
 /* { dg-options "-O3 -fdump-tree-optimized -mbig-endian" } */
 

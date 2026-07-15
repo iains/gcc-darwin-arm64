@@ -35,9 +35,11 @@ dg-init
 dg-runtest [lsort [glob -nocomplain $srcdir/$subdir/*\[cCs\]]] \
 	" -ansi -pedantic-errors -std=c23 -O2 -march=armv8-a+simd" ""
 
-# Again, for big-endian targets.
-dg-runtest [lsort [glob -nocomplain $srcdir/$subdir/*\[cCs\]]] \
+if { [istarget be] } then {
+    # Again, for big-endian targets.
+    dg-runtest [lsort [glob -nocomplain $srcdir/$subdir/*\[cCs\]]] \
 	" -ansi -pedantic-errors -std=c23 -O2 -march=armv8-a+simd -mbig-endian" ""
+}
 
 # All done.
 dg-finish

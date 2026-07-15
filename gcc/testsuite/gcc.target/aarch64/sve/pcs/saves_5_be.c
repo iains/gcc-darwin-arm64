@@ -1,4 +1,5 @@
 /* { dg-do compile } */
+/* { dg-require-effective-target aarch64_big_endian } */
 /* { dg-options "-O -mbig-endian -fno-stack-clash-protection -g" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 

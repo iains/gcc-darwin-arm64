@@ -1,4 +1,5 @@
 /* { dg-do compile { target lp64 } } */
+/* { dg-require-effective-target aarch64_big_endian } */
 /* { dg-options "-O -mbig-endian -fno-stack-clash-protection -fno-cprop-registers -fdisable-rtl-combine -g" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
