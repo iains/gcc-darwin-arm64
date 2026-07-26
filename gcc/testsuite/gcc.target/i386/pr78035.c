@@ -22,4 +22,6 @@ int bar ()
 }
 
 /* We should not optimize away either comparison.  */
-/* { dg-final { scan-assembler-times "cmp" 2 } } */
+/* { dg-final { scan-assembler-times "cmp" 2 { target { ! *-*-darwin* } } } } */
+/* Darwin codegens equivalent code with 3 cmps.  */
+/* { dg-final { scan-assembler-times "cmp" 3 { target *-*-darwin* } } } */
