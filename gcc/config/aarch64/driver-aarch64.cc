@@ -32,6 +32,7 @@
 /* Default architecture to use if -mcpu=native did not detect a known CPU.  */
 #if TARGET_MACHO
 #define DEFAULT_ARCH "apple-m1"
+#define DEFAULT_CPU "generic-armv8-a"
 #else
 #define DEFAULT_ARCH "8A"
 #define DEFAULT_CPU "generic-armv8-a"
