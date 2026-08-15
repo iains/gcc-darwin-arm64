@@ -3,7 +3,6 @@
 /* { dg-options "" } */
 /* { dg-add-options bfloat16 } */
 /* { dg-require-effective-target bfloat16_runtime } */
-/* { dg-xfail-if "PR111876" { aarch64-*-darwin* } } */
 
 extern void exit (int);
 extern void abort (void);
