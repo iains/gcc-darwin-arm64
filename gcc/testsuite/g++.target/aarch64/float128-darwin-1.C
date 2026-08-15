@@ -1,6 +1,5 @@
-/* { dg-do run { target { aarch64*-*-darwin* } } } */
-/* { dg-options "-std=c++11 -std=gnu++98" } */
-
+/* { dg-do run { target { aarch64*-*-darwin*} } } */
+/* { dg-options "-Wno-pedantic -std=gnu++11" } */
 #include <limits>
 #include <string>
 #include <typeinfo>
