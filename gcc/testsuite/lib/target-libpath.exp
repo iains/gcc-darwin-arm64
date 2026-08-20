@@ -86,6 +86,32 @@ proc set_ld_library_path_env_vars { } {
     return
   }
 
+  # Darwin's equivalent of LD_LIBRARY_PATH.
+  if { [istarget *-*-darwin\[89\]*] || [istarget *-*-darwin1\[0-4\]*] } {
+    if { $orig_environment_saved == 0 } {
+      set orig_environment_saved 1
+      if [info exists env(DYLD_LIBRARY_PATH)] {
+        set orig_dyld_library_path "$env(DYLD_LIBRARY_PATH)"
+        set orig_dyld_library_path_saved 1
+      }
+      if [info exists env(PATH)] {
+        set orig_path "$env(PATH)"
+        set orig_path_saved 1
+      }
+    }
+    if { $orig_dyld_library_path_saved } {
+      setenv DYLD_LIBRARY_PATH "$ld_library_path:$orig_dyld_library_path"
+    } else {
+      setenv DYLD_LIBRARY_PATH "$ld_library_path"
+    }
+    verbose -log "DYLD_LIBRARY_PATH=[getenv DYLD_LIBRARY_PATH]"
+    return
+  } elseif { [istarget *-*-darwin*] } {
+    # Later versions exclude DYLD_* variables when calling via system apps
+    # which includes, for example, the shells - so this cannot work there.
+    return 
+  }
+
   if { $orig_environment_saved == 0 } {
     set orig_environment_saved 1
 
@@ -110,10 +136,6 @@ proc set_ld_library_path_env_vars { } {
       set orig_ld_library_path_64 "$env(LD_LIBRARY_PATH_64)"
       set orig_ld_library_path_64_saved 1
     }
-    if [info exists env(DYLD_LIBRARY_PATH)] {
-      set orig_dyld_library_path "$env(DYLD_LIBRARY_PATH)"
-      set orig_dyld_library_path_saved 1
-    }
     if [info exists env(PATH)] {
       set orig_path "$env(PATH)"
       set orig_path_saved 1
@@ -125,16 +147,14 @@ proc set_ld_library_path_env_vars { } {
   # It only sets SHLIB_PATH and LD_LIBRARY_PATH when it executes a
   # program.  We also need the environment set for compilations, etc.
   #
-  # On Darwin, we have to set variables akin to LD_LIBRARY_PATH, but called
-  # DYLD_LIBRARY_PATH.  The same applies to Solaris 32 bit
-  # (LD_LIBRARY_PATH_32), Solaris 64 bit (LD_LIBRARY_PATH_64), and HP-UX
-  # (SHLIB_PATH).  In some cases, the variables are independent of
-  # LD_LIBRARY_PATH, and in other cases LD_LIBRARY_PATH is used if the
+  # On Solaris, we have to set variables akin to LD_LIBRARY_PATH, but called
+  # LD_LIBRARY_PATH_32 (Solaris 32 bit) and LD_LIBRARY_PATH_32 (Solaris 64 bit).
+  # and, on HP-UX, (SHLIB_PATH).  In some cases, the variables are independent
+  # of LD_LIBRARY_PATH, and in other cases LD_LIBRARY_PATH is used if the
   # variable is not defined.
   #
   # Doing this is somewhat of a hack as ld_library_path gets repeated in
   # SHLIB_PATH and LD_LIBRARY_PATH when unix_load sets these variables.
-  if { ![istarget *-*-darwin*] } {
   if { $orig_ld_library_path_saved } {
     setenv LD_LIBRARY_PATH "$ld_library_path:$orig_ld_library_path"
   } else {
@@ -168,23 +188,7 @@ proc set_ld_library_path_env_vars { } {
   } else {
     setenv LD_LIBRARY_PATH_64 "$ld_library_path"
   }
-  }
-  if { [istarget *-*-darwin*] } {
-    if { [info exists ENABLE_DARWIN_AT_RPATH] || [istarget *-*-darwin1\[5-9\]*]
-         || [istarget *-*-darwin2*] } {
-      # Either we are not using DYLD_LIBRARY_PATH or we're on a version of the
-      # OS for which it is not passed through system exes.
-      if [info exists env(DYLD_LIBRARY_PATH)] {
-        unsetenv DYLD_LIBRARY_PATH
-      }
-    } else {
-      if { $orig_dyld_library_path_saved } {
-        setenv DYLD_LIBRARY_PATH "$ld_library_path:$orig_dyld_library_path"
-      } else {
-        setenv DYLD_LIBRARY_PATH "$ld_library_path"
-      }
-    }
-  }
+
   if { [istarget *-*-cygwin*] || [istarget *-*-mingw*] } {
     if { $orig_path_saved } {
       setenv PATH "$ld_library_path:$orig_path"
@@ -199,7 +203,6 @@ proc set_ld_library_path_env_vars { } {
   verbose -log "SHLIB_PATH=[getenv SHLIB_PATH]"
   verbose -log "LD_LIBRARY_PATH_32=[getenv LD_LIBRARY_PATH_32]"
   verbose -log "LD_LIBRARY_PATH_64=[getenv LD_LIBRARY_PATH_64]"
-  verbose -log "DYLD_LIBRARY_PATH=[getenv DYLD_LIBRARY_PATH]"
 }
 
 #######################################
