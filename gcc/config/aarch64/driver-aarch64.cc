@@ -34,8 +34,8 @@
 #define DEFAULT_ARCH "apple-m1"
 #else
 #define DEFAULT_ARCH "8A"
-#define DEFAULT_CPU "generic-armv8-a"
 #endif
+#define DEFAULT_CPU "generic-armv8-a"
 
 
 #if defined(__APPLE__)
