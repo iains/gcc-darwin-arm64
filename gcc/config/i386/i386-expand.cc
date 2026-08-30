@@ -11520,15 +11520,18 @@ ix86_expand_call (rtx retval, rtx fnaddr, rtx callarg1,
     }
 
   if (TARGET_MACHO && TARGET_64BIT && !sibcall
-      && ((SYMBOL_REF_P (addr) && !SYMBOL_REF_LOCAL_P (addr))
-	  || !fndecl || TREE_PUBLIC (fndecl)))
+      && (!fndecl || TREE_PUBLIC (fndecl)
+	  || (SYMBOL_REF_P (addr) && !SYMBOL_REF_LOCAL_P (addr)))
+      && (!fndecl || !lookup_attribute ("no_caller_saved_registers",
+					TYPE_ATTRIBUTES (TREE_TYPE (fndecl)))))
     {
       /* We allow public functions defined in a TU to bind locally for PIC
 	 code (the default) on 64bit Mach-O.
 	 If such functions are not inlined, we cannot tell at compile-time if
 	 they will be called via the lazy symbol resolver (this can depend on
 	 options given at link-time).  Therefore, we must assume that the lazy
-	 resolver could be used which clobbers R11 and R10.  */
+	 resolver could be used which clobbers R11 and R10.
+	 User specification of "no caller saved regs" overides.  */
       clobber_reg (&use, gen_rtx_REG (DImode, R11_REG));
       clobber_reg (&use, gen_rtx_REG (DImode, R10_REG));
     }
