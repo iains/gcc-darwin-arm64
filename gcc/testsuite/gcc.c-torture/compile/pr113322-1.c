@@ -1,8 +1,9 @@
 /* { dg-additional-options "-march=sapphirerapids" { target x86_64*-*-* i?86-*-* } } */
+/* { dg-require-effective-target avx512f { target x86_64-*-* i?86-*-* } } */
 /* PR middle-end/113322 */
 
 float a[16];
-void 
+void
 foo ()
 {
 int i;
