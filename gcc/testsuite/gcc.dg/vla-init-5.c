@@ -2,6 +2,7 @@
 /* Origin: Joseph Myers <jsm@polyomino.org.uk> */
 /* { dg-do compile } */
 /* { dg-options "" } */
+/* { dg-additional-options "-fno-allow-const-var-array-size" { target *-*-darwin* } } */
 
 const int i = 1;
 void foo() { void *p = (char [][i]){ "" }; } /* { dg-error "variable-sized object" } */
