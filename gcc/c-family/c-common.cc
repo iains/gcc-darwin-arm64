@@ -394,8 +394,8 @@ static bool nonnull_check_p (tree, unsigned HOST_WIDE_INT);
 */
 const struct c_common_resword c_common_reswords[] =
 {
-  { "_Alignas",		RID_ALIGNAS,   D_CONLY },
-  { "_Alignof",		RID_ALIGNOF,   D_CONLY },
+  { "_Alignas",		RID_ALIGNAS,   D_EXT_C_IN_CXX },
+  { "_Alignof",		RID_ALIGNOF,   D_EXT_C_IN_CXX },
   { "_Countof",		RID_COUNTOF,   D_CONLY },
   { "_Maxof",		RID_MAXOF,     D_CONLY },
   { "_Minof",		RID_MINOF,     D_CONLY },
@@ -418,7 +418,7 @@ const struct c_common_resword c_common_reswords[] =
   { "_Fract",           RID_FRACT,     D_CONLY | D_EXT },
   { "_Accum",           RID_ACCUM,     D_CONLY | D_EXT },
   { "_Sat",             RID_SAT,       D_CONLY | D_EXT },
-  { "_Static_assert",   RID_STATIC_ASSERT, D_CONLY },
+  { "_Static_assert",   RID_STATIC_ASSERT, D_EXT_C_IN_CXX },
   { "_Noreturn",        RID_NORETURN,  D_CONLY },
   { "_Generic",         RID_GENERIC,   D_CONLY },
   { "_Thread_local",    RID_THREAD,    D_CONLY },
