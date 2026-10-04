@@ -463,6 +463,20 @@ can_inline_edge_p (struct cgraph_edge *e, bool report,
       e->inline_failed = CIF_MUST_REMAIN_IN_TU;
       inlinable = false;
     }
+  /* Do not inline a body that still calls a target with no guaranteed
+     definition: the call would be duplicated into the caller, while the
+     callee's own body is DECL_EXTERNAL and so emitted by nobody.
+     However, allow always-inline.  */
+  if (inlinable && !DECL_DISREGARD_INLINE_LIMITS (callee->decl))
+    for (cgraph_edge *e2 = callee->callees; e2; e2 = e2->next_callee)
+      if (e2->callee->no_external_definition
+	  && DECL_EXTERNAL (e2->callee->decl))
+	{
+	  e->inline_failed = CIF_BODY_NOT_AVAILABLE;
+	  inlinable = false;
+	  break;
+	}
+
   if (!inlinable && report)
     report_inline_failed_reason (e);
   return inlinable;

@@ -149,7 +149,8 @@ public:
       must_remain_in_tu_name (false), must_remain_in_tu_body (false),
       unique_name (false), implicit_section (false), body_removed (false),
       semantic_interposition (flag_semantic_interposition),
-      used_from_other_partition (false), in_other_partition (false),
+      used_from_other_partition (false), no_external_definition (false),
+      in_other_partition (false),
       address_taken (false), in_init_priority_hash (false),
       need_lto_streaming (false), offloadable (false), ifunc_resolver (false),
       next_sharing_asm_name (NULL),
@@ -622,6 +623,9 @@ public:
 
   /* Set when variable is used from other LTRANS partition.  */
   unsigned used_from_other_partition : 1;
+  /* Set when no definition of this symbol is guaranteed to exist in any
+     translation unit.  */
+  unsigned no_external_definition : 1;
   /* Set when function is available in the other LTRANS partition.
      During WPA output it is used to mark nodes that are present in
      multiple partitions.  */

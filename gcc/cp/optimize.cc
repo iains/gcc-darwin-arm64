@@ -293,7 +293,7 @@ maybe_thunk_body (tree fn, bool force)
 				UNAVAILABLE_DEPRECATED_SUPPRESS);
 
   DECL_ABSTRACT_P (fn) = false;
-  if (!DECL_WEAK (fn))
+  if (!DECL_WEAK (fn) && !DECL_ONE_ONLY (fn))
     {
       TREE_PUBLIC (fn) = false;
       DECL_EXTERNAL (fn) = false;
@@ -326,6 +326,16 @@ maybe_thunk_body (tree fn, bool force)
 	 have these flags set.  */
       DECL_WEAK (fn) = false;
       DECL_COMDAT (fn) = false;
+    }
+  else
+    {
+      /* Neither case above could claim the unified body for this TU, so keeps
+	 vague linkage and may end up DECL_EXTERNAL.  However, no other TU
+	 will necessarily emit it.  */
+      symtab_node::get_create (fn)->no_external_definition = true;
+      /* It is an implementation detail of this TU.  */
+      DECL_VISIBILITY (fn) = VISIBILITY_HIDDEN;
+      DECL_VISIBILITY_SPECIFIED (fn) = 1;
     }
 
   /* Find the vtt_parm, if present.  */
