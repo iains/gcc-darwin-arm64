@@ -13,7 +13,7 @@ extern "C" {
 ** (
 **	strb	.*
 ** |
-**	bl	memcpy
+**	bl	_?memcpy
 ** )
 **	...
 */
@@ -31,7 +31,7 @@ ld2 (int32x4x2_t *a, int32_t *b)
 ** (
 **	strb	.*
 ** |
-**	bl	memcpy
+**	bl	_?memcpy
 ** )
 **	...
 */
@@ -49,7 +49,7 @@ ld3 (int32x4x3_t *a, int32_t *b)
 ** (
 **	strb	.*
 ** |
-**	bl	memcpy
+**	bl	_?memcpy
 ** )
 **	...
 */
