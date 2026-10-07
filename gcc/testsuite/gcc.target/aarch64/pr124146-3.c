@@ -21,7 +21,7 @@ void consume_ul (int, unsigned long);
 **	mov	x2, x0
 **	mov	x3, x1
 **	mov	w0, 5
-**	b	consume_i128
+**	b	_?consume_i128
 */
 void pass_i128 (ma_i128 y) { consume_i128 (5, y); }
 
@@ -31,7 +31,7 @@ void pass_i128 (ma_i128 y) { consume_i128 (5, y); }
 **	mov	x2, x0
 **	mov	x3, x1
 **	mov	w0, 5
-**	b	consume_i128
+**	b	_?consume_i128
 */
 void pass_i128_underaligned (ma8_i128 y) { consume_i128 (5, y); }
 
@@ -40,6 +40,6 @@ void pass_i128_underaligned (ma8_i128 y) { consume_i128 (5, y); }
 ** pass_ul:
 **	mov	x1, x0
 **	mov	w0, 5
-**	b	consume_ul
+**	b	_?consume_ul
 */
 void pass_ul (ma_ul y) { consume_ul (5, y); }

@@ -13,5 +13,5 @@ void foo(double *f, int n)
 		f[i] = log(f[i]);
 }
 
-/* { dg-final { scan-assembler-not {\.variant_pcs\tlog} } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\t_ZGVnN2v_log} 1 } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?log} } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?_ZGVnN2v_log} 1 } } */
