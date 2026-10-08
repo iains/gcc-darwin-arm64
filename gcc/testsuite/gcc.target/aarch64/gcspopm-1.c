@@ -1,5 +1,4 @@
 /* { dg-do compile } */
-/* { dg-skip-if "the Guarded Control Stack is not implemented on Darwin" { *-*-darwin* } } */
 /* { dg-options "-O2 -mbranch-protection=none" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
