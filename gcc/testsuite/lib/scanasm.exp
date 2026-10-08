@@ -976,6 +976,12 @@ proc configure_check-function-bodies { config } {
 	# Skip lines beginning with '//' comments ('-fverbose-asm', for
 	# example).
 	set up_config(fluff) {^\s*(?://)}
+    } elseif { [istarget aarch64*-*-darwin*] } {
+	# As for Darwin generally, below, but additionally treat a Mach-O numeric
+	# local label line as fluff, which is what ELF does with '.L<n>:'.  This
+	# is done for aarch64 only: aarch64 body scans do not expect label lines,
+	# whereas x86 ones do, and ask for them with the 'matched' argument.
+	set up_config(fluff) {^\s*(?:\.|//|@|#)|^L[ABCESV]|^L[0-9]+:$}
     } elseif { [istarget *-*-darwin*] } {
 	set up_config(fluff) {^\s*(?:\.|//|@|#)|^L[ABCESV]}
     } elseif { [istarget s390*-*-*] } {
@@ -1282,6 +1288,7 @@ proc check-function-bodies { args } {
     # Allow config to augment or override prefix choices.
     set config(prefix) $prefix
     configure_check-function-bodies config
+    target_substitute_func_regex config config(matched)
     set prefix $config(prefix)
     foreach s $prefix {
       lappend prefix_len [string length $s]
