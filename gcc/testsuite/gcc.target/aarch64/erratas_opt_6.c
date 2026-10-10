@@ -1,4 +1,5 @@
 /* { dg-do link } */
+/* { dg-skip-if "Apple silicon needs no Cortex errata workarounds, and ld64 has no such option" { *-*-darwin* } } */
 /* { dg-additional-options "-march=armv8-a -mfix-cortex-a53-835769 -###" } */
 
 int main()
