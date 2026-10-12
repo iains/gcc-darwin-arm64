@@ -10,7 +10,7 @@ void normal();
 /*
 ** test1:
 **	str	x30, \[sp, #?-16\]!
-**	bl	inout_zt0
+**	bl	_?inout_zt0
 **	ldr	x30, \[sp\], #?16
 **	ret
 */
@@ -25,7 +25,7 @@ void test1() __arm_inout("zt0")
 **	add	(x[0-9]+), sp, #?16
 **	str	zt0, \[\1\]
 **	smstop	za
-**	bl	normal
+**	bl	_?normal
 **	smstart	za
 **	add	(x[0-9]+), sp, #?16
 **	ldr	zt0, \[\1\]
@@ -41,9 +41,9 @@ void test2() __arm_inout("zt0")
 ** test3:
 **	...
 **	smstop	za
-**	bl	normal
+**	bl	_?normal
 **	smstart	za
-**	bl	out_zt0
+**	bl	_?out_zt0
 **	ldr	[^\n]+
 **	ret
 */

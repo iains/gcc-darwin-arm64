@@ -9,18 +9,18 @@ new_to_shared ()
 {
   shared_callee ();
 }
-/* { dg-final { scan-assembler {\tbl\tshared_callee} } } */
+/* { dg-final { scan-assembler {\tbl\t_?shared_callee} } } */
 
 [[arm::new("za")]] void
 new_to_new ()
 {
   new_callee ();
 }
-/* { dg-final { scan-assembler {\tb\tnew_callee} } } */
+/* { dg-final { scan-assembler {\tb\t_?new_callee} } } */
 
 [[arm::new("za")]] void
 new_to_normal ()
 {
   normal_callee ();
 }
-/* { dg-final { scan-assembler {\tb\tnormal_callee} } } */
+/* { dg-final { scan-assembler {\tb\t_?normal_callee} } } */

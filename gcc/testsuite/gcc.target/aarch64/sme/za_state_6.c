@@ -17,7 +17,7 @@ __arm_new("za") void test20(volatile int *ptr)
     *ptr += 1;
 }
 
-// { dg-final { scan-assembler {\tbl\t__arm_tpidr2_save\n} } }
+// { dg-final { scan-assembler {\tbl\t_?__arm_tpidr2_save\n} } }
 // { dg-final { scan-assembler {\tsmstart\tza\n} } }
 // { dg-final { scan-assembler {\tsmstop\tza\n} } }
 // { dg-final { scan-assembler-not {\tsub\tsp, sp, x[0-9]+\n} } }

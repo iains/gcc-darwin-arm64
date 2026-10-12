@@ -22,7 +22,7 @@ void g1(bool x)
 /*
 ** g2:
 ** 	tbz	[wx][0-9]+, #?0, .L([0-9]+)
-** 	b	h
+** 	b	_?h
 **	...
 */
 void g2(bool x)
@@ -34,7 +34,7 @@ void g2(bool x)
 /*
 ** g3_ge:
 ** 	tbnz	w[0-9]+, #?31, .L[0-9]+
-** 	b	h
+** 	b	_?h
 **	...
 */
 void g3_ge(int x)
@@ -47,7 +47,7 @@ void g3_ge(int x)
 ** g3_gt:
 ** 	cmp	w[0-9]+, 0
 ** 	ble	.L[0-9]+
-** 	b	h
+** 	b	_?h
 **	...
 */
 void g3_gt(int x)
@@ -59,7 +59,7 @@ void g3_gt(int x)
 /*
 ** g3_lt:
 ** 	tbz	w[0-9]+, #?31, .L[0-9]+
-** 	b	h
+** 	b	_?h
 **	...
 */
 void g3_lt(int x)
@@ -72,7 +72,7 @@ void g3_lt(int x)
 ** g3_le:
 ** 	cmp	w[0-9]+, 0
 ** 	bgt	.L[0-9]+
-** 	b	h
+** 	b	_?h
 **	...
 */
 void g3_le(int x)
@@ -86,7 +86,7 @@ void g3_le(int x)
 ** 	mov	w[0-9]+, 65279
 ** 	tst	w[0-9]+, w[0-9]+
 ** 	beq	.L[0-9]+
-** 	b	h
+** 	b	_?h
 **	...
 */
 void g5(int x)
