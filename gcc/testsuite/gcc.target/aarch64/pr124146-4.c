@@ -31,7 +31,7 @@ void consume_bi256 (int, _BitInt(256));
 ** pass_bi64:
 **	mov	x1, x0
 **	mov	w0, 5
-**	b	consume_bi64
+**	b	_?consume_bi64
 */
 void pass_bi64 (ma8_bi64 y) { consume_bi64 (5, y); }
 
@@ -42,7 +42,7 @@ void pass_bi64 (ma8_bi64 y) { consume_bi64 (5, y); }
 *M	mov	x2, x1
 *M	mov	x1, x0
 **	mov	w0, 5
-**	b	consume_bi128
+**	b	_?consume_bi128
 */
 void pass_bi128 (ma_bi128 y) { consume_bi128 (5, y); }
 
@@ -54,7 +54,7 @@ void pass_bi128 (ma_bi128 y) { consume_bi128 (5, y); }
 *M	mov	x2, x1
 *M	mov	x1, x0
 **	mov	w0, 5
-**	b	consume_bi128
+**	b	_?consume_bi128
 */
 void pass_bi128_underaligned (ma8_bi128 y) { consume_bi128 (5, y); }
 

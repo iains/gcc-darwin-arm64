@@ -9,7 +9,7 @@
 /*
 ** test_nosme:
 **	...
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	lsr	x0, x0, #?63
 **	...
 */
