@@ -943,8 +943,13 @@ output_call_frame_info (int for_eh)
 			     eh_data_format_name (fde_encoding));
     }
 
-  FOR_EACH_VEC_ELT (*cie_cfi_vec, i, cfi)
-    output_cfi (cfi, NULL, for_eh);
+  /* cie_cfi_vec is created lazily by the dwarf2 frame pass.  If that pass never
+     ran for any function in this translation unit -- which the RTL frontend
+     allows, by starting with a pass that follows it -- there is no CIE program
+     to emit.  */
+  if (cie_cfi_vec)
+    FOR_EACH_VEC_ELT (*cie_cfi_vec, i, cfi)
+      output_cfi (cfi, NULL, for_eh);
 
   /* Pad the CIE out to an address sized boundary.  */
   ASM_OUTPUT_ALIGN (asm_out_file,
