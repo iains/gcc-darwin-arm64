@@ -19,8 +19,9 @@ unsigned func1(unsigned a, bool b)
 
 /*
 **func2:
-**	bic	w([0-9]+), w1, w0
-**	and	w0, w\1, 255
+*E	bic	w([0-9]+), w1, w0
+*E	and	w0, w\1, 255
+*M	bic	w0, w1, w0
 **      ret
 */
 unsigned func2(bool a, bool b)

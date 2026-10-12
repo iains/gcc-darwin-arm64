@@ -117,40 +117,56 @@ TEST_UNIFORM_BINARY (vqaddq_s64, int64x2_t)
 
 /*
 ** test_vqaddb_u8:
-** dup	v([0-9]+)\.8b, w[0-9]+
-** dup	v([0-9]+)\.8b, w[0-9]+
-** uqadd	b([0-9]+), (b\2, b\1|b\1, b\2)
-** umov	w0, v\3\.b\[0\]
+*E dup	v([0-9]+)\.8b, w[0-9]+
+*E dup	v([0-9]+)\.8b, w[0-9]+
+*E uqadd	b([0-9]+), (b\2, b\1|b\1, b\2)
+*E umov	w0, v\3\.b\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M uqadd	b\1, b\1, b\2
+*M umov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqaddb_u8, uint8_t)
 
 /*
 ** test_vqaddb_s8:
-** dup	v([0-9]+)\.8b, w[0-9]+
-** dup	v([0-9]+)\.8b, w[0-9]+
-** sqadd	b([0-9]+), (b\2, b\1|b\1, b\2)
-** umov	w0, v\3\.b\[0\]
+*E dup	v([0-9]+)\.8b, w[0-9]+
+*E dup	v([0-9]+)\.8b, w[0-9]+
+*E sqadd	b([0-9]+), (b\2, b\1|b\1, b\2)
+*E umov	w0, v\3\.b\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M sqadd	b\1, b\1, b\2
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqaddb_s8, int8_t)
 
 /*
 ** test_vqaddh_u16:
-** dup	v([0-9]+)\.4h, w[0-9]+
-** dup	v([0-9]+)\.4h, w[0-9]+
-** uqadd	h([0-9]+), (h\2, h\1|h\1, h\2)
-** umov	w0, v\3\.h\[0\]
+*E dup	v([0-9]+)\.4h, w[0-9]+
+*E dup	v([0-9]+)\.4h, w[0-9]+
+*E uqadd	h([0-9]+), (h\2, h\1|h\1, h\2)
+*E umov	w0, v\3\.h\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M uqadd	h\1, h\1, h\2
+*M umov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqaddh_u16, uint16_t)
 
 /*
 ** test_vqaddh_s16:
-** dup	v([0-9]+)\.4h, w[0-9]+
-** dup	v([0-9]+)\.4h, w[0-9]+
-** sqadd	h([0-9]+), (h\2, h\1|h\1, h\2)
-** umov	w0, v\3\.h\[0\]
+*E dup	v([0-9]+)\.4h, w[0-9]+
+*E dup	v([0-9]+)\.4h, w[0-9]+
+*E sqadd	h([0-9]+), (h\2, h\1|h\1, h\2)
+*E umov	w0, v\3\.h\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M sqadd	h\1, h\1, h\2
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqaddh_s16, int16_t)

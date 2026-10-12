@@ -117,40 +117,56 @@ TEST_UNIFORM_BINARY (vqsubq_s64, int64x2_t)
 
 /*
 ** test_vqsubb_u8:
-** dup	v([0-9]+)\.8b, w0
-** dup	v([0-9]+)\.8b, w1
-** uqsub	b([0-9]+), b\1, b\2
-** umov	w0, v\3\.b\[0\]
+*E dup	v([0-9]+)\.8b, w0
+*E dup	v([0-9]+)\.8b, w1
+*E uqsub	b([0-9]+), b\1, b\2
+*E umov	w0, v\3\.b\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M uqsub	b\1, b\1, b\2
+*M umov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqsubb_u8, uint8_t)
 
 /*
 ** test_vqsubb_s8:
-** dup	v([0-9]+)\.8b, w0
-** dup	v([0-9]+)\.8b, w1
-** sqsub	b([0-9]+), b\1, b\2
-** umov	w0, v\3\.b\[0\]
+*E dup	v([0-9]+)\.8b, w0
+*E dup	v([0-9]+)\.8b, w1
+*E sqsub	b([0-9]+), b\1, b\2
+*E umov	w0, v\3\.b\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M sqsub	b\1, b\1, b\2
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqsubb_s8, int8_t)
 
 /*
 ** test_vqsubh_u16:
-** dup	v([0-9]+)\.4h, w0
-** dup	v([0-9]+)\.4h, w1
-** uqsub	h([0-9]+), h\1, h\2
-** umov	w0, v\3\.h\[0\]
+*E dup	v([0-9]+)\.4h, w0
+*E dup	v([0-9]+)\.4h, w1
+*E uqsub	h([0-9]+), h\1, h\2
+*E umov	w0, v\3\.h\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M uqsub	h\1, h\1, h\2
+*M umov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqsubh_u16, uint16_t)
 
 /*
 ** test_vqsubh_s16:
-** dup	v([0-9]+)\.4h, w0
-** dup	v([0-9]+)\.4h, w1
-** sqsub	h([0-9]+), h\1, h\2
-** umov	w0, v\3\.h\[0\]
+*E dup	v([0-9]+)\.4h, w0
+*E dup	v([0-9]+)\.4h, w1
+*E sqsub	h([0-9]+), h\1, h\2
+*E umov	w0, v\3\.h\[0\]
+*M fmov	s([0-9]+), w0
+*M fmov	s([0-9]+), w1
+*M sqsub	h\1, h\1, h\2
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNIFORM_BINARY (vqsubh_s16, int16_t)
