@@ -12,7 +12,7 @@ void inout_za_in_zt0() __arm_inout("za") __arm_in("zt0");
 /*
 ** test1:
 **	str	x30, \[sp, #?-16\]!
-**	bl	inout_za_zt0
+**	bl	_?inout_za_zt0
 **	ldr	x30, \[sp\], #?16
 **	ret
 */
@@ -26,7 +26,7 @@ void test1() __arm_inout("za", "zt0")
 **	...
 **	str	zt0, \[(?:x[0-9]+|sp)\]
 **	...
-**	bl	inout_za
+**	bl	_?inout_za
 **	...
 **	ldr	zt0, \[(?:x[0-9]+|sp)\]
 **	...
@@ -40,8 +40,8 @@ void test2() __arm_inout("za", "zt0")
 /*
 ** test3:
 **	...
-**	bl	inout_za
-**	bl	inout_za_out_zt0
+**	bl	_?inout_za
+**	bl	_?inout_za_out_zt0
 **	[^\n]+
 **	ret
 */

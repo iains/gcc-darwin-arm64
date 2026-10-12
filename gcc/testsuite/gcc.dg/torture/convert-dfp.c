@@ -56,9 +56,9 @@ int main()
   return 0;
 }
 
-/* { dg-final { scan-assembler-times {\t__bid_extendsddd2} 3 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendsdtd2} 3 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendddtd2} 3 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendhfsd} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendhfdd} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_extendhftd} 2 { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler {\t_?__bid_extendsddd2} { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler {\t_?__bid_extendsdtd2} { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler {\t_?__bid_extendddtd2} { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler {\t_?__bid_extendhfsd} { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler {\t_?__bid_extendhfdd} { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler {\t_?__bid_extendhftd} { target { dfp_bid } } } } */

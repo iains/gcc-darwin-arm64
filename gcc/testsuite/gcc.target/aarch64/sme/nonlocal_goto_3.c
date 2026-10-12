@@ -23,7 +23,7 @@ void run(void (*)());
 *E	smstart	sm
 *E	add	x0, .*
 *E	smstop	sm
-*E	bl	run
+*E	bl	_?run
 *E	smstart	sm
 *E	mov	w0, 1
 *E	...

@@ -27,11 +27,11 @@ struct callbacks {
 **	stp	q20, q21, \[sp, #?224\]
 **	stp	q22, q23, \[sp, #?256\]
 **	mov	\1, x0
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	smstart	sm
-**	bl	s_callee
+**	bl	_?s_callee
 **	smstop	sm
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	ldr	(x[0-9]+), \[\1\]
 **	blr	\2
 **	ldr	(x[0-9]+), \[\1, #?8\]
@@ -78,10 +78,10 @@ n_caller (struct callbacks *c)
 **	stp	q22, q23, \[sp, #?256\]
 **	mov	\1, x0
 **	smstop	sm
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	smstart	sm
-**	bl	s_callee
-**	bl	sc_callee
+**	bl	_?s_callee
+**	bl	_?sc_callee
 **	ldr	(x[0-9]+), \[\1\]
 **	smstop	sm
 **	blr	\2
@@ -132,18 +132,18 @@ s_caller (struct callbacks *c) [[arm::streaming]]
 **	ldr	x16, \[x29, #?16\]
 **	tbz	x16, 0, .*
 **	smstop	sm
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	ldr	x16, \[x29, #?16\]
 **	tbz	x16, 0, .*
 **	smstart	sm
 **	ldr	x16, \[x29, #?16\]
 **	tbnz	x16, 0, .*
 **	smstart	sm
-**	bl	s_callee
+**	bl	_?s_callee
 **	ldr	x16, \[x29, #?16\]
 **	tbnz	x16, 0, .*
 **	smstop	sm
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	ldp	q8, q9, \[sp, #?32\]
 **	ldp	q10, q11, \[sp, #?64\]
 **	ldp	q12, q13, \[sp, #?96\]
