@@ -8,52 +8,60 @@ int foo [[gnu::preserve_none]] (...);
 
 /* Check preserve_none falls back to AAPCS for variadic functions. */
 
+/* On Darwin the fallback is to darwinpcs, which passes variadic arguments on
+   the stack, so none of the w1..w7 setup appears there; the *M lines assert the
+   stack form rather than freezing the whole body.  Apple clang 17 does the same
+   for a plain variadic call, so the difference is the ABI, not codegen.  */
+
 /*
 ** bar:
 ** ...
-**	mov	w0, 23
-**	mov	w7, 7
-**	mov	w6, 6
-**	mov	w5, 5
-**	mov	w4, 4
-**	mov	w3, 3
-**	mov	w2, 2
-**	mov	w1, 1
-**	str	w0, \[sp, 120\]
-**	mov	w0, 22
-**	str	w0, \[sp, 112\]
-**	mov	w0, 21
-**	str	w0, \[sp, 104\]
-**	mov	w0, 20
-**	str	w0, \[sp, 96\]
-**	mov	w0, 19
-**	str	w0, \[sp, 88\]
-**	mov	w0, 18
-**	str	w0, \[sp, 80\]
-**	mov	w0, 17
-**	str	w0, \[sp, 72\]
-**	mov	w0, 16
-**	str	w0, \[sp, 64\]
-**	mov	w0, 15
-**	str	w0, \[sp, 56\]
-**	mov	w0, 14
-**	str	w0, \[sp, 48\]
-**	mov	w0, 13
-**	str	w0, \[sp, 40\]
-**	mov	w0, 12
-**	str	w0, \[sp, 32\]
-**	mov	w0, 11
-**	str	w0, \[sp, 24\]
-**	mov	w0, 10
-**	str	w0, \[sp, 16\]
-**	mov	w0, 9
-**	str	w0, \[sp, 8\]
-**	mov	w0, 8
-**	str	w0, \[sp\]
-**	mov	w0, 0
-**	bl	foo
-**	add	w0, w0, 1
+*E	mov	w0, 23
+*E	mov	w7, 7
+*E	mov	w6, 6
+*E	mov	w5, 5
+*E	mov	w4, 4
+*E	mov	w3, 3
+*E	mov	w2, 2
+*E	mov	w1, 1
+*E	str	w0, \[sp, 120\]
+*E	mov	w0, 22
+*E	str	w0, \[sp, 112\]
+*E	mov	w0, 21
+*E	str	w0, \[sp, 104\]
+*E	mov	w0, 20
+*E	str	w0, \[sp, 96\]
+*E	mov	w0, 19
+*E	str	w0, \[sp, 88\]
+*E	mov	w0, 18
+*E	str	w0, \[sp, 80\]
+*E	mov	w0, 17
+*E	str	w0, \[sp, 72\]
+*E	mov	w0, 16
+*E	str	w0, \[sp, 64\]
+*E	mov	w0, 15
+*E	str	w0, \[sp, 56\]
+*E	mov	w0, 14
+*E	str	w0, \[sp, 48\]
+*E	mov	w0, 13
+*E	str	w0, \[sp, 40\]
+*E	mov	w0, 12
+*E	str	w0, \[sp, 32\]
+*E	mov	w0, 11
+*E	str	w0, \[sp, 24\]
+*E	mov	w0, 10
+*E	str	w0, \[sp, 16\]
+*E	mov	w0, 9
+*E	str	w0, \[sp, 8\]
+*E	mov	w0, 8
+*E	str	w0, \[sp\]
+*E	mov	w0, 0
+*E	bl	foo
+*E	add	w0, w0, 1
 ** ...
+*M	...
+*M	str	w[0-9]+, \[sp, [0-9]+\]
+*M	...
 */
 int bar [[gnu::preserve_none]] ()
 {
