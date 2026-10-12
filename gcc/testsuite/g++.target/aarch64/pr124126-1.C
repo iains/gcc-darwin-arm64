@@ -4,7 +4,7 @@
 /* Make sure an array of uint64_t[8] works when
    used before the inlcude of arm_acle.h.  */
 
-typedef unsigned long uint64_t;
+typedef __UINT64_TYPE__ uint64_t;
 void executeSuperscalar(uint64_t (*r)[8]);
 
 #include "arm_acle.h"
