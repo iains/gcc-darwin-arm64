@@ -10,7 +10,7 @@ void consume_z0 (svint8_t);
 ** test_z0:
 **	...
 **	smstop	sm
-**	bl	produce_z0
+**	bl	_?produce_z0
 **	sub	sp, sp, #?32
 **	str	z0, \[sp\]
 **	smstart	sm
@@ -21,7 +21,7 @@ void consume_z0 (svint8_t);
 **	smstop	sm
 **	ldr	z0, \[sp\]
 **	add	sp, sp, #?32
-**	bl	consume_z0
+**	bl	_?consume_z0
 **	...
 */
 void
@@ -39,7 +39,7 @@ void consume_z3 (svint8x4_t);
 ** test_z3:
 **	...
 **	smstop	sm
-**	bl	produce_z3
+**	bl	_?produce_z3
 **	sub	sp, sp, #?128
 **	str	z0, \[sp\]
 **	str	z1, \[sp, #1, mul vl\]
@@ -62,7 +62,7 @@ void consume_z3 (svint8x4_t);
 **	ldr	z2, \[sp, #2, mul vl\]
 **	ldr	z3, \[sp, #3, mul vl\]
 **	add	sp, sp, #?128
-**	bl	consume_z3
+**	bl	_?consume_z3
 **	...
 */
 void
@@ -80,7 +80,7 @@ void consume_p0 (svbool_t);
 ** test_p0:
 **	...
 **	smstop	sm
-**	bl	produce_p0
+**	bl	_?produce_p0
 **	sub	sp, sp, #?32
 **	str	p0, \[sp\]
 **	smstart	sm
@@ -91,7 +91,7 @@ void consume_p0 (svbool_t);
 **	smstop	sm
 **	ldr	p0, \[sp\]
 **	add	sp, sp, #?32
-**	bl	consume_p0
+**	bl	_?consume_p0
 **	...
 */
 void
