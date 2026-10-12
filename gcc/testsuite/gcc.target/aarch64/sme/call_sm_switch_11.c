@@ -39,7 +39,7 @@ struct callbacks {
 **	mov	x14, sp
 **	and	x14, x14, x15
 **	mov	sp, x14
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	ldr	x16, \[x29, #?16\]
@@ -59,7 +59,7 @@ struct callbacks {
 **	mov	x14, sp
 **	and	x14, x14, x15
 **	mov	sp, x14
-**	bl	s_callee
+**	bl	_?s_callee
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	ldr	x16, \[x29, #?16\]
@@ -72,7 +72,7 @@ struct callbacks {
 **	mov	x14, sp
 **	and	x14, x14, x15
 **	mov	sp, x14
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	ldp	d8, d9, \[sp, #?32\]
@@ -110,12 +110,12 @@ sc_caller_sme () [[arm::streaming_compatible]]
 **	mov	x14, sp
 **	and	x14, x14, x15
 **	mov	sp, x14
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	str	x0, \[x29, #?16\]
 **	...
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	ldp	d8, d9, \[sp, #?32\]
@@ -142,7 +142,7 @@ sc_caller () [[arm::streaming_compatible]]
 **	mov	x14, sp
 **	and	x14, x14, x15
 **	mov	sp, x14
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	...
 **	str	wzr, \[x10\]
 **	...
@@ -163,7 +163,7 @@ sc_caller_x0 (int *ptr) [[arm::streaming_compatible]]
 **	mov	x14, sp
 **	and	x14, x14, x15
 **	mov	sp, x14
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	...
 **	str	w11, \[x10\]
 **	...
@@ -186,12 +186,12 @@ sc_caller_x1 (int *ptr, int a) [[arm::streaming_compatible]]
 **	...
 **	stp	d8, d9, \[sp, #?48\]
 **	...
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	str	x0, \[x29, #?16\]
 **	...
-**	bl	ns_callee_stack
+**	bl	_?ns_callee_stack
 **	cmp	sp, #?0
 **	csetm	x15, ne
 **	ldr	x16, \[x29, #?16\]
