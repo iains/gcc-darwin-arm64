@@ -16,6 +16,6 @@ __arm_new("za") __arm_locally_streaming int test()
   return svptest_any(all, svcmpne(all, expected, actual));
 }
 
-// { dg-final { scan-assembler {\tbl\t__arm_tpidr2_save\n} } }
-// { dg-final { scan-assembler {\tbl\t__arm_tpidr2_restore\n} } }
+// { dg-final { scan-assembler {\tbl\t_?__arm_tpidr2_save\n} } }
+// { dg-final { scan-assembler {\tbl\t_?__arm_tpidr2_restore\n} } }
 // { dg-final { scan-assembler-times {\tsmstart\tza\n} 2 } }

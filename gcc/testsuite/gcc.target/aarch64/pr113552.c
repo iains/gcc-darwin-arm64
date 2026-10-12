@@ -14,4 +14,4 @@ void foo (float *a, double *b)
       }
 }
 
-/* { dg-final { scan-assembler-times {bl\t_ZGVnN2v_cos} 6 } } */
+/* { dg-final { scan-assembler-times {bl\t_?_ZGVnN2v_cos} 6 } } */

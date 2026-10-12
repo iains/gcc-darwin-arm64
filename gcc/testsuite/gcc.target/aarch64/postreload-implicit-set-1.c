@@ -15,11 +15,11 @@ int h (int);
 **	beq	\.L[0-9]+
 **	stp	x29, x30, \[sp, -16\]!
 **	mov	x29, sp
-**	bl	g
+**	bl	_?g
 **	cmp	w0, 7
 **	beq	\.L[0-9]+
 **	ldp	x29, x30, \[sp\], 16
-**	b	h
+**	b	_?h
 **	ldp	x29, x30, \[sp\], 16
 **	ret
 **	ret

@@ -25,11 +25,11 @@ struct callbacks {
 **	stp	d12, d13, \[sp, #?64\]
 **	stp	d14, d15, \[sp, #?80\]
 **	mov	\1, x0
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	smstart	sm
-**	bl	s_callee
+**	bl	_?s_callee
 **	smstop	sm
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	ldr	(x[0-9]+), \[\1\]
 **	blr	\2
 **	ldr	(x[0-9]+), \[\1, #?8\]
@@ -68,10 +68,10 @@ n_caller (struct callbacks *c)
 **	stp	d14, d15, \[sp, #?80\]
 **	mov	\1, x0
 **	smstop	sm
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	smstart	sm
-**	bl	s_callee
-**	bl	sc_callee
+**	bl	_?s_callee
+**	bl	_?sc_callee
 **	ldr	(x[0-9]+), \[\1\]
 **	smstop	sm
 **	blr	\2
@@ -114,18 +114,18 @@ s_caller (struct callbacks *c) [[arm::streaming]]
 **	ldr	x16, \[x29, #?16\]
 **	tbz	x16, 0, .*
 **	smstop	sm
-**	bl	ns_callee
+**	bl	_?ns_callee
 **	ldr	x16, \[x29, #?16\]
 **	tbz	x16, 0, .*
 **	smstart	sm
 **	ldr	x16, \[x29, #?16\]
 **	tbnz	x16, 0, .*
 **	smstart	sm
-**	bl	s_callee
+**	bl	_?s_callee
 **	ldr	x16, \[x29, #?16\]
 **	tbnz	x16, 0, .*
 **	smstop	sm
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	ldp	d8, d9, \[sp, #?32\]
 **	ldp	d10, d11, \[sp, #?48\]
 **	ldp	d12, d13, \[sp, #?64\]
@@ -153,10 +153,10 @@ sc_caller_sme () [[arm::streaming_compatible]]
 **	stp	d10, d11, \[sp, #?48\]
 **	stp	d12, d13, \[sp, #?64\]
 **	stp	d14, d15, \[sp, #?80\]
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	str	x0, \[x29, #?16\]
 **	...
-**	bl	sc_callee
+**	bl	_?sc_callee
 **	ldp	d8, d9, \[sp, #?32\]
 **	ldp	d10, d11, \[sp, #?48\]
 **	ldp	d12, d13, \[sp, #?64\]
@@ -175,7 +175,7 @@ sc_caller () [[arm::streaming_compatible]]
 ** sc_caller_x0:
 **	...
 **	mov	x10, x0
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	...
 **	str	wzr, \[x10\]
 **	...
@@ -193,7 +193,7 @@ sc_caller_x0 (int *ptr) [[arm::streaming_compatible]]
 **	...
 **	mov	x10, x0
 **	mov	x11, x1
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	...
 **	str	w11, \[x10\]
 **	...
@@ -214,10 +214,10 @@ sc_caller_x1 (int *ptr, int a) [[arm::streaming_compatible]]
 **	...
 **	stp	d8, d9, \[sp, #?48\]
 **	...
-**	bl	__arm_sme_state
+**	bl	_?__arm_sme_state
 **	str	x0, \[x29, #?16\]
 **	...
-**	bl	ns_callee_stack
+**	bl	_?ns_callee_stack
 **	ldr	x16, \[x29, #?16\]
 **	tbz	x16, 0, .*
 **	.inst 0xd503437f // smstart sm
