@@ -2,6 +2,30 @@
 /* { dg-options "-O2 -march=armv8.2-a+fp16" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
+/* On aarch64-darwin, darwinpcs D.3 promotes a narrow argument in the caller, so
+   the callee sees subreg:QI (reg:SI) rather than a QImode register.  Given that
+   shape, @aarch64_simd_vec_set<mode> no longer selects bfi in a general
+   register: it takes the FP alternative instead, dup'ing each value into a
+   vector register and inserting it with ins, which costs one to seven
+   instructions more here depending on how many elements are inserted.
+
+   The shape is what moves the choice, not the target: pass these same
+   parameters as int and cast them in the callee, so that the subreg appears
+   with no ABI deviation anywhere, and ELF stops using bfi too -- it goes to
+   memory, taking a stack slot and ld1 where Darwin merely spends an extra
+   instruction.  bfi remains available to both (the promoted value is in a
+   general register either way), so this is a cost comparison that does not
+   reckon with the subreg rather than anything the ABI requires.
+
+   The nine affected bodies are therefore xfailed rather than given a Mach-O
+   variant: a *M body would freeze the longer form as the expectation, while
+   the xfail turns into an XPASS if the cost comparison is improved.
+
+   test_int16_9 is NOT one of them: there Darwin emits the same six
+   instructions and merely exchanges v0 and v31 (the zip1 operands exchange to
+   match, so the result is identical), which is what the per-line *E / *M
+   introducers are for.  */
+
 #include <arm_neon.h>
 
 /* Check vector initialization with a repeating sequence of elements.  */
@@ -93,7 +117,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_3:
+** test_int8_3: { xfail *-*-darwin* }
 **	bfi	w0, w1, 8, 8
 **	bfi	w0, w2, 16, 8
 **	bfi	w0, w3, 24, 8
@@ -102,7 +126,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_4:
+** test_int8_4: { xfail *-*-darwin* }
 **	bfi	w0, w2, 8, 8
 **	bfi	w1, w3, 8, 8
 **	bfi	w0, w4, 16, 8
@@ -123,7 +147,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_6:
+** test_int8_6: { xfail *-*-darwin* }
 **	mov	w1, 0
 **	bfi	w1, w0, 8, 8
 **	dup	v0\.8h, w1
@@ -158,7 +182,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_10:
+** test_int8_10: { xfail *-*-darwin* }
 **	bfi	w0, w1, 8, 8
 **	bfi	w0, w2, 16, 8
 **	bfi	w0, w3, 24, 8
@@ -170,7 +194,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_11:
+** test_int8_11: { xfail *-*-darwin* }
 **	bfi	w0, w1, 8, 8
 **	adrp	x4, .LANCHOR[0-9]+
 **	bfi	w0, w2, 16, 8
@@ -212,7 +236,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_14:
+** test_int8_14: { xfail *-*-darwin* }
 **	dup	v31\.8b, w1
 **	fmov	w1, s31
 **	bfi	w1, w0, 0, 8
@@ -222,7 +246,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int8_15:
+** test_int8_15: { xfail *-*-darwin* }
 **	dup	v31\.8b, w1
 **	fmov	w1, s31
 **	bfi	w1, w0, 0, 8
@@ -368,7 +392,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int16_5:
+** test_int16_5: { xfail *-*-darwin* }
 **	mov	w1, 0
 **	bfi	w1, w0, 16, 16
 **	dup	v0\.4s, w1
@@ -387,7 +411,7 @@ TEST_64(int, int64_t, s)
 */
 
 /*
-** test_int16_7:
+** test_int16_7: { xfail *-*-darwin* }
 **	mov	w2, 0
 **	bfi	w2, w0, 16, 16
 **	mov	w0, 65537
@@ -411,9 +435,12 @@ TEST_64(int, int64_t, s)
 ** test_int16_9:
 **	bfi	w0, w1, 16, 16
 **	bfi	w1, w2, 16, 16
-**	dup	v31\.2s, w0
-**	dup	v0\.2s, w1
-**	zip1	v0\.8h, v31\.8h, v0\.8h
+*E	dup	v31\.2s, w0
+*E	dup	v0\.2s, w1
+*E	zip1	v0\.8h, v31\.8h, v0\.8h
+*M	dup	v0\.2s, w0
+*M	dup	v31\.2s, w1
+*M	zip1	v0\.8h, v0\.8h, v31\.8h
 **	ret
 */
 

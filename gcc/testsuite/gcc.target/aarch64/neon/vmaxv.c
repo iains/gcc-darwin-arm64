@@ -6,7 +6,8 @@
 /*
 ** test_vmaxv_u8:
 ** umaxv	b([0-9]+), v0\.8b
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M umov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vmaxv_u8, uint8_t, uint8x8_t)
@@ -14,7 +15,8 @@ TEST_UNARY (vmaxv_u8, uint8_t, uint8x8_t)
 /*
 ** test_vmaxv_s8:
 ** smaxv	b([0-9]+), v0\.8b
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vmaxv_s8, int8_t, int8x8_t)
@@ -22,7 +24,8 @@ TEST_UNARY (vmaxv_s8, int8_t, int8x8_t)
 /*
 ** test_vmaxv_u16:
 ** umaxv	h([0-9]+), v0\.4h
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M umov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vmaxv_u16, uint16_t, uint16x4_t)
@@ -30,7 +33,8 @@ TEST_UNARY (vmaxv_u16, uint16_t, uint16x4_t)
 /*
 ** test_vmaxv_s16:
 ** smaxv	h([0-9]+), v0\.4h
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vmaxv_s16, int16_t, int16x4_t)
@@ -62,7 +66,8 @@ TEST_UNARY (vmaxvq_u8, uint8_t, uint8x16_t)
 /*
 ** test_vmaxvq_s8:
 ** smaxv	b([0-9]+), v0\.16b
-** umov	w0, v\1\.b\[0\]
+*E umov	w0, v\1\.b\[0\]
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vmaxvq_s8, int8_t, int8x16_t)
@@ -78,7 +83,8 @@ TEST_UNARY (vmaxvq_u16, uint16_t, uint16x8_t)
 /*
 ** test_vmaxvq_s16:
 ** smaxv	h([0-9]+), v0\.8h
-** umov	w0, v\1\.h\[0\]
+*E umov	w0, v\1\.h\[0\]
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vmaxvq_s16, int16_t, int16x8_t)

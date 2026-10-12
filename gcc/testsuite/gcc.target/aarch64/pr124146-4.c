@@ -10,7 +10,12 @@
    using the natural alignment of its container, ignoring user alignment: a
    _BitInt no wider than 64 bits occupies a single GPR, one between 65 and 128
    bits uses a 16-byte two-GPR container (so the C.8 rule rounds NGRN up to an
-   even register), and one wider than 128 bits is passed by reference.  */
+   even register), and one wider than 128 bits is passed by reference.
+
+   Darwin is an exception: darwinpcs relaxes the register-pairing requirement
+   for 16-byte transfers, so the argument lands in x1/x2 rather than x2/x3.  Verified against Apple
+   clang 17, which emits the same sequence as GCC does for both __int128 and
+   _BitInt(128); hence the *M bodies below.  */
 
 typedef __attribute__((__aligned__ (8), __may_alias__)) _BitInt(64) ma8_bi64;
 typedef __attribute__((__aligned__, __may_alias__)) _BitInt(128) ma_bi128;
@@ -32,8 +37,10 @@ void pass_bi64 (ma8_bi64 y) { consume_bi64 (5, y); }
 
 /* Over-aligned _BitInt(128): natural alignment 16 -> argument in x2/x3.
 ** pass_bi128:
-**	mov	x2, x0
-**	mov	x3, x1
+*E	mov	x2, x0
+*E	mov	x3, x1
+*M	mov	x2, x1
+*M	mov	x1, x0
 **	mov	w0, 5
 **	b	consume_bi128
 */
@@ -42,8 +49,10 @@ void pass_bi128 (ma_bi128 y) { consume_bi128 (5, y); }
 /* Under-aligned (aligned(8)) _BitInt(128): natural alignment is still 16, so
    the argument must still land in x2/x3, not x1/x2.
 ** pass_bi128_underaligned:
-**	mov	x2, x0
-**	mov	x3, x1
+*E	mov	x2, x0
+*E	mov	x3, x1
+*M	mov	x2, x1
+*M	mov	x1, x0
 **	mov	w0, 5
 **	b	consume_bi128
 */
