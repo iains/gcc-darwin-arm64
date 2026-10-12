@@ -132,6 +132,7 @@ test_read_fpmr_sysreg_asm_32 ()
 /*
 **test_read_fpmr_sysreg_asm_16:
 **	mrs	x0, fpmr
+*M	and	w0, w0, 65535
 **	ret
 */
 uint16_t
@@ -145,6 +146,7 @@ test_read_fpmr_sysreg_asm_16 ()
 /*
 **test_read_fpmr_sysreg_asm_8:
 **	mrs	x0, fpmr
+*M	and	w0, w0, 255
 **	ret
 */
 uint8_t

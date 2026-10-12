@@ -6,7 +6,8 @@
 /*
 ** test_vaddv_u8:
 ** addv	b([0-9]+), v0\.8b
-** umov	w0, v\1\.b\[0\]
+*E umov	w0, v\1\.b\[0\]
+*M fmov	w0, s\1
 ** ret
 */
 TEST_UNARY (vaddv_u8, uint8_t, uint8x8_t)
@@ -14,7 +15,8 @@ TEST_UNARY (vaddv_u8, uint8_t, uint8x8_t)
 /*
 ** test_vaddv_s8:
 ** addv	b([0-9]+), v0\.8b
-** umov	w0, v\1\.b\[0\]
+*E umov	w0, v\1\.b\[0\]
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vaddv_s8, int8_t, int8x8_t)
@@ -22,7 +24,8 @@ TEST_UNARY (vaddv_s8, int8_t, int8x8_t)
 /*
 ** test_vaddv_u16:
 ** addv	h([0-9]+), v0\.4h
-** umov	w0, v\1\.h\[0\]
+*E umov	w0, v\1\.h\[0\]
+*M fmov	w0, s\1
 ** ret
 */
 TEST_UNARY (vaddv_u16, uint16_t, uint16x4_t)
@@ -30,7 +33,8 @@ TEST_UNARY (vaddv_u16, uint16_t, uint16x4_t)
 /*
 ** test_vaddv_s16:
 ** addv	h([0-9]+), v0\.4h
-** umov	w0, v\1\.h\[0\]
+*E umov	w0, v\1\.h\[0\]
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vaddv_s16, int16_t, int16x4_t)
@@ -54,7 +58,8 @@ TEST_UNARY (vaddv_s32, int32_t, int32x2_t)
 /*
 ** test_vaddvq_u8:
 ** addv	b([0-9]+), v0\.16b
-** umov	w0, v\1\.b\[0\]
+*E umov	w0, v\1\.b\[0\]
+*M fmov	w0, s\1
 ** ret
 */
 TEST_UNARY (vaddvq_u8, uint8_t, uint8x16_t)
@@ -62,7 +67,8 @@ TEST_UNARY (vaddvq_u8, uint8_t, uint8x16_t)
 /*
 ** test_vaddvq_s8:
 ** addv	b([0-9]+), v0\.16b
-** umov	w0, v\1\.b\[0\]
+*E umov	w0, v\1\.b\[0\]
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vaddvq_s8, int8_t, int8x16_t)
@@ -70,7 +76,8 @@ TEST_UNARY (vaddvq_s8, int8_t, int8x16_t)
 /*
 ** test_vaddvq_u16:
 ** addv	h([0-9]+), v0\.8h
-** umov	w0, v\1\.h\[0\]
+*E umov	w0, v\1\.h\[0\]
+*M fmov	w0, s\1
 ** ret
 */
 TEST_UNARY (vaddvq_u16, uint16_t, uint16x8_t)
@@ -78,7 +85,8 @@ TEST_UNARY (vaddvq_u16, uint16_t, uint16x8_t)
 /*
 ** test_vaddvq_s16:
 ** addv	h([0-9]+), v0\.8h
-** umov	w0, v\1\.h\[0\]
+*E umov	w0, v\1\.h\[0\]
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vaddvq_s16, int16_t, int16x8_t)

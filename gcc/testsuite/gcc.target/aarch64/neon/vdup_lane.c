@@ -488,14 +488,16 @@ TEST_DUP_LANE (vdupb_laneq_u8, uint8_t, uint8x16_t)
 
 /*
 ** test_vdupb_lane_s8:
-** umov	w0, v0\.b\[0\]
+*E umov	w0, v0\.b\[0\]
+*M smov	w0, v0\.b\[0\]
 ** ret
 */
 TEST_DUP_LANE (vdupb_lane_s8, int8_t, int8x8_t)
 
 /*
 ** test_vdupb_laneq_s8:
-** umov	w0, v0\.b\[0\]
+*E umov	w0, v0\.b\[0\]
+*M smov	w0, v0\.b\[0\]
 ** ret
 */
 TEST_DUP_LANE (vdupb_laneq_s8, int8_t, int8x16_t)
@@ -516,14 +518,16 @@ TEST_DUP_LANE (vduph_laneq_u16, uint16_t, uint16x8_t)
 
 /*
 ** test_vduph_lane_s16:
-** umov	w0, v0\.h\[0\]
+*E umov	w0, v0\.h\[0\]
+*M smov	w0, v0\.h\[0\]
 ** ret
 */
 TEST_DUP_LANE (vduph_lane_s16, int16_t, int16x4_t)
 
 /*
 ** test_vduph_laneq_s16:
-** umov	w0, v0\.h\[0\]
+*E umov	w0, v0\.h\[0\]
+*M smov	w0, v0\.h\[0\]
 ** ret
 */
 TEST_DUP_LANE (vduph_laneq_s16, int16_t, int16x8_t)
