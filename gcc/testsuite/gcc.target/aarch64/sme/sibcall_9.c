@@ -10,7 +10,7 @@ void callee() __arm_inout("za");
 ** caller_inout:
 **	...
 **	str	zt0, \[[^\n]+\]
-**	bl	callee
+**	bl	_?callee
 **	ldr	zt0, \[[^\n]+\]
 **	...
 **	ret
@@ -21,7 +21,7 @@ void caller_inout() __arm_inout("za", "zt0") { callee(); }
 ** caller_in:
 **	...
 **	str	zt0, \[[^\n]+\]
-**	bl	callee
+**	bl	_?callee
 **	ldr	zt0, \[[^\n]+\]
 **	...
 **	ret
@@ -32,7 +32,7 @@ void caller_in() __arm_inout("za") __arm_in("zt0") { callee(); }
 ** caller_out:
 **	...
 **	str	zt0, \[[^\n]+\]
-**	bl	callee
+**	bl	_?callee
 **	ldr	zt0, \[[^\n]+\]
 **	...
 **	ret
@@ -43,7 +43,7 @@ void caller_out() __arm_inout("za") __arm_in("zt0") { gen_zt0(); callee(); }
 ** caller_preserves:
 **	...
 **	str	zt0, \[[^\n]+\]
-**	bl	callee
+**	bl	_?callee
 **	ldr	zt0, \[[^\n]+\]
 **	...
 **	ret
