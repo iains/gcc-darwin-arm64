@@ -10,4 +10,4 @@ void test_fn3 (int *a, int *b, char *c, int n)
     a[i] = (int) (fn3 (b[i], c[i]) + c[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv_fn3\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv_fn3\n} } } */

@@ -50,9 +50,9 @@ void (*ATTR refs_vpcs[]) (void) = {
 /* Note: local symbols don't need .variant_pcs, but gcc generates it, so
    we check them here.  */
 
-/* { dg-final { scan-assembler-not {\.variant_pcs\tf_local_basepcs} } } */
-/* { dg-final { scan-assembler-not {\.variant_pcs\tf_ifunc_basepcs} } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_local_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_ifunc_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_hidden_ifunc_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_local_ifunc_vpcs} 1 } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?f_local_basepcs} } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?f_ifunc_basepcs} } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_local_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_ifunc_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_hidden_ifunc_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_local_ifunc_vpcs} 1 } } */

@@ -38,9 +38,15 @@ int main ()
   return 0;
 }
 
-/* { dg-final { scan-assembler-times {\t__bid_truncsdhf} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_truncddhf} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_truncddsd2} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_trunctdhf} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_trunctdsd2} 2 { target { dfp_bid } } } } */
-/* { dg-final { scan-assembler-times {\t__bid_trunctddd2} 2 { target { dfp_bid } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_truncsdhf} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler {\t___bid_truncsdhf} { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_truncddhf} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler {\t___bid_truncddhf} { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_truncddsd2} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler {\t___bid_truncddsd2} { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_trunctdhf} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler {\t___bid_trunctdhf} { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_trunctdsd2} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler {\t___bid_trunctdsd2} { target { dfp_bid && *-*-darwin* } } } } */
+/* { dg-final { scan-assembler-times {\t__bid_trunctddd2} 2 { target { dfp_bid && { ! *-*-darwin* } } } } } */
+/* { dg-final { scan-assembler {\t___bid_trunctddd2} { target { dfp_bid && *-*-darwin* } } } } */

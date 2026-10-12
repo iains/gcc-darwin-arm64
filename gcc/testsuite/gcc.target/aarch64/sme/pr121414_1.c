@@ -13,15 +13,15 @@ __arm_locally_streaming void g1() {}
 __arm_new("za") void g2() {}
 __arm_new("zt0") void g3() {}
 
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf1\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf2\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf3\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf4\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf5\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf6\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf7\n} } } */
-/* { dg-final { scan-assembler {\t\.variant_pcs\tf8\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f1\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f2\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f3\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f4\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f5\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f6\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f7\n} } } */
+/* { dg-final { scan-assembler {\t\.variant_pcs\t_?f8\n} } } */
 
-/* { dg-final { scan-assembler-not {\t\.variant_pcs\tg1\n} } } */
-/* { dg-final { scan-assembler-not {\t\.variant_pcs\tg2\n} } } */
-/* { dg-final { scan-assembler-not {\t\.variant_pcs\tg3\n} } } */
+/* { dg-final { scan-assembler-not {\t\.variant_pcs\t_?g1\n} } } */
+/* { dg-final { scan-assembler-not {\t\.variant_pcs\t_?g2\n} } } */
+/* { dg-final { scan-assembler-not {\t\.variant_pcs\t_?g3\n} } } */

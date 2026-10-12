@@ -80,17 +80,17 @@ void (*ATTR refs_vpcs[]) (void) = {
    we check them here.  An undefined weakref does not show up in the
    symbol table, only the target symbol, so it does not need .variant_pcs.  */
 
-/* { dg-final { scan-assembler-not {\.variant_pcs\tf_undef_basepcs} } } */
-/* { dg-final { scan-assembler-not {\.variant_pcs\tf_def_basepcs} } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_undef_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_def_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_alias_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_weak_alias_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_weak_undef_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_protected_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_hidden_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_local_vpcs} 1 } } */
-/* { dg-final { scan-assembler-not {\.variant_pcs\tf_local_weakref_undef_vpcs} } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_local_weakref_def_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_undef_renamed_vpcs} 1 } } */
-/* { dg-final { scan-assembler-times {\.variant_pcs\tf_def_renamed_vpcs} 1 } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?f_undef_basepcs} } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?f_def_basepcs} } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_undef_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_def_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_alias_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_weak_alias_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_weak_undef_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_protected_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_hidden_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_local_vpcs} 1 } } */
+/* { dg-final { scan-assembler-not {\.variant_pcs\t_?f_local_weakref_undef_vpcs} } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_local_weakref_def_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_undef_renamed_vpcs} 1 } } */
+/* { dg-final { scan-assembler-times {\.variant_pcs\t_?f_def_renamed_vpcs} 1 } } */
