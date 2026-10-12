@@ -81,11 +81,11 @@ sc_ls () [[arm::streaming_compatible]]
 **	smstart	sm
 **	mrs	(x[0-9]+), tpidr2_el0
 **	cbz	\1, [^\n]+
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	msr	tpidr2_el0, xzr
 **	zero	{ za }
 **	smstart	za
-**	bl	consume_za
+**	bl	_?consume_za
 **	smstop	za
 **	smstop	sm
 **	ldp	d8, d9, \[sp, #?16\]
@@ -107,11 +107,11 @@ n_ls_new_za ()
 **	str	x30, \[sp, #?-16\]!
 **	mrs	(x[0-9]+), tpidr2_el0
 **	cbz	\1, [^\n]+
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	msr	tpidr2_el0, xzr
 **	zero	{ za }
 **	smstart	za
-**	bl	consume_za
+**	bl	_?consume_za
 **	smstop	za
 **	ldr	x30, \[sp\], #?16
 **	ret
@@ -139,11 +139,11 @@ s_ls_new_za () [[arm::streaming]]
 **	smstart	sm
 **	mrs	(x[0-9]+), tpidr2_el0
 **	cbz	\1, [^\n]+
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	msr	tpidr2_el0, xzr
 **	zero	{ za }
 **	smstart	za
-**	bl	consume_za
+**	bl	_?consume_za
 **	smstop	za
 **	ldr	x16, \[x29, #?16\]
 **	tbnz	x16, 0, [^\n]+
@@ -172,7 +172,7 @@ sc_ls_new_za () [[arm::streaming_compatible]]
 **	stp	d12, d13, \[sp, #?48\]
 **	stp	d14, d15, \[sp, #?64\]
 **	smstart	sm
-**	bl	consume_za
+**	bl	_?consume_za
 **	smstop	sm
 **	ldp	d8, d9, \[sp, #?16\]
 **	ldp	d10, d11, \[sp, #?32\]
@@ -191,7 +191,7 @@ n_ls_shared_za () [[arm::inout("za")]]
 /*
 ** s_ls_shared_za:
 **	str	x30, \[sp, #?-16\]!
-**	bl	consume_za
+**	bl	_?consume_za
 **	ldr	x30, \[sp\], #?16
 **	ret
 */
@@ -216,7 +216,7 @@ s_ls_shared_za () [[arm::streaming, arm::inout("za")]]
 **	str	x16, \[x29, #?16\]
 **	tbnz	x16, 0, [^\n]+
 **	smstart	sm
-**	bl	consume_za
+**	bl	_?consume_za
 **	ldr	x16, \[x29, #?16\]
 **	tbnz	x16, 0, [^\n]+
 **	smstop	sm
