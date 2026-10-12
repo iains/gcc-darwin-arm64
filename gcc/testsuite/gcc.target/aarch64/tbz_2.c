@@ -1,7 +1,8 @@
 /* { dg-do compile } */
 /* { dg-additional-options "-O2 -std=c99" } */
 /* { dg-additional-options "-fno-unwind-tables -fno-asynchronous-unwind-tables" { target { ! *-*-darwin* } } } */
-/* { dg-final { check-function-bodies "**" "" "" { target { le } } } } */
+/* { dg-final { check-function-bodies {"**" "*E"} "" "" { target { le && { ! *-*-darwin* } } } } } */
+/* { dg-final { check-function-bodies {"**" "*M"} "" "" { target { le && *-*-darwin* } } } } */
 
 #include <stdbool.h>
 
@@ -57,8 +58,9 @@ void g4(int x)
 
 /* 
 ** g5:
-** 	tst	[wx]0, 255
-** 	bne	.L[0-9]+
+*E 	tst	[wx]0, 255
+*E 	bne	.L[0-9]+
+*M 	cbnz	w0, .L[0-9]+
 ** 	ret
 ** 	...
 */

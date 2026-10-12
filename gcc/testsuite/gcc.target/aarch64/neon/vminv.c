@@ -1,12 +1,14 @@
 /* { dg-do compile } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies {"**" "*E"} "" "" { target { ! *-*-darwin* } } } } */
+/* { dg-final { check-function-bodies {"**" "*M"} "" "" { target *-*-darwin* } } } */
 
 #include "arm_neon_test.h"
 
 /*
 ** test_vminv_u8:
 ** uminv	b([0-9]+), v0\.8b
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M umov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vminv_u8, uint8_t, uint8x8_t)
@@ -14,7 +16,8 @@ TEST_UNARY (vminv_u8, uint8_t, uint8x8_t)
 /*
 ** test_vminv_s8:
 ** sminv	b([0-9]+), v0\.8b
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vminv_s8, int8_t, int8x8_t)
@@ -22,7 +25,8 @@ TEST_UNARY (vminv_s8, int8_t, int8x8_t)
 /*
 ** test_vminv_u16:
 ** uminv	h([0-9]+), v0\.4h
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M umov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vminv_u16, uint16_t, uint16x4_t)
@@ -30,7 +34,8 @@ TEST_UNARY (vminv_u16, uint16_t, uint16x4_t)
 /*
 ** test_vminv_s16:
 ** sminv	h([0-9]+), v0\.4h
-** umov	x0, v\1\.d\[0\]
+*E umov	x0, v\1\.d\[0\]
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vminv_s16, int16_t, int16x4_t)
@@ -62,7 +67,8 @@ TEST_UNARY (vminvq_u8, uint8_t, uint8x16_t)
 /*
 ** test_vminvq_s8:
 ** sminv	b([0-9]+), v0\.16b
-** umov	w0, v\1\.b\[0\]
+*E umov	w0, v\1\.b\[0\]
+*M smov	w0, v\1\.b\[0\]
 ** ret
 */
 TEST_UNARY (vminvq_s8, int8_t, int8x16_t)
@@ -78,7 +84,8 @@ TEST_UNARY (vminvq_u16, uint16_t, uint16x8_t)
 /*
 ** test_vminvq_s16:
 ** sminv	h([0-9]+), v0\.8h
-** umov	w0, v\1\.h\[0\]
+*E umov	w0, v\1\.h\[0\]
+*M smov	w0, v\1\.h\[0\]
 ** ret
 */
 TEST_UNARY (vminvq_s16, int16_t, int16x8_t)

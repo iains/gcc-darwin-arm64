@@ -1,6 +1,7 @@
 /* { dg-do compile } */
 /* { dg-options "-O2" } */
-/* { dg-final { check-function-bodies "**" "" "" } } */
+/* { dg-final { check-function-bodies {"**" "*E"} "" "" { target { ! *-*-darwin* } } } } */
+/* { dg-final { check-function-bodies {"**" "*M"} "" "" { target *-*-darwin* } } } */
 
 /* PR rtl-optmization/111949 */
 
@@ -19,8 +20,9 @@ unsigned func1(unsigned a, bool b)
 
 /*
 **func2:
-**	bic	w([0-9]+), w1, w0
-**	and	w0, w\1, 255
+*E	bic	w([0-9]+), w1, w0
+*E	and	w0, w\1, 255
+*M	bic	w0, w1, w0
 **      ret
 */
 unsigned func2(bool a, bool b)

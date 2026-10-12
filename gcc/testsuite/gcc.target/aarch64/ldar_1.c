@@ -1,6 +1,8 @@
 /* Test the LDAR instruction generation from atomic acquire loads.  */
 /* { dg-do assemble } */
-/* { dg-additional-options "--save-temps -O1" } */
+/* { dg-additional-options "--save-temps" } */
+/* { dg-additional-options "-O1" { target { ! *-*-darwin* } } } */
+/* { dg-additional-options "-O2" { target *-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 #include <stdint.h>

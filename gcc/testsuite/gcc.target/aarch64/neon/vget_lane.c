@@ -1,5 +1,6 @@
 /* { dg-do compile } */
-/* { dg-final { check-function-bodies "**" "" } } */
+/* { dg-final { check-function-bodies {"**" "*E"} "" "" { target { ! *-*-darwin* } } } } */
+/* { dg-final { check-function-bodies {"**" "*M"} "" "" { target *-*-darwin* } } } */
 
 #include "arm_neon_test.h"
 
@@ -21,7 +22,8 @@ TEST_GET_FIRST_LANE (vget_lane_u8, uint8_t, uint8x8_t)
 
 /*
 ** test_vget_lane_s8_first:
-** umov	w0, v0\.b\[0\]
+*E umov	w0, v0\.b\[0\]
+*M smov	w0, v0\.b\[0\]
 ** ret
 */
 TEST_GET_FIRST_LANE (vget_lane_s8, int8_t, int8x8_t)
@@ -48,7 +50,8 @@ TEST_GET_FIRST_LANE (vgetq_lane_u8, uint8_t, uint8x16_t)
 
 /*
 ** test_vgetq_lane_s8_first:
-** umov	w0, v0\.b\[0\]
+*E umov	w0, v0\.b\[0\]
+*M smov	w0, v0\.b\[0\]
 ** ret
 */
 TEST_GET_FIRST_LANE (vgetq_lane_s8, int8_t, int8x16_t)
@@ -75,7 +78,8 @@ TEST_GET_FIRST_LANE (vget_lane_u16, uint16_t, uint16x4_t)
 
 /*
 ** test_vget_lane_s16_first:
-** umov	w0, v0\.h\[0\]
+*E umov	w0, v0\.h\[0\]
+*M smov	w0, v0\.h\[0\]
 ** ret
 */
 TEST_GET_FIRST_LANE (vget_lane_s16, int16_t, int16x4_t)
@@ -108,7 +112,8 @@ TEST_GET_FIRST_LANE (vgetq_lane_u16, uint16_t, uint16x8_t)
 
 /*
 ** test_vgetq_lane_s16_first:
-** umov	w0, v0\.h\[0\]
+*E umov	w0, v0\.h\[0\]
+*M smov	w0, v0\.h\[0\]
 ** ret
 */
 TEST_GET_FIRST_LANE (vgetq_lane_s16, int16_t, int16x8_t)
@@ -235,7 +240,8 @@ TEST_GET_LAST_LANE (vget_lane_u8, uint8_t, uint8x8_t)
 
 /*
 ** test_vget_lane_s8_last:
-** umov	w0, v0\.b\[7\]
+*E umov	w0, v0\.b\[7\]
+*M smov	w0, v0\.b\[7\]
 ** ret
 */
 TEST_GET_LAST_LANE (vget_lane_s8, int8_t, int8x8_t)
@@ -263,7 +269,8 @@ TEST_GET_LAST_LANE (vgetq_lane_u8, uint8_t, uint8x16_t)
 
 /*
 ** test_vgetq_lane_s8_last:
-** umov	w0, v0\.b\[15\]
+*E umov	w0, v0\.b\[15\]
+*M smov	w0, v0\.b\[15\]
 ** ret
 */
 TEST_GET_LAST_LANE (vgetq_lane_s8, int8_t, int8x16_t)
@@ -291,7 +298,8 @@ TEST_GET_LAST_LANE (vget_lane_u16, uint16_t, uint16x4_t)
 
 /*
 ** test_vget_lane_s16_last:
-** umov	w0, v0\.h\[3\]
+*E umov	w0, v0\.h\[3\]
+*M smov	w0, v0\.h\[3\]
 ** ret
 */
 TEST_GET_LAST_LANE (vget_lane_s16, int16_t, int16x4_t)
@@ -326,7 +334,8 @@ TEST_GET_LAST_LANE (vgetq_lane_u16, uint16_t, uint16x8_t)
 
 /*
 ** test_vgetq_lane_s16_last:
-** umov	w0, v0\.h\[7\]
+*E umov	w0, v0\.h\[7\]
+*M smov	w0, v0\.h\[7\]
 ** ret
 */
 TEST_GET_LAST_LANE (vgetq_lane_s16, int16_t, int16x8_t)
