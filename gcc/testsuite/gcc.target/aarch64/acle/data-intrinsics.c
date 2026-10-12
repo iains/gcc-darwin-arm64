@@ -206,6 +206,7 @@ uint64_t test_rorll (uint64_t a, uint32_t r)
 /*
 ** test_revsh:
 **	rev16	w0, w0
+*M	sxth	w0, w0
 **	ret
 */
 
