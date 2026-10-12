@@ -31,7 +31,7 @@ void run(void (*)());
 *E	ldr	x16, \1
 *E	tbz	x16, 0, .*
 *E	smstop	sm
-*E	bl	run
+*E	bl	_?run
 *E	ldr	x16, \1
 *E	tbz	x16, 0, .*
 *E	smstart	sm

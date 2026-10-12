@@ -31,7 +31,7 @@ __arm_new("zt0") int test2(int *ptr)
 ** test3:
 **	stp	[^\n]+
 **	mov	x29, sp
-**	bl	private_zt0
+**	bl	_?private_zt0
 ** (
 **	mov	w0, 0
 **	ldp	[^\n]+
@@ -52,11 +52,11 @@ __arm_new("zt0") int test3()
 **	...
 **	mrs	x0, tpidr2_el0
 **	cbz	x0, [^\n]+
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	msr	tpidr2_el0, xzr
 **	zero	{ zt0 }
 **	smstart	za
-**	bl	in_zt0
+**	bl	_?in_zt0
 **	smstop	za
 **	ldp	[^\n]+
 **	ret
@@ -71,16 +71,16 @@ __arm_new("zt0") void test4()
 **	...
 **	mrs	x0, tpidr2_el0
 **	cbz	x0, [^\n]+
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	msr	tpidr2_el0, xzr
 **	smstop	za
-**	bl	private_zt0
+**	bl	_?private_zt0
 **	smstart	za
-**	bl	out_zt0
-**	bl	in_zt0
+**	bl	_?out_zt0
+**	bl	_?in_zt0
 **	...
 **	smstop	za
-**	bl	private_zt0
+**	bl	_?private_zt0
 **	ldp	[^\n]+
 **	ret
 */
@@ -100,18 +100,18 @@ __arm_new("zt0") void test5()
 **	mov	x29, sp
 **	mrs	x0, tpidr2_el0
 **	cbz	x0, [^\n]+
-**	bl	__arm_tpidr2_save
+**	bl	_?__arm_tpidr2_save
 **	msr	tpidr2_el0, xzr
 **	smstart	za
-**	bl	out_zt0
+**	bl	_?out_zt0
 **	...
 **	str	zt0, [^\n]+
 **	smstop	za
-**	bl	private_zt0
+**	bl	_?private_zt0
 **	smstart	za
 **	...
 **	ldr	zt0, [^\n]+
-**	bl	in_zt0
+**	bl	_?in_zt0
 **	smstop	za
 **	ldp	[^\n]+
 **	ret
@@ -128,14 +128,14 @@ __arm_new("zt0") void test6()
 ** test7:
 **	...
 **	smstart	za
-**	bl	out_zt0
-**	bl	in_zt0
+**	bl	_?out_zt0
+**	bl	_?in_zt0
 **	...
 **	smstop	za
-**	bl	private_zt0
+**	bl	_?private_zt0
 **	smstart	za
-**	bl	out_zt0
-**	bl	in_zt0
+**	bl	_?out_zt0
+**	bl	_?in_zt0
 **	smstop	za
 **	ldp	[^\n]+
 **	ret
@@ -153,17 +153,17 @@ __arm_new("zt0") void test7()
 ** test8:
 **	...
 **	smstart	za
-**	bl	out_zt0
-**	bl	in_zt0
+**	bl	_?out_zt0
+**	bl	_?in_zt0
 **	...
 **	smstop	za
-**	bl	private_zt0
+**	bl	_?private_zt0
 **	smstart	za
-**	bl	out_zt0
-**	bl	in_zt0
+**	bl	_?out_zt0
+**	bl	_?in_zt0
 **	...
 **	smstop	za
-**	bl	private_zt0
+**	bl	_?private_zt0
 **	ldp	[^\n]+
 **	ret
 */
@@ -182,14 +182,14 @@ __arm_new("zt0") void test8()
 **	...
 **	str	zt0, [^\n]+
 **	smstop	za
-**	bl	private_zt0
-**	bl	private_zt0
-**	bl	private_zt0
-**	bl	private_zt0
+**	bl	_?private_zt0
+**	bl	_?private_zt0
+**	bl	_?private_zt0
+**	bl	_?private_zt0
 **	smstart	za
 **	...
 **	ldr	zt0, [^\n]+
-**	bl	in_zt0
+**	bl	_?in_zt0
 **	smstop	za
 **	...
 */
@@ -232,7 +232,7 @@ __arm_new("zt0") void test10(volatile int *ptr)
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
-**	bl	inout_zt0
+**	bl	_?inout_zt0
 **	ldr	(w[0-9]+), [^\n]+
 **	cbnz	\2, [^\n]+
 **	smstop	za

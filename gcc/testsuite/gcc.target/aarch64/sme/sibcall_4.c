@@ -14,32 +14,32 @@ sc_to_sc () [[arm::streaming_compatible]]
 {
   sc_callee ();
 }
-/* { dg-final { scan-assembler {\tb\tsc_callee} } } */
+/* { dg-final { scan-assembler {\tb\t_?sc_callee} } } */
 
 [[arm::locally_streaming]] void
 sc_to_s () [[arm::streaming_compatible]]
 {
   s_callee ();
 }
-/* { dg-final { scan-assembler {\tbl\ts_callee} } } */
+/* { dg-final { scan-assembler {\tbl\t_?s_callee} } } */
 
 [[arm::locally_streaming]] void
 sc_to_n () [[arm::streaming_compatible]]
 {
   n_callee ();
 }
-/* { dg-final { scan-assembler {\tbl\tn_callee} } } */
+/* { dg-final { scan-assembler {\tbl\t_?n_callee} } } */
 
 [[arm::locally_streaming]] void
 sc_to_sc_ls () [[arm::streaming_compatible]]
 {
   sc_ls_callee ();
 }
-/* { dg-final { scan-assembler {\tb\tsc_ls_callee} } } */
+/* { dg-final { scan-assembler {\tb\t_?sc_ls_callee} } } */
 
 [[arm::locally_streaming]] void
 sc_to_n_ls () [[arm::streaming_compatible]]
 {
   n_ls_callee ();
 }
-/* { dg-final { scan-assembler {\tbl\tn_ls_callee} } } */
+/* { dg-final { scan-assembler {\tbl\t_?n_ls_callee} } } */
