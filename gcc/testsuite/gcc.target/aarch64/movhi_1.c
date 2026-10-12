@@ -49,7 +49,8 @@ zero_to_fpr ()
 
 /*
 ** fpr_to_gpr:
-**	fmov	w0, s0
+**	(fmov	w0, s0|umov	w0, v0.h\[0\])
+*M	and	w0, w0, 65535
 **	ret
 */
 uint16_t
