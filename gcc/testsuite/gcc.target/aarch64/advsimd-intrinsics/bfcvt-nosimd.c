@@ -1,4 +1,5 @@
 /* { dg-do assemble { target { aarch64*-*-* } } } */
+/* { dg-skip-if "older Xcode assemblers apply +nosimd after +bf16 and reject scalar bfcvt" { *-*-darwin* } } */
 /* { dg-skip-if "" { *-*-* } { "-fno-fat-lto-objects" } } */
 /* { dg-require-effective-target aarch64_asm_bf16_ok } */
 /* { dg-additional-options "-save-temps -march=armv8.2-a+bf16+nosimd" } */

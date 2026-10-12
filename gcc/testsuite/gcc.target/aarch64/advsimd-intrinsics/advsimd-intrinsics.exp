@@ -54,7 +54,15 @@ set-torture-options $C_TORTURE_OPTIONS {{}} $LTO_TORTURE_OPTIONS
 
 # Make sure Neon flags are provided, if necessary.  Use fp16 if we can.
 # Use fp16 arithmetic operations if the hardware supports it.
-if {[check_effective_target_arm_v8_2a_fp16_neon_hw]} then {
+if { [istarget *-*-darwin*] } {
+  # Darwin's default CPU (apple-m1) already has the v8.2-a fp16 and v8.3-a
+  # features.  Setting these global flags here causes a mismatch when we later
+  # test for v8.3-a features (which work without additional options), so no
+  # option is added to override the v8.2-a ones, which breaks the tests'
+  # assumptions.  This relies on the default CPU: a Darwin build configured
+  # for an older CPU would lose the fp16 flags.
+  set additional_flags ""
+} elseif {[check_effective_target_arm_v8_2a_fp16_neon_hw]} then {
   set additional_flags [add_options_for_arm_v8_2a_fp16_neon ""]
 } elseif {[check_effective_target_arm_neon_fp16_ok]} then {
   set additional_flags [add_options_for_arm_neon_fp16 ""]
