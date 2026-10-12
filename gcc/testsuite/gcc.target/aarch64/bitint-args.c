@@ -2,6 +2,11 @@
 /* { dg-additional-options "-std=c23 -O -fno-stack-clash-protection -g" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
+/* A _BitInt wider than 64 bits uses a 16-byte two-GPR container, which AAPCS64's
+   C.8 rule rounds up to an even register.  darwinpcs relaxes that pairing
+   requirement, so the pair starts one register lower; hence the *M bodies.  Verified
+   against Apple clang 17, which agrees with GCC on Darwin.  */
+
 #define CHECK_ARG(N)				\
 void f##N(_BitInt(N) *ptr, _BitInt(N) y)	\
 {						\
@@ -67,8 +72,10 @@ CHECK_ARG(64)
 CHECK_ARG(65)
 /*
 ** f65:
-**	extr	(x[0-9]+), x3, x2, 1
-**	and	(x[0-9]+), x2, 1
+*E	extr	(x[0-9]+), x3, x2, 1
+*E	and	(x[0-9]+), x2, 1
+*M	extr	(x[0-9]+), x2, x1, 1
+*M	and	(x[0-9]+), x1, 1
 **	add	(x[0-9]+), \2, \1, lsl 1
 **	asr	(x[0-9]+), \1, 63
 **	stp	\3, \4, \[x0\]
@@ -78,8 +85,10 @@ CHECK_ARG(65)
 CHECK_ARG(127)
 /*
 ** f127:
-**	extr	(x[0-9]+), x3, x2, 63
-**	and	(x[0-9]+), x2, 9223372036854775807
+*E	extr	(x[0-9]+), x3, x2, 63
+*E	and	(x[0-9]+), x2, 9223372036854775807
+*M	extr	(x[0-9]+), x2, x1, 63
+*M	and	(x[0-9]+), x1, 9223372036854775807
 **	add	(x[0-9]+), \2, \1, lsl 63
 **	asr	(x[0-9]+), \1, 1
 **	stp	\3, \4, \[x0\]
@@ -89,7 +98,8 @@ CHECK_ARG(127)
 CHECK_ARG(128)
 /*
 ** f128:
-**	stp	x2, x3, \[x0\]
+*E	stp	x2, x3, \[x0\]
+*M	stp	x1, x2, \[x0\]
 **	ret
 */
 
