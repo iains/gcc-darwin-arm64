@@ -32,13 +32,13 @@ int test2(int *ptr) __arm_inout("za")
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -53,7 +53,7 @@ int test3() __arm_inout("za")
 ** test4:
 **	stp	[^\n]+
 **	[^\n]+
-**	bl	in_za
+**	bl	_?in_za
 **	ldp	[^\n]+
 **	ret
 */
@@ -67,22 +67,22 @@ void test4() __arm_inout("za")
 **	...
 **	smstop	za
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	smstart	za
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	...
 **	sub	sp, sp, x[0-9]+
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -98,23 +98,23 @@ void test5() __arm_inout("za")
 /*
 ** test6:
 **	...
-**	bl	out_za
+**	bl	_?out_za
 **	...
 **	sub	sp, sp, x[0-9]+
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
-**	bl	in_za
+**	bl	_?in_za
 **	...
 */
 void test6() __arm_inout("za")
@@ -128,13 +128,13 @@ void test6() __arm_inout("za")
 ** test7:
 **	stp	[^\n]+
 **	[^\n]+
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	smstop	za
-**	bl	private_za
+**	bl	_?private_za
 **	smstart	za
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	ldp	[^\n]+
 **	ret
 */
@@ -151,25 +151,25 @@ void test7() __arm_inout("za")
 ** test8:
 **	stp	[^\n]+
 **	[^\n]+
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	smstop	za
-**	bl	private_za
+**	bl	_?private_za
 **	smstart	za
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	...
 **	sub	sp, sp, x[0-9]+
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -189,19 +189,19 @@ void test8() __arm_inout("za")
 ** test9:
 **	stp	[^\n]+
 **	[^\n]+
-**	bl	out_za
+**	bl	_?out_za
 **	...
 **	msr	tpidr2_el0, x[0-9]+
-**	bl	private_za
-**	bl	private_za
-**	bl	private_za
-**	bl	private_za
+**	bl	_?private_za
+**	bl	_?private_za
+**	bl	_?private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -271,20 +271,20 @@ void test12(volatile int *ptr) __arm_inout("za")
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
-**	bl	inout_za
+**	bl	_?inout_za
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	ldr	[^\n]+
 **	cbnz	[^\n]+
 **	smstart	za
 **	msr	tpidr2_el0, xzr
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	[^\n]+
 **	[^\n]+
 **	ldp	[^\n]+
@@ -306,11 +306,11 @@ void test13(volatile int *ptr) __arm_inout("za")
 /*
 ** test14:
 **	...
-**	bl	inout_za
+**	bl	_?inout_za
 **	ldr	[^\n]+
 **	cbnz	[^\n]+
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	...
 */
 void test14(volatile int *ptr) __arm_inout("za")
@@ -325,8 +325,8 @@ void test14(volatile int *ptr) __arm_inout("za")
 /*
 ** test15:
 **	...
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	ldr	[^\n]+
 **	cbnz	[^\n]+
 **	...
@@ -334,11 +334,11 @@ void test14(volatile int *ptr) __arm_inout("za")
 **	...
 **	msr	tpidr2_el0, [^\n]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -367,17 +367,17 @@ void test15(volatile int *ptr) __arm_inout("za")
 **	...
 **	msr	tpidr2_el0, xzr
 -- loop_entry:
-**	bl	inout_za
+**	bl	_?inout_za
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -397,17 +397,17 @@ void test16(volatile int *ptr) __arm_inout("za")
 ** test17:
 **	...
 -- loop:
-**	bl	inout_za
+**	bl	_?inout_za
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
 **	smstart	za
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -435,16 +435,16 @@ void test17(volatile int *ptr) __arm_inout("za")
 **	cbnz	w[0-9]+, [^\n]+
 **	ret
 **	...
-**	bl	out_za
-**	bl	in_za
+**	bl	_?out_za
+**	bl	_?in_za
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	msr	tpidr2_el0, xzr
 **	...
@@ -475,17 +475,17 @@ void test19(volatile int *ptr) __arm_inout("za")
 /*
 ** test20:
 **	...
-**	bl	a20
+**	bl	_?a20
 **	(?:(?!x0).)*
-**	bl	b20
+**	bl	_?b20
 **	...
 **	mov	([wx][0-9]+), [wx]0
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	mov	[wx]0, \1
 **	...
-**	bl	c20
+**	bl	_?c20
 **	...
 */
 void test20() __arm_inout("za")
@@ -499,17 +499,17 @@ void test20() __arm_inout("za")
 /*
 ** test21:
 **	...
-**	bl	a21
+**	bl	_?a21
 **	(?:(?!x0).)*
-**	bl	b21
+**	bl	_?b21
 **	...
 **	mov	(x[0-9]+), x0
 **	...
-**	bl	__arm_tpidr2_restore
+**	bl	_?__arm_tpidr2_restore
 **	...
 **	mov	x0, \1
 **	...
-**	bl	c21
+**	bl	_?c21
 **	...
 */
 void test21() __arm_inout("za")
@@ -549,16 +549,16 @@ void test23(volatile int *ptr) __arm_inout("za")
 /*
 ** test24:
 **	...
-**	bl	in_za
+**	bl	_?in_za
 **	...
 **	incb	x1
 **	...
-**	bl	out_za
-**	bl	inout_za
+**	bl	_?out_za
+**	bl	_?inout_za
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
@@ -566,7 +566,7 @@ void test23(volatile int *ptr) __arm_inout("za")
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...
@@ -574,7 +574,7 @@ void test23(volatile int *ptr) __arm_inout("za")
 **	...
 **	msr	tpidr2_el0, x[0-9]+
 **	...
-**	bl	private_za
+**	bl	_?private_za
 **	...
 **	mrs	x[0-9]+, tpidr2_el0
 **	...

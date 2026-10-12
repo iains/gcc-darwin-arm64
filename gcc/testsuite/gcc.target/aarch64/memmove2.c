@@ -21,4 +21,4 @@ copy3 (int *x, int *y)
   __builtin_memmove (x, y, 255);
 }
 
-/* { dg-final { scan-assembler-times {\tb\tmemmove} 3 } } */
+/* { dg-final { scan-assembler-times {\tb\t_?memmove} 3 } } */

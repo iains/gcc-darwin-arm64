@@ -11,14 +11,14 @@ void consume_d0 (double);
 ** test_d0:
 **	...
 **	smstop	sm
-**	bl	produce_d0
+**	bl	_?produce_d0
 **	fmov	x10, d0
 **	smstart	sm
 **	fmov	d0, x10
 **	fmov	x10, d0
 **	smstop	sm
 **	fmov	d0, x10
-**	bl	consume_d0
+**	bl	_?consume_d0
 **	...
 */
 void
@@ -36,7 +36,7 @@ void consume_d0_vec (int8x8_t);
 ** test_d0_vec:
 **	...
 **	smstop	sm
-**	bl	produce_d0_vec
+**	bl	_?produce_d0_vec
 ** (
 **	fmov	x10, d0
 ** |
@@ -51,7 +51,7 @@ void consume_d0_vec (int8x8_t);
 ** )
 **	smstop	sm
 **	fmov	d0, x10
-**	bl	consume_d0_vec
+**	bl	_?consume_d0_vec
 **	...
 */
 void
@@ -69,14 +69,14 @@ void consume_q0 (int8x16_t);
 ** test_q0:
 **	...
 **	smstop	sm
-**	bl	produce_q0
+**	bl	_?produce_q0
 **	str	q0, \[sp, #?-16\]!
 **	smstart	sm
 **	ldr	q0, \[sp\], #?16
 **	str	q0, \[sp, #?-16\]!
 **	smstop	sm
 **	ldr	q0, \[sp\], #?16
-**	bl	consume_q0
+**	bl	_?consume_q0
 **	...
 */
 void
@@ -94,14 +94,14 @@ void consume_q1 (int8x16x2_t);
 ** test_q1:
 **	...
 **	smstop	sm
-**	bl	produce_q1
+**	bl	_?produce_q1
 **	stp	q0, q1, \[sp, #?-32\]!
 **	smstart	sm
 **	ldp	q0, q1, \[sp\], #?32
 **	stp	q0, q1, \[sp, #?-32\]!
 **	smstop	sm
 **	ldp	q0, q1, \[sp\], #?32
-**	bl	consume_q1
+**	bl	_?consume_q1
 **	...
 */
 void
@@ -119,7 +119,7 @@ void consume_q2 (int8x16x3_t);
 ** test_q2:
 **	...
 **	smstop	sm
-**	bl	produce_q2
+**	bl	_?produce_q2
 **	stp	q0, q1, \[sp, #?-48\]!
 **	str	q2, \[sp, #?32\]
 **	smstart	sm
@@ -130,7 +130,7 @@ void consume_q2 (int8x16x3_t);
 **	smstop	sm
 **	ldr	q2, \[sp, #?32\]
 **	ldp	q0, q1, \[sp\], #?48
-**	bl	consume_q2
+**	bl	_?consume_q2
 **	...
 */
 void
@@ -148,7 +148,7 @@ void consume_q3 (int8x16x4_t);
 ** test_q3:
 **	...
 **	smstop	sm
-**	bl	produce_q3
+**	bl	_?produce_q3
 **	stp	q0, q1, \[sp, #?-64\]!
 **	stp	q2, q3, \[sp, #?32\]
 **	smstart	sm
@@ -159,7 +159,7 @@ void consume_q3 (int8x16x4_t);
 **	smstop	sm
 **	ldp	q2, q3, \[sp, #?32\]
 **	ldp	q0, q1, \[sp\], #?64
-**	bl	consume_q3
+**	bl	_?consume_q3
 **	...
 */
 void
@@ -177,7 +177,7 @@ void consume_z0 (svint8_t);
 ** test_z0:
 **	...
 **	smstop	sm
-**	bl	produce_z0
+**	bl	_?produce_z0
 **	addvl	sp, sp, #-1
 **	str	z0, \[sp\]
 **	smstart	sm
@@ -188,7 +188,7 @@ void consume_z0 (svint8_t);
 **	smstop	sm
 **	ldr	z0, \[sp\]
 **	addvl	sp, sp, #1
-**	bl	consume_z0
+**	bl	_?consume_z0
 **	...
 */
 void
@@ -206,7 +206,7 @@ void consume_z3 (svint8x4_t);
 ** test_z3:
 **	...
 **	smstop	sm
-**	bl	produce_z3
+**	bl	_?produce_z3
 **	addvl	sp, sp, #-4
 **	str	z0, \[sp\]
 **	str	z1, \[sp, #1, mul vl\]
@@ -229,7 +229,7 @@ void consume_z3 (svint8x4_t);
 **	ldr	z2, \[sp, #2, mul vl\]
 **	ldr	z3, \[sp, #3, mul vl\]
 **	addvl	sp, sp, #4
-**	bl	consume_z3
+**	bl	_?consume_z3
 **	...
 */
 void
@@ -247,7 +247,7 @@ void consume_p0 (svbool_t);
 ** test_p0:
 **	...
 **	smstop	sm
-**	bl	produce_p0
+**	bl	_?produce_p0
 **	addvl	sp, sp, #-1
 **	str	p0, \[sp\]
 **	smstart	sm
@@ -258,7 +258,7 @@ void consume_p0 (svbool_t);
 **	smstop	sm
 **	ldr	p0, \[sp\]
 **	addvl	sp, sp, #1
-**	bl	consume_p0
+**	bl	_?consume_p0
 **	...
 */
 void
@@ -292,7 +292,7 @@ void consume_d7 (double, double, double, double, double, double, double,
 **	fmov	d5, x15
 **	fmov	d6, x16
 **	fmov	d7, x17
-**	bl	consume_d7
+**	bl	_?consume_d7
 **	...
 */
 void
@@ -335,7 +335,7 @@ void consume_d7_vec (int8x8_t, int8x8_t, int8x8_t, int8x8_t, int8x8_t,
 **	fmov	d5, x15
 **	fmov	d6, x16
 **	fmov	d7, x17
-**	bl	consume_d7_vec
+**	bl	_?consume_d7_vec
 **	...
 */
 void
@@ -359,7 +359,7 @@ void consume_q7 (int8x16_t, int8x16_t, int8x16_t, int8x16_t, int8x16_t,
 **	ldp	q4, q5, \[sp, #?64\]
 **	ldp	q6, q7, \[sp, #?96\]
 **	ldp	q0, q1, \[sp\], #?128
-**	bl	consume_q7
+**	bl	_?consume_q7
 **	...
 */
 void
@@ -393,7 +393,7 @@ void consume_z7 (svint8_t, svint8_t, svint8_t, svint8_t, svint8_t,
 **	ldr	z6, \[sp, #6, mul vl\]
 **	ldr	z7, \[sp, #7, mul vl\]
 **	addvl	sp, sp, #8
-**	bl	consume_z7
+**	bl	_?consume_z7
 **	...
 */
 void
@@ -418,7 +418,7 @@ void consume_p3 (svbool_t, svbool_t, svbool_t, svbool_t);
 **	ldr	p2, \[sp, #2, mul vl\]
 **	ldr	p3, \[sp, #3, mul vl\]
 **	addvl	sp, sp, #1
-**	bl	consume_p3
+**	bl	_?consume_p3
 **	...
 */
 void
@@ -459,7 +459,7 @@ void consume_mixed (float, double, float32x4_t, svfloat32_t,
 **	ldr	z3, \[sp, #1, mul vl\]
 **	ldr	z7, \[sp, #2, mul vl\]
 **	addvl	sp, sp, #3
-**	bl	consume_mixed
+**	bl	_?consume_mixed
 **	...
 */
 void
@@ -502,7 +502,7 @@ void consume_varargs (float, ...);
 *E	fmov	d5, x14
 *E	fmov	d6, x15
 *E	ldp	q3, q7, \[sp\], #?32
-**	bl	consume_varargs
+**	bl	_?consume_varargs
 **	...
 */
 void

@@ -38,7 +38,7 @@
 	for #pragma GCC target("+simd): _ZGVnN4vv_fn */
 
 #pragma GCC target ("+sve")
-/* { dg-final { scan-assembler {\s+_ZGVsMxv_fn0\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxv_fn0\n} } } */
 extern int __attribute__ ((simd, const)) fn0 (int);
 void test_fn0 (int *a, int *b, int n)
 {
@@ -46,7 +46,7 @@ void test_fn0 (int *a, int *b, int n)
     a[i] += fn0 (b[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv_fn1\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv_fn1\n} } } */
 extern int __attribute__ ((simd, const)) fn1 (short, int);
 void test_fn1 (int *a, int *b, short *c, int n)
 {
@@ -54,7 +54,7 @@ void test_fn1 (int *a, int *b, short *c, int n)
     a[i] = fn1 (c[i], b[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv_fn2\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv_fn2\n} } } */
 extern short __attribute__ ((simd, const)) fn2 (short, int);
 void test_fn2 (short *a, int *b, short *c, int n)
 {
@@ -62,7 +62,7 @@ void test_fn2 (short *a, int *b, short *c, int n)
     a[i] = fn2 (c[i], b[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv_fn3\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv_fn3\n} } } */
 extern char __attribute__ ((simd, const)) fn3 (int, char);
 void test_fn3 (int *a, int *b, char *c, int n)
 {
@@ -70,7 +70,7 @@ void test_fn3 (int *a, int *b, char *c, int n)
     a[i] = (int) (fn3 (b[i], c[i]) + c[i]);
 }
 
-/* { dg-final { scan-assembler {\s+_ZGVsMxvv_fn4\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVsMxvv_fn4\n} } } */
 extern short __attribute__ ((simd, const)) fn4 (int, short);
 void test_fn4 (int *a, int *b, short *c, int n)
 {
@@ -80,7 +80,7 @@ void test_fn4 (int *a, int *b, short *c, int n)
 
 #pragma GCC reset_options
 #pragma GCC target ("+simd")
-/* { dg-final { scan-assembler {\s+_ZGVnN4vv_fn4\n} } } */
+/* { dg-final { scan-assembler {\s+_?_ZGVnN4vv_fn4\n} } } */
 extern short __attribute__ ((simd, const)) fn4 (int, short);
 void test_fn5 (int *a, int *b, short *c, int n)
 {
