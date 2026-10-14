@@ -1,4 +1,5 @@
 /* { dg-options "-O2 -Wpsabi" } */
+/* { dg-skip-if "darwinpcs D.4: aligned x-reg passing differs" { *-*-darwin* } } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
 #include <stdarg.h>
