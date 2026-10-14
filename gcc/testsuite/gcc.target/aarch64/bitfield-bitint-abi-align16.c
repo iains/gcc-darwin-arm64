@@ -1,4 +1,5 @@
 /* { dg-do compile { target bitint } } */
+/* { dg-skip-if "darwinpcs D.4: aligned x-reg passing differs" { aarch64-*-darwin* } } */
 /* { dg-additional-options "-std=c23 -O2 -fno-stack-protector -save-temps -fno-schedule-insns -fno-schedule-insns2 -fno-late-combine-instructions" } */
 /* { dg-final { check-function-bodies "**" "" "" } } */
 
