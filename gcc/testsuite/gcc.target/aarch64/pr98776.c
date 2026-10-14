@@ -8,4 +8,5 @@ foo (void)
 {
 }
 
-/* { dg-final { scan-assembler "\t\.cfi_startproc\n.*\.LPFE0:\n\tnop\n\tret\n" } } */
+/* The .cfi_* directives are only emitted where the assembler supports them.  */
+/* { dg-final { scan-assembler "\t\.cfi_startproc\n.*\.LPFE0:\n\tnop\n\tret\n" { target cfi } } } */
