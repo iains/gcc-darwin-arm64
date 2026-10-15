@@ -21835,7 +21835,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 21835 "configure"
+#line 21838 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -21941,7 +21941,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 21941 "configure"
+#line 21944 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -26102,6 +26102,9 @@ else
    case "$target:$as_flavor" in
   *-*-darwin*:*)
                         case "$target" in
+      aarch64*-*-*)
+	gcc_cv_as_flags="-arch arm64"
+	;;
       i?86-*-*)
 	gcc_cv_as_flags="-arch i386"
 	;;
