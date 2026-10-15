@@ -462,12 +462,15 @@ AC_DEFUN([gcc_GAS_FLAGS],
 [AC_CACHE_CHECK([assembler flags], gcc_cv_as_flags,
 [ case "$target:$as_flavor" in
   *-*-darwin*:*)
-    dnl Darwin with the native assembler uses -arch i386/x86_64/ppc/ppc64.
+    dnl Darwin with the native assembler uses -arch arm64/i386/x86_64/ppc/ppc64.
     dnl
     dnl Old cctools versions of the Darwin assembler identify as "GNU
     dnl assembler version 1.38", but still accept the same options as later
     dnl clang-based ones, so treat them all the same regardless.
     case "$target" in
+      aarch64*-*-*)
+	gcc_cv_as_flags="-arch arm64"
+	;;
       i?86-*-*)
 	gcc_cv_as_flags="-arch i386"
 	;;
