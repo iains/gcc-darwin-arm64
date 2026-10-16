@@ -13353,6 +13353,24 @@ proc check_effective_target_aarch64_variant_pcs { } {
     }
 }
 
+# Return 1 if the target emits .variant_pcs markings for vector PCS symbols.
+#
+# This is a different question from check_effective_target_aarch64_variant_pcs,
+# which asks only whether the assembler accepts the directive.  The two are not
+# interchangeable: Mach-O accepts .variant_pcs and silently ignores it, so a
+# target can support the vector PCS while emitting no marking at all and there
+# is then nothing to scan for.  Tests that SCAN for the directive need this
+# check; tests that merely use the vector PCS need the other one.
+proc check_effective_target_aarch64_variant_pcs_marking { } {
+    if { ![istarget aarch64*-*-*] } {
+	return 0
+    }
+    return [check_no_messages_and_pattern aarch64_variant_pcs_marking \
+		"\\.variant_pcs" assembly {
+	__attribute__ ((aarch64_vector_pcs)) void f (void) {}
+    }]
+}
+
 # Return 1 if this is a reduced AVR Tiny core.  Such cores have different
 # register set, instruction set, addressing capabilities and ABI.
 
