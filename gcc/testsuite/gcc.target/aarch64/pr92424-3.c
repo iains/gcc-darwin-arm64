@@ -1,5 +1,5 @@
 /* { dg-do "compile" } */
-/* { dg-options "-O1" } */
+/* { dg-options "-O1 -march=armv8-a" } */
 
 /* Test the placement of the .LPFE0 label.  */
 
