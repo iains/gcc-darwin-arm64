@@ -1,6 +1,9 @@
 /* { dg-do compile } */
 /* -Os to create jump table.  */
-/* { dg-options "-Os -dA" } */
+/* The epilogue spelling depends on the architecture: at armv8.3-a and above
+   "autiasp; ret" is emitted as the combined "retaa", so pin a baseline rather
+   than depend on the configured default.  BTI itself is unaffected.  */
+/* { dg-options "-Os -dA -march=armv8-a" } */
 /* { dg-require-effective-target lp64 } */
 /* If configured with --enable-standard-branch-protection, don't use
    command line option.  */
