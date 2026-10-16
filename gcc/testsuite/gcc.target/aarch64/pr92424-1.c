@@ -1,5 +1,5 @@
 /* { dg-do "compile" } */
-/* { dg-options "-O1" } */
+/* { dg-options "-O1 -march=armv8-a" } */
 /* { dg-final { check-function-bodies "**" "" } } */
 
 /* Note: this test only checks the instructions in the function bodies,

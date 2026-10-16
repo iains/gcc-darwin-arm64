@@ -1,5 +1,6 @@
 /* PR middle-end/126236 */
 /* { dg-do assemble } */
+/* { dg-require-effective-target aarch64_mcmodel_tiny } */
 /* { dg-options "-O2 -fduplicate-switch-dispatch -mcmodel=tiny -save-temps" } */
 
 #include "switch-dispatch-1.c"

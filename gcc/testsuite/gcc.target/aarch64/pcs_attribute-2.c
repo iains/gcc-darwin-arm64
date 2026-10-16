@@ -1,4 +1,7 @@
 /* { dg-do compile } */
+/* { dg-require-alias "" } */
+/* { dg-require-weak "" } */
+/* { dg-require-visibility "protected" } */
 /* { dg-require-effective-target aarch64_variant_pcs } */
 
 /* Test that .variant_pcs is emitted for vector PCS symbol references.  */
