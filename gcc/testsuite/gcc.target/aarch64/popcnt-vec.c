@@ -1,5 +1,8 @@
 /* { dg-do compile } */
-/* { dg-options "-O2 -fno-vect-cost-model" } */
+/* The uaddlp count depends on the architecture (12 at armv8-a, 4 where a
+   wider accumulate is available), so pin a baseline rather than depend on the
+   configured default.  The vectorisation itself is unaffected.  */
+/* { dg-options "-O2 -fno-vect-cost-model -march=armv8-a" } */
 
 /* This function should produce cnt v.16b.  */
 void

@@ -1,5 +1,6 @@
 /* PR middle-end/126236 */
 /* { dg-do compile } */
+/* { dg-require-effective-target aarch64_mcmodel_tiny } */
 /* { dg-options "-O2 -fduplicate-switch-dispatch -mcmodel=tiny -fno-pie -fselective-scheduling2 -fsel-sched-pipelining -fno-gcse -fno-move-loop-invariants -fdump-rtl-compgotos-details" } */
 
 /* Keep the table address in the dispatch blocks.  Selective scheduling must

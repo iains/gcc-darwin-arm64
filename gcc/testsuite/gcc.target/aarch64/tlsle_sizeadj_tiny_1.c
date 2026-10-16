@@ -1,4 +1,5 @@
 /* { dg-do run } */
+/* { dg-require-effective-target aarch64_mcmodel_tiny } */
 /* { dg-require-effective-target tls_native } */
 /* { dg-options "-O2 -fpic -ftls-model=local-exec -mtls-size=32 -mcmodel=tiny --save-temps" } */
 /* { dg-require-effective-target fpic } */
