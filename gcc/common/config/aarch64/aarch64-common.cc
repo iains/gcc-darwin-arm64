@@ -64,8 +64,13 @@ static const struct default_options aarch_option_optimization_table[] =
     { OPT_LEVELS_ALL, OPT_fasynchronous_unwind_tables, NULL, 1 },
     { OPT_LEVELS_ALL, OPT_funwind_tables, NULL, 1},
 #endif
+    /* Darwin's default guard region for a thread is a single page (16KB), so
+       the usual AArch64 default of 64KB would allow an allocation to move the
+       stack pointer past it without probing; use 4KB there, which is no
+       larger than any supported page size.  */
     { OPT_LEVELS_ALL, OPT__param_stack_clash_protection_guard_size_, NULL,
-      DEFAULT_STK_CLASH_GUARD_SIZE == 0 ? 16 : DEFAULT_STK_CLASH_GUARD_SIZE },
+      DEFAULT_STK_CLASH_GUARD_SIZE != 0 ? DEFAULT_STK_CLASH_GUARD_SIZE
+				        : (TARGET_MACHO ? 12 : 16) },
 
     { OPT_LEVELS_NONE, 0, NULL, 0 }
   };
