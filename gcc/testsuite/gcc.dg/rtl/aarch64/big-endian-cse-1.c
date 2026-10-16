@@ -1,5 +1,6 @@
 /* { dg-do compile { target aarch64*-*-* } } */
 /* { dg-require-effective-target lp64 } */
+/* { dg-require-effective-target aarch64_mbig_endian } */
 /* { dg-options "-O3 -mbig-endian" } */
 
 void __RTL (startwith ("vregs")) foo (void *ptr1, void *ptr2)
