@@ -12,4 +12,4 @@ long long f(int b, int c, long long d)
   return d;
 }
 
-/* { dg-final { scan-assembler-not "bl" } } */
+/* { dg-final { scan-assembler-not {\tbl\t} } } */

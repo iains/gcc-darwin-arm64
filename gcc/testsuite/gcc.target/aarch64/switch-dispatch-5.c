@@ -1,5 +1,6 @@
 /* PR middle-end/126236 */
 /* { dg-do assemble } */
+/* { dg-require-effective-target aarch64_mcmodel_large } */
 /* { dg-options "-O2 -fduplicate-switch-dispatch -mcmodel=large -fno-pie -save-temps" } */
 
 #include "switch-dispatch-1.c"
