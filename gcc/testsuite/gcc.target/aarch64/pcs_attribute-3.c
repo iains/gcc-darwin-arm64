@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-require-ifunc "" } */
-/* { dg-require-effective-target aarch64_variant_pcs } */
+/* { dg-require-effective-target aarch64_variant_pcs_marking } */
 
 /* Test that .variant_pcs is emitted for vector PCS symbol references.  */
 
