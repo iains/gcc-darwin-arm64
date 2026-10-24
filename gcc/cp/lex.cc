@@ -268,6 +268,9 @@ init_reswords (void)
     {
       if (c_common_reswords[i].disable & D_CONLY)
 	continue;
+      if (!flag_allow_extra_keywords
+	  && c_common_reswords[i].disable & D_EXT_C_IN_CXX)
+	continue;
       id = get_identifier (c_common_reswords[i].word);
       C_SET_RID_CODE (id, c_common_reswords[i].rid);
       ridpointers [(int) c_common_reswords[i].rid] = id;
