@@ -22,6 +22,7 @@ along with GCC; see the file COPYING3.  If not see
 #define INCLUDE_DLFCN_H
 #include "system.h"
 #include "coretypes.h"
+#include "target.h"
 
 #include "jit-common.h"
 #include "jit-logging.h"
@@ -104,6 +105,61 @@ get_code (const char *funcname)
   return code;
 }
 
+#ifndef _WIN32
+/* Emulated TLS has no exported symbol for the variable itself.  What is
+   exported is the control object, so we need to first look to see if there
+   is a control object for the named var; if there is we can then translate
+   the address.  Control object name composition copied from tree-emutls.cc.  */
+
+#if !defined (NO_DOT_IN_LABEL)
+# define EMUTLS_SEPARATOR	"."
+#elif !defined (NO_DOLLAR_IN_LABEL)
+# define EMUTLS_SEPARATOR	"$"
+#else
+# define EMUTLS_SEPARATOR	"_"
+#endif
+
+static void *
+get_emulated_tls_global (void *dso_handle, const char *name)
+{
+  const char *prefix = (targetm.emutls.var_prefix
+			? targetm.emutls.var_prefix
+			: "__emutls_v" EMUTLS_SEPARATOR);
+  char *control_name = concat (prefix, name, NULL);
+  /* Look this up and exit early if it is not available.  */
+  void *control = dlsym (dso_handle, control_name);
+  free (control_name);
+  if (!control)
+    return NULL;
+
+  /* We have to call get_address function to translate the emulated TLS
+     control object address to a pointer the actual var.  */
+  const char *fn_name;
+  if (targetm.emutls.get_address)
+    {
+      fn_name = targetm.emutls.get_address;
+      if (strncmp (fn_name, "__builtin_", 10) == 0)
+	fn_name += 10;
+    }
+  else
+    fn_name = "__emutls_get_address";
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconditionally-supported"
+  /* We need the function pointer here, but we need to look up the version
+     that the dynamic linker resolved - which is most likely not in the same
+     DSO as the variable we are looking up.  */
+  using fn_t = void * (*) (void*);
+  auto get_address_fn
+    = reinterpret_cast<fn_t> (dlsym (RTLD_DEFAULT, fn_name));
+#pragma GCC diagnostic pop
+  if (!get_address_fn)
+    return NULL;
+
+  return get_address_fn (control);
+}
+#endif /* !_WIN32 */
+
 /* Attempt to locate the given global by name within the
    playback::result, using dlsym.
 
@@ -132,6 +188,20 @@ get_global (const char *name)
   dlerror ();
 
   global = dlsym (m_dso_handle, name);
+
+  if (!global && !targetm.have_tls)
+    {
+      /* Under emulated TLS there is no symbol for the variable itself, so the
+	 global lookup above fails. The only way to tell if there is a TLS var
+	 with this name is by trying to look it up via its control object.  */
+      void *tls_global = get_emulated_tls_global (m_dso_handle, name);
+      if (tls_global)
+	{
+	  /* Discard the "symbol not found" error from the failed lookup.  */
+	  dlerror ();
+	  return tls_global;
+	}
+    }
 
   if ((error = dlerror()) != NULL)  {
     fprintf(stderr, "%s\n", error);
