@@ -483,7 +483,8 @@ builtins_manager::make_primitive_type (enum jit_builtin_type type_id)
     case BT_UINT32: return m_ctxt->get_int_type (4, false);
     case BT_UINT64: return m_ctxt->get_int_type (8, false);
     case BT_UINT128: return m_ctxt->get_int_type (16, false);
-    // case BT_WORD:
+    case BT_WORD:
+      return m_ctxt->get_int_type (GET_MODE_SIZE (word_mode), false);
     // case BT_UNWINDWORD:
     case BT_FLOAT: return m_ctxt->get_type (GCC_JIT_TYPE_FLOAT);
     case BT_DOUBLE: return m_ctxt->get_type (GCC_JIT_TYPE_DOUBLE);
@@ -620,6 +621,12 @@ builtins_manager::ensure_optimization_builtins_exist ()
   (void)get_builtin_function_by_id (BUILT_IN_CTZL);
   (void)get_builtin_function_by_id (BUILT_IN_CLZLL);
   (void)get_builtin_function_by_id (BUILT_IN_CTZLL);
+  if (!targetm.have_tls)
+    {
+      /* Targets without native TLS may use the emulated model.  */
+      (void)get_builtin_function_by_id (BUILT_IN_EMUTLS_GET_ADDRESS);
+      (void)get_builtin_function_by_id (BUILT_IN_EMUTLS_REGISTER_COMMON);
+    }
 }
 
 /* Playback support.  */
