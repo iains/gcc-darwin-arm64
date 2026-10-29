@@ -812,6 +812,8 @@ ipa_lower_emutls (void)
     cgraph_build_static_cdtor ('I', ctor_body, DEFAULT_INIT_PRIORITY);
 
   delete tls_map;
+  tls_map = NULL;
+  emutls_object_type = NULL_TREE;
 
   return 0;
 }
