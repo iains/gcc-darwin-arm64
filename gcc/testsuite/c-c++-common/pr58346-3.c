@@ -1,5 +1,6 @@
 /* PR c/58346 */
 /* { dg-do compile } */
+/* { dg-additional-options "-fno-allow-const-var-array-size" { target *-*-darwin* } } */
 
 void
 foo (void)
