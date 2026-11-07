@@ -292,8 +292,19 @@ maybe_thunk_body (tree fn, bool force)
   auto du = make_temp_override (deprecated_state,
 				UNAVAILABLE_DEPRECATED_SUPPRESS);
 
+  /* Do not thunk a cdtor whose linkage is not yet decided and whose output is
+     deferred: if it turns out not to be emitted, its thunks would refer to a
+     unified cdtor that no translation unit defines (PR111019).  FORCE is
+     honoured, so the cases that cannot be cloned are unaffected.  */
+  if (!force && !DECL_INTERFACE_KNOWN (fn) && DECL_DEFER_OUTPUT (fn))
+    return 0;
+
   DECL_ABSTRACT_P (fn) = false;
-  if (!DECL_WEAK (fn))
+  /* A one-only cdtor is vague-linkage however the target spells it: Mach-O sets
+     DECL_WEAK (MAKE_DECL_ONE_ONLY), while PE leaves it clear and relies on the
+     COMDAT group alone, so testing DECL_WEAK by itself would claim a PE cdtor
+     for this translation unit as though it had internal linkage.  */
+  if (!DECL_WEAK (fn) && !DECL_ONE_ONLY (fn))
     {
       TREE_PUBLIC (fn) = false;
       DECL_EXTERNAL (fn) = false;
@@ -326,6 +337,20 @@ maybe_thunk_body (tree fn, bool force)
 	 have these flags set.  */
       DECL_WEAK (fn) = false;
       DECL_COMDAT (fn) = false;
+    }
+  else
+    {
+      /* Vague linkage, on a target with no named group to bind the clones to
+	 the unified body, so neither arm above could claim it for this
+	 translation unit and it stays public.  A unified body is an
+	 implementation detail of this link unit rather than an interface -- it
+	 exists only where -fdeclone-ctor-dtor was used -- so do not publish
+	 it.  Hidden visibility still coalesces duplicate definitions within a
+	 DSO (.private_extern on Mach-O, -exclude-symbols: on PE) while keeping
+	 it out of the export table, so nothing outside can come to depend on a
+	 symbol whose existence depends on how this unit was compiled.  */
+      DECL_VISIBILITY (fn) = VISIBILITY_HIDDEN;
+      DECL_VISIBILITY_SPECIFIED (fn) = 1;
     }
 
   /* Find the vtt_parm, if present.  */
