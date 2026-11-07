@@ -3423,6 +3423,7 @@ common_handle_option (struct gcc_options *opts,
       break;
 
     case OPT_fuse_ld_bfd:
+    case OPT_fuse_ld_classic:
     case OPT_fuse_ld_gold:
     case OPT_fuse_ld_lld:
     case OPT_fuse_ld_mold:
