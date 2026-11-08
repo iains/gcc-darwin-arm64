@@ -8277,7 +8277,7 @@ aarch64_layout_arg (cumulative_args_t pcum_v, const function_arg_info &arg)
       if (TARGET_MACHO
 	  && !arg.named)
 	{
-	  pcum->aapcs_nextncrn = NUM_ARG_REGS;
+	  pcum->aapcs_nextncrn = num_pcs_arg_regs (pcum->pcs_variant);
 	  goto on_stack;
 	}
 
@@ -8751,7 +8751,7 @@ aarch64_function_arg_boundary_ca (machine_mode mode ATTRIBUTE_UNUSED,
   bool named_p = pcum->darwinpcs_n_args_processed < pcum->darwinpcs_n_named;
   gcc_checking_assert (named_p == pcum->named_p);
   machine_mode comp_mode = VOIDmode;
-  int nregs;
+  int nregs = 0;
   bool is_ha;
   aarch64_vfp_is_call_or_return_candidate (mode, type, &comp_mode, &nregs,
 					   &is_ha, /*silent*/true);
@@ -8760,9 +8760,13 @@ aarch64_function_arg_boundary_ca (machine_mode mode ATTRIBUTE_UNUSED,
 	  && !is_ha && !SCALAR_FLOAT_MODE_P (comp_mode))
       || TREE_CODE (type) == UNION_TYPE);
 
-  bool in_regs = (pcum->aapcs_reg != NULL_RTX);
+  bool in_reg = pcum->aapcs_reg != NULL_RTX;
 
-  if ((named_p && !no_pack) || in_regs)
+  /* See aarch64_layout_arg for comment about mode sizes.  */
+  int size = (type) ? int_size_in_bytes (type)
+		    : GET_MODE_SIZE (mode).to_constant ();
+
+  if ((named_p && (!no_pack || size == 0)) || in_reg)
     ; /* Leave the alignment as natural.  */
   else
     alignment = MAX (alignment, PARM_BOUNDARY);
