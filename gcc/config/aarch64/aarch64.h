@@ -1328,11 +1328,16 @@ typedef struct
 				   stack arg area so far.  */
 
   /* darwinpcs: named arguments passed on the stack are packed at their
-     natural alignment, except for the kinds that start a new 8-byte slot.
-     aarch64_layout_arg records the boundary and padding it chose for the
-     current argument here.  */
+     natural alignment, except for the kinds that start a new 8-byte slot;
+     unnamed arguments in a variadic call occupy whole 8-byte slots.  There
+     is no padding after the last named argument: va_start rounds the offset
+     of the first unnamed argument up to a slot.  aarch64_layout_arg records
+     the boundary and padding it chose for the current argument here.  */
   unsigned darwinpcs_arg_boundary; /* The computed argument boundary.  */
   unsigned darwinpcs_arg_padding; /* The computed argument padding.  */
+  unsigned darwinpcs_n_named;	/* Number of named arguments.  */
+  unsigned darwinpcs_n_args_processed; /* Processed so far.  */
+  bool darwinpcs_named_p;	/* Is this arg named?  */
   bool silent_p;		/* True if we should act silently, rather than
 				   raise an error for invalid calls.  */
 

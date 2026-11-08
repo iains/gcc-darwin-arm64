@@ -1698,6 +1698,9 @@ UrlSuffix(gcc/Instrumentation-Options.html#index-fstack-protector-explicit)
 fstack-usage
 UrlSuffix(gcc/Developer-Options.html#index-fstack-usage)
 
+fstack-use-cumulative-args
+UrlSuffix(gcc/Code-Gen-Options.html#index-fno-stack-use-cumulative-args)
+
 fstrict-aliasing
 UrlSuffix(gcc/Optimize-Options.html#index-fno-strict-aliasing)
 

@@ -818,7 +818,7 @@ Objective-C and Objective-C++ Dialects}.
 -freg-struct-return  -fshort-enums  -fshort-wchar
 -fverbose-asm  -fpack-struct[=@var{n}]
 -fleading-underscore  -ftls-model=@var{model}
--fstack-reuse=@var{reuse_level}
+-fstack-reuse=@var{reuse_level}  -fstack-use-cumulative-args
 -ftrampolines  -ftrampoline-impl=@r{[}stack@r{|}heap@r{]}
 -ftrapv  -fwrapv  -fwrapv-pointer
 -fvisibility=@r{[}default@r{|}internal@r{|}hidden@r{|}protected@r{]}
@@ -19272,6 +19272,17 @@ does not overlap with it. However some of the legacy code relies on
 the behavior of older compilers in which temporaries' stack space is
 not reused, the aggressive stack reuse can lead to runtime errors. This
 option is used to control the temporary stack reuse optimization.
+
+@opindex fstack-use-cumulative-args
+@opindex fno-stack-use-cumulative-args
+@item -fstack-use-cumulative-args
+Lay out arguments passed on the stack using information about all the
+arguments of the call, such as whether each one is named.  Some ABIs,
+such as that of AArch64 Darwin, depend on this, and on those targets the
+option is enabled by default; on other targets it has no effect.
+@option{-fno-stack-use-cumulative-args} is intended for debugging the
+compiler; on targets that enable the option by default it produces code
+that does not follow the platform ABI.
 
 @opindex ftrapv
 @opindex fno-trapv

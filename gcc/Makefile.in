@@ -995,7 +995,8 @@ COMMON_TARGET_DEF = common/common-target.def target-hooks-macros.h
 D_TARGET_DEF = d/d-target.def target-hooks-macros.h
 RUST_TARGET_DEF = rust/rust-target.def target-hooks-macros.h
 JIT_TARGET_DEF = jit/jit-target.def target-hooks-macros.h
-TARGET_H = $(TM_H) target.h $(TARGET_DEF) insn-modes.h insn-codes.h
+TARGET_H = $(TM_H) target.h cumulative-args.h $(TARGET_DEF) insn-modes.h \
+	insn-codes.h
 C_TARGET_H = c-family/c-target.h $(C_TARGET_DEF)
 COMMON_TARGET_H = common/common-target.h $(INPUT_H) $(COMMON_TARGET_DEF)
 D_TARGET_H = d/d-target.h $(D_TARGET_DEF)
@@ -1040,7 +1041,7 @@ EMIT_RTL_H = emit-rtl.h
 FLAGS_H = flags.h flag-types.h $(OPTIONS_H)
 OPTIONS_H = options.h flag-types.h $(OPTIONS_H_EXTRA)
 FUNCTION_H = function.h $(HASHTAB_H) $(TM_H) hard-reg-set.h \
-	$(VEC_H) $(INPUT_H)
+	$(VEC_H) $(INPUT_H) cumulative-args.h
 BACKEND_H = backend.h $(TM_H) $(FUNCTION_H) $(BITMAP_H) sbitmap.h \
 	$(BASIC_BLOCK_H) cfg.h
 EXPR_H = expr.h insn-config.h $(FUNCTION_H) $(RTL_H) $(FLAGS_H) $(TREE_H) \
