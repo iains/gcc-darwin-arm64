@@ -1285,6 +1285,14 @@ aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
 	done
 	TM_MULTILIB_CONFIG=`echo $TM_MULTILIB_CONFIG | sed 's/^,//'`
 	;;
+aarch64-*-darwin*)
+	tmake_file="${tmake_file} aarch64/t-aarch64"
+	extra_options="${extra_options} ${cpu_type}/darwin.opt"
+	tm_defines="${tm_defines} TARGET_DEFAULT_ASYNC_UNWIND_TABLES=1"
+	tm_defines="${tm_defines} DISABLE_AARCH64_AS_CRC_BUGFIX=1"
+	# Choose a default CPU version that will work for all current releases.
+	with_cpu=${with_cpu:-apple-m1}
+	;;
 aarch64*-*-freebsd*)
 	tm_file="${tm_file} elfos.h ${fbsd_tm_file}"
 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-errata.h aarch64/aarch64-freebsd.h"
