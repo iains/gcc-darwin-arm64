@@ -1326,6 +1326,13 @@ typedef struct
 				   aapcs_reg == NULL_RTX.  */
   int aapcs_stack_size;		/* The total size (in words, per 8 byte) of the
 				   stack arg area so far.  */
+
+  /* darwinpcs: named arguments passed on the stack are packed at their
+     natural alignment, except for the kinds that start a new 8-byte slot.
+     aarch64_layout_arg records the boundary and padding it chose for the
+     current argument here.  */
+  unsigned darwinpcs_arg_boundary; /* The computed argument boundary.  */
+  unsigned darwinpcs_arg_padding; /* The computed argument padding.  */
   bool silent_p;		/* True if we should act silently, rather than
 				   raise an error for invalid calls.  */
 
