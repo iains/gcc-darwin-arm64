@@ -1226,13 +1226,22 @@ case ${target} in
   ;;
 esac
 
-# Figure out if we need to enable heap trampolines by default
+# Figure out if we need to enable heap trampolines
+# and variadic functions handling.
 case ${target} in
+aarch64*-*-darwin2*)
+  # This applies to arm64 Darwin variadic functions.
+  tm_defines="$tm_defines STACK_USE_CUMULATIVE_ARGS_INIT=1"
+  # Executable stack is forbidden.
+  tm_defines="$tm_defines HEAP_TRAMPOLINES_INIT=1"
+  ;;
 *-*-darwin2*)
+  tm_defines="$tm_defines STACK_USE_CUMULATIVE_ARGS_INIT=0"
   # Currently, we do this for macOS 11 and above.
   tm_defines="$tm_defines HEAP_TRAMPOLINES_INIT=1"
   ;;
 *)
+  tm_defines="$tm_defines STACK_USE_CUMULATIVE_ARGS_INIT=0"
   tm_defines="$tm_defines HEAP_TRAMPOLINES_INIT=0"
   ;;
 esac

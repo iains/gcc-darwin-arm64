@@ -1334,6 +1334,9 @@ typedef struct
 				   darwinpcs.  */
   unsigned darwinpcs_arg_boundary; /* The computed argument boundary.  */
   unsigned darwinpcs_arg_padding; /* The computed argument padding.  */
+  unsigned darwinpcs_n_named;	/* Number of named arguments.  */
+  unsigned darwinpcs_n_args_processed; /* Processed so far.  */
+  bool named_p;			/* Is this arg named? */
   bool silent_p;		/* True if we should act silently, rather than
 				   raise an error for invalid calls.  */
 
